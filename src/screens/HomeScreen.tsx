@@ -9,7 +9,6 @@ import {
 } from 'react-native';
 import {
   BarChart2,
-  Bell,
   ChevronRight,
   ClipboardList,
   Clock,
@@ -23,6 +22,7 @@ import {
 } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 import { CircularProgress } from '../components/CircularProgress';
+import { TopBar } from '../components/TopBar';
 
 interface HomeScreenProps {
   onNavigatePerjalanan: () => void;
@@ -36,237 +36,224 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onNavigateNotifications,
 }) => {
   return (
-    <ScrollView
-      style={styles.container}
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={styles.scrollContent}
-    >
-      {/* 1. TOP HEADER / APP BAR */}
-      <View style={styles.topBar}>
-        <View style={styles.logoRow}>
-          <Image
-            source={require('../../assets/Fleetra Blue Ribbon Logo.png')}
-            style={styles.logoImage}
-            resizeMode="contain"
-          />
-        </View>
+    <View style={styles.container}>
+      {/* 1. MODULAR TOP BAR (FIXED, NOT CRAMPED) */}
+      <TopBar
+        variant="logo"
+        showNotificationBell
+        hasUnreadNotifications
+        onPressNotifications={onNavigateNotifications}
+      />
 
-        <TouchableOpacity
-          style={styles.bellButton}
-          activeOpacity={0.75}
-          onPress={onNavigateNotifications}
-          accessibilityLabel="Notifikasi"
-        >
-          <Bell size={20} color={colors.text} strokeWidth={2} />
-          <View style={styles.badgeDot} />
-        </TouchableOpacity>
-      </View>
-
-      {/* 2. DRIVER PROFILE HERO CARD (CLEAN CODE-DEFINED, NO ASSET BACKGROUND) */}
-      <View style={styles.heroCard}>
-        <View style={styles.heroLeft}>
-          <View style={styles.avatarWrapper}>
-            <Image
-              source={require('../../assets/driver-avatar.png')}
-              style={styles.avatarImage}
-            />
-          </View>
-          <View style={styles.driverInfo}>
-            <Text style={styles.greetingText}>Selamat bertugas,</Text>
-            <Text style={styles.driverName}>Budi Santoso</Text>
-            <View style={styles.vehicleRow}>
-              <Truck size={12} color={colors.textSecondary} strokeWidth={2} />
-              <Text style={styles.vehicleText}>Gran Max Blind Van • B 9821 KCE</Text>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* 2. DRIVER PROFILE HERO CARD */}
+        <View style={styles.heroCard}>
+          <View style={styles.heroLeft}>
+            <View style={styles.avatarWrapper}>
+              <Image
+                source={require('../../assets/driver-avatar.png')}
+                style={styles.avatarImage}
+              />
+            </View>
+            <View style={styles.driverInfo}>
+              <Text style={styles.greetingText}>Selamat bertugas,</Text>
+              <Text style={styles.driverName}>Budi Santoso</Text>
+              <View style={styles.vehicleRow}>
+                <Truck size={12} color={colors.textSecondary} strokeWidth={2} />
+                <Text style={styles.vehicleText}>Gran Max Blind Van • B 9821 KCE</Text>
+              </View>
             </View>
           </View>
-        </View>
 
-        <View style={styles.heroStatusBadge}>
-          <View style={styles.liveDot} />
-          <Text style={styles.heroStatusText}>Aktif</Text>
-        </View>
-      </View>
-
-      {/* 3. CARD: TUGAS HARI INI */}
-      <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <View style={styles.cardHeaderLeft}>
-            <View style={styles.iconBoxBlue}>
-              <ClipboardList size={16} color={colors.white} strokeWidth={2.2} />
-            </View>
-            <Text style={styles.cardTitle}>Tugas Hari Ini</Text>
+          <View style={styles.heroStatusBadge}>
+            <View style={styles.liveDot} />
+            <Text style={styles.heroStatusText}>Aktif</Text>
           </View>
+        </View>
+
+        {/* 3. CARD: TUGAS HARI INI */}
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <View style={styles.cardHeaderLeft}>
+              <View style={styles.iconBoxBlue}>
+                <ClipboardList size={16} color={colors.white} strokeWidth={2.2} />
+              </View>
+              <Text style={styles.cardTitle}>Tugas Hari Ini</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.cardHeaderRight}
+              onPress={onNavigatePerjalanan}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.activeTaskLink}>1 Penugasan Aktif</Text>
+              <ChevronRight size={14} color={colors.primary} strokeWidth={2.5} />
+            </TouchableOpacity>
+          </View>
+
+          {/* Inner Task Details Box */}
+          <View style={styles.innerTaskBox}>
+            <Text style={styles.tripCode}>#TRIP-2026-089</Text>
+            <Text style={styles.tripRoute}>Gudang Cimahi → 4 Titik Bandung Kota</Text>
+
+            <View style={styles.divider} />
+
+            <View style={styles.metricsRow}>
+              {/* Metric 1 */}
+              <View style={styles.metricItem}>
+                <View style={styles.metricIconRow}>
+                  <Clock size={13} color={colors.primary} strokeWidth={2.2} />
+                  <Text style={styles.metricValue}>08.00 WIB</Text>
+                </View>
+                <Text style={styles.metricLabel}>Waktu Mulai</Text>
+              </View>
+
+              {/* Metric 2 */}
+              <View style={styles.metricItem}>
+                <View style={styles.metricIconRow}>
+                  <MapPin size={13} color={colors.primary} strokeWidth={2.2} />
+                  <Text style={styles.metricValue}>4 Stop</Text>
+                </View>
+                <Text style={styles.metricLabel}>Tujuan</Text>
+              </View>
+
+              {/* Metric 3 */}
+              <View style={styles.metricItem}>
+                <View style={styles.metricIconRow}>
+                  <BarChart2 size={13} color={colors.primary} strokeWidth={2.2} />
+                  <Text style={styles.metricValue}>± 1j 15m</Text>
+                </View>
+                <Text style={styles.metricLabel}>Estimasi</Text>
+              </View>
+            </View>
+          </View>
+
+          {/* Action Button: Mulai Perjalanan */}
           <TouchableOpacity
-            style={styles.cardHeaderRight}
+            style={styles.primaryActionButton}
             onPress={onNavigatePerjalanan}
-            activeOpacity={0.7}
+            activeOpacity={0.85}
           >
-            <Text style={styles.activeTaskLink}>1 Penugasan Aktif</Text>
-            <ChevronRight size={14} color={colors.primary} strokeWidth={2.5} />
+            <Play size={14} color={colors.white} fill={colors.white} style={{ marginRight: 8 }} />
+            <Text style={styles.primaryActionText}>Mulai Perjalanan</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Inner Task Details Box */}
-        <View style={styles.innerTaskBox}>
-          <Text style={styles.tripCode}>#TRIP-2026-089</Text>
-          <Text style={styles.tripRoute}>Gudang Cimahi → 4 Titik Bandung Kota</Text>
-
-          <View style={styles.divider} />
-
-          <View style={styles.metricsRow}>
-            {/* Metric 1 */}
-            <View style={styles.metricItem}>
-              <View style={styles.metricIconRow}>
-                <Clock size={13} color={colors.primary} strokeWidth={2.2} />
-                <Text style={styles.metricValue}>08.00 WIB</Text>
-              </View>
-              <Text style={styles.metricLabel}>Waktu Mulai</Text>
+        {/* 4. CARD: STATUS ARMADA */}
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <View style={styles.cardHeaderLeft}>
+              <Truck size={17} color={colors.primary} strokeWidth={2.2} />
+              <Text style={[styles.cardTitle, { marginLeft: 8 }]}>Status Armada</Text>
             </View>
 
-            {/* Metric 2 */}
-            <View style={styles.metricItem}>
-              <View style={styles.metricIconRow}>
-                <MapPin size={13} color={colors.primary} strokeWidth={2.2} />
-                <Text style={styles.metricValue}>4 Stop</Text>
+            <View style={styles.statusPillNeutral}>
+              <View style={styles.statusDotGreen} />
+              <Text style={styles.statusPillNeutralText}>Siap Digunakan</Text>
+            </View>
+          </View>
+
+          <View style={styles.armadaRow}>
+            {/* Kolom 1: Bahan Bakar */}
+            <View style={styles.armadaCol}>
+              <View style={styles.iconCircleLightBlue}>
+                <Fuel size={18} color={colors.primary} strokeWidth={2.2} />
               </View>
-              <Text style={styles.metricLabel}>Tujuan</Text>
+              <View style={styles.armadaColText}>
+                <Text style={styles.armadaLabel}>Bahan Bakar</Text>
+                <Text style={styles.armadaValue}>74%</Text>
+                <View style={styles.progressBarBg}>
+                  <View style={[styles.progressBarFill, { width: '74%' }]} />
+                </View>
+              </View>
             </View>
 
-            {/* Metric 3 */}
-            <View style={styles.metricItem}>
-              <View style={styles.metricIconRow}>
-                <BarChart2 size={13} color={colors.primary} strokeWidth={2.2} />
-                <Text style={styles.metricValue}>± 1j 15m</Text>
+            {/* Kolom 2: Odometer Hari Ini */}
+            <View style={styles.armadaCol}>
+              <View style={styles.iconCircleLightBlue}>
+                <Milestone size={18} color={colors.primary} strokeWidth={2.2} />
               </View>
-              <Text style={styles.metricLabel}>Estimasi</Text>
+              <View style={styles.armadaColText}>
+                <Text style={styles.armadaLabel}>Odometer Hari Ini</Text>
+                <Text style={styles.armadaValue}>128 km</Text>
+                <Text style={styles.armadaSubLabel}>Ritase Ke-2</Text>
+              </View>
             </View>
           </View>
         </View>
 
-        {/* Action Button: Mulai Perjalanan */}
-        <TouchableOpacity
-          style={styles.primaryActionButton}
-          onPress={onNavigatePerjalanan}
-          activeOpacity={0.85}
-        >
-          <Play size={14} color={colors.white} fill={colors.white} style={{ marginRight: 8 }} />
-          <Text style={styles.primaryActionText}>Mulai Perjalanan</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* 4. CARD: STATUS ARMADA (ANTI-AI-SLOP: NO PUFFY GREEN BACKGROUND) */}
-      <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <View style={styles.cardHeaderLeft}>
-            <Truck size={17} color={colors.primary} strokeWidth={2.2} />
-            <Text style={[styles.cardTitle, { marginLeft: 8 }]}>Status Armada</Text>
-          </View>
-
-          {/* Clean enterprise status indicator - subtle dot, neutral surface */}
-          <View style={styles.statusPillNeutral}>
-            <View style={styles.statusDotGreen} />
-            <Text style={styles.statusPillNeutralText}>Siap Digunakan</Text>
-          </View>
-        </View>
-
-        <View style={styles.armadaRow}>
-          {/* Kolom 1: Bahan Bakar */}
-          <View style={styles.armadaCol}>
-            <View style={styles.iconCircleLightBlue}>
-              <Fuel size={18} color={colors.primary} strokeWidth={2.2} />
+        {/* 5. DUA KARTU METRIK: SAFETY SCORE & PROGRESS RTO */}
+        <View style={styles.twinCardsRow}>
+          {/* Kartu Kiri: Safety Score */}
+          <TouchableOpacity
+            style={styles.halfCard}
+            onPress={onNavigateProfil}
+            activeOpacity={0.85}
+          >
+            <View style={styles.halfCardHeader}>
+              <View style={styles.halfCardHeaderLeft}>
+                <ShieldCheck size={15} color={colors.primary} strokeWidth={2.2} />
+                <Text style={styles.halfCardTitle}>Safety Score</Text>
+              </View>
+              <ChevronRight size={14} color={colors.textDisabled} strokeWidth={2} />
             </View>
-            <View style={styles.armadaColText}>
-              <Text style={styles.armadaLabel}>Bahan Bakar</Text>
-              <Text style={styles.armadaValue}>74%</Text>
-              <View style={styles.progressBarBg}>
-                <View style={[styles.progressBarFill, { width: '74%' }]} />
+
+            <View style={styles.halfCardBody}>
+              <CircularProgress
+                size={54}
+                strokeWidth={4.5}
+                percentage={94}
+                color={colors.primary}
+                bgColor="#E2E8F0"
+              >
+                <Text style={styles.scoreTextMain}>94</Text>
+                <Text style={styles.scoreTextSub}>/100</Text>
+              </CircularProgress>
+
+              <View style={styles.scoreMetaContainer}>
+                <Text style={styles.scoreHeadlineText}>Sangat Baik</Text>
+                <Text style={styles.scoreSubText}>30 hari terakhir</Text>
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
 
-          {/* Kolom 2: Odometer Hari Ini */}
-          <View style={styles.armadaCol}>
-            <View style={styles.iconCircleLightBlue}>
-              <Milestone size={18} color={colors.primary} strokeWidth={2.2} />
+          {/* Kartu Kanan: Progress RTO */}
+          <TouchableOpacity
+            style={styles.halfCard}
+            onPress={onNavigateProfil}
+            activeOpacity={0.85}
+          >
+            <View style={styles.halfCardHeader}>
+              <View style={styles.halfCardHeaderLeft}>
+                <TrendingUp size={15} color={colors.primary} strokeWidth={2.2} />
+                <Text style={styles.halfCardTitle}>Progress RTO</Text>
+              </View>
+              <ChevronRight size={14} color={colors.textDisabled} strokeWidth={2} />
             </View>
-            <View style={styles.armadaColText}>
-              <Text style={styles.armadaLabel}>Odometer Hari Ini</Text>
-              <Text style={styles.armadaValue}>128 km</Text>
-              <Text style={styles.armadaSubLabel}>Ritase Ke-2</Text>
+
+            <View style={styles.halfCardBody}>
+              <CircularProgress
+                size={54}
+                strokeWidth={4.5}
+                percentage={64.8}
+                color={colors.primary}
+                bgColor="#E2E8F0"
+              >
+                <Text style={styles.rtoPctText}>64,8%</Text>
+              </CircularProgress>
+
+              <View style={styles.rtoMetaContainer}>
+                <Text style={styles.rtoHeadlineText}>Bulan ke-23</Text>
+                <Text style={styles.rtoSubText}>dari 36 bulan</Text>
+              </View>
             </View>
-          </View>
+          </TouchableOpacity>
         </View>
-      </View>
-
-      {/* 5. DUA KARTU METRIK: SAFETY SCORE & PROGRESS RTO (ANTI-AI-SLOP) */}
-      <View style={styles.twinCardsRow}>
-        {/* Kartu Kiri: Safety Score */}
-        <TouchableOpacity
-          style={styles.halfCard}
-          onPress={onNavigateProfil}
-          activeOpacity={0.85}
-        >
-          <View style={styles.halfCardHeader}>
-            <View style={styles.halfCardHeaderLeft}>
-              <ShieldCheck size={15} color={colors.primary} strokeWidth={2.2} />
-              <Text style={styles.halfCardTitle}>Safety Score</Text>
-            </View>
-            <ChevronRight size={14} color={colors.textDisabled} strokeWidth={2} />
-          </View>
-
-          <View style={styles.halfCardBody}>
-            <CircularProgress
-              size={54}
-              strokeWidth={4.5}
-              percentage={94}
-              color={colors.primary}
-              bgColor="#E2E8F0"
-            >
-              <Text style={styles.scoreTextMain}>94</Text>
-              <Text style={styles.scoreTextSub}>/100</Text>
-            </CircularProgress>
-
-            {/* Professional typography - NO pastel green bubble! */}
-            <View style={styles.scoreMetaContainer}>
-              <Text style={styles.scoreHeadlineText}>Sangat Baik</Text>
-              <Text style={styles.scoreSubText}>30 hari terakhir</Text>
-            </View>
-          </View>
-        </TouchableOpacity>
-
-        {/* Kartu Kanan: Progress RTO */}
-        <TouchableOpacity
-          style={styles.halfCard}
-          onPress={onNavigateProfil}
-          activeOpacity={0.85}
-        >
-          <View style={styles.halfCardHeader}>
-            <View style={styles.halfCardHeaderLeft}>
-              <TrendingUp size={15} color={colors.primary} strokeWidth={2.2} />
-              <Text style={styles.halfCardTitle}>Progress RTO</Text>
-            </View>
-            <ChevronRight size={14} color={colors.textDisabled} strokeWidth={2} />
-          </View>
-
-          <View style={styles.halfCardBody}>
-            <CircularProgress
-              size={54}
-              strokeWidth={4.5}
-              percentage={64.8}
-              color={colors.primary}
-              bgColor="#E2E8F0"
-            >
-              <Text style={styles.rtoPctText}>64,8%</Text>
-            </CircularProgress>
-
-            <View style={styles.rtoMetaContainer}>
-              <Text style={styles.rtoHeadlineText}>Bulan ke-23</Text>
-              <Text style={styles.rtoSubText}>dari 36 bulan</Text>
-            </View>
-          </View>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -275,48 +262,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.bg,
   },
+  scrollView: {
+    flex: 1,
+  },
   scrollContent: {
     paddingBottom: 110,
-  },
-
-  /* TOP APP BAR */
-  topBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 18,
-    paddingTop: 8,
-    paddingBottom: 10,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  logoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  logoImage: {
-    width: 118,
-    height: 30,
-  },
-  bellButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: colors.surface2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  badgeDot: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: colors.dangerDark,
   },
 
   /* DRIVER HERO CARD */
@@ -520,7 +470,7 @@ const styles = StyleSheet.create({
     color: colors.white,
   },
 
-  /* STATUS ARMADA (CLEAN ENTERPRISE) */
+  /* STATUS ARMADA */
   statusPillNeutral: {
     flexDirection: 'row',
     alignItems: 'center',

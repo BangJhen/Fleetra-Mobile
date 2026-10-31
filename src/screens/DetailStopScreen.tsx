@@ -8,16 +8,15 @@ import {
   View,
 } from 'react-native';
 import {
-  ArrowLeft,
   Clock,
   Compass,
   Info,
-  MapPin,
   MessageSquare,
   Navigation,
   Phone,
 } from 'lucide-react-native';
 import { colors } from '../theme/colors';
+import { TopBar } from '../components/TopBar';
 
 interface DetailStopScreenProps {
   onBack: () => void;
@@ -32,26 +31,16 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = ({
 }) => {
   return (
     <View style={styles.container}>
-      {/* 1. TOP HEADER / APP BAR */}
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={onBack}
-          activeOpacity={0.7}
-          accessibilityLabel="Kembali"
-        >
-          <ArrowLeft size={18} color={colors.text} strokeWidth={2.2} />
-        </TouchableOpacity>
-
-        <View style={styles.headerTitleCenter}>
-          <Text style={styles.headerTitle}>Detail Stop</Text>
-          <Text style={styles.headerSubtitle}>Trip #TRIP-2026-089</Text>
-        </View>
-
-        <View style={styles.headerRightPlaceholder} />
-      </View>
+      {/* 1. MODULAR TOP BAR (FIXED, SPACIOUS) */}
+      <TopBar
+        variant="back"
+        title="Detail Stop"
+        subtitle="Trip #TRIP-2026-089"
+        onBack={onBack}
+      />
 
       <ScrollView
+        style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
@@ -214,47 +203,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.bg,
   },
+  scrollView: {
+    flex: 1,
+  },
   scrollContent: {
     paddingBottom: 40,
-  },
-
-  /* HEADER */
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 10,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  backButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.surface2,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  headerTitleCenter: {
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  headerSubtitle: {
-    fontSize: 11,
-    color: colors.textMuted,
-    marginTop: 1,
-  },
-  headerRightPlaceholder: {
-    width: 38,
   },
 
   /* TOP DISTANCE & ETA BANNER */

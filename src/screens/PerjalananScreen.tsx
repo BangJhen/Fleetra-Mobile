@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   Alert,
-  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -16,9 +15,9 @@ import {
   MapPin,
   Milestone,
   Play,
-  Truck,
 } from 'lucide-react-native';
 import { colors } from '../theme/colors';
+import { TopBar } from '../components/TopBar';
 
 interface StopItem {
   id: number;
@@ -84,264 +83,256 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = ({
   const progressPercent = (completedCount / 4) * 100;
 
   return (
-    <ScrollView
-      style={styles.container}
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={styles.scrollContent}
-    >
-      {/* 1. TOP HEADER / APP BAR */}
-      <View style={styles.topBar}>
-        <View style={styles.logoRow}>
-          <Image
-            source={require('../../assets/Fleetra Blue Ribbon Logo.png')}
-            style={styles.logoImage}
-            resizeMode="contain"
-          />
-        </View>
-      </View>
+    <View style={styles.container}>
+      {/* 1. MODULAR TOP BAR (FIXED, CONSISTENT HEIGHT) */}
+      <TopBar variant="logo" />
 
-      {/* 2. PAGE TITLE & SUBTITLE */}
-      <View style={styles.pageHeader}>
-        <Text style={styles.pageTitle}>Perjalanan</Text>
-        <Text style={styles.pageSubtitle}>
-          Kelola dan jalankan penugasan harian Anda
-        </Text>
-      </View>
-
-      {/* 3. SEGMENTED TABS (TUGAS AKTIF / RIWAYAT) */}
-      <View style={styles.segmentContainer}>
-        <TouchableOpacity
-          style={[
-            styles.segmentButton,
-            activeSegmentTab === 'aktif' && styles.segmentButtonActive,
-          ]}
-          onPress={() => setActiveSegmentTab('aktif')}
-          activeOpacity={0.8}
-        >
-          <Text
-            style={[
-              styles.segmentText,
-              activeSegmentTab === 'aktif' && styles.segmentTextActive,
-            ]}
-          >
-            Tugas Aktif
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* 2. PAGE TITLE & SUBTITLE */}
+        <View style={styles.pageHeader}>
+          <Text style={styles.pageTitle}>Perjalanan</Text>
+          <Text style={styles.pageSubtitle}>
+            Kelola dan jalankan penugasan harian Anda
           </Text>
-        </TouchableOpacity>
+        </View>
 
-        <TouchableOpacity
-          style={[
-            styles.segmentButton,
-            activeSegmentTab === 'riwayat' && styles.segmentButtonActive,
-          ]}
-          onPress={() => {
-            setActiveSegmentTab('riwayat');
-            Alert.alert(
-              'Riwayat Perjalanan',
-              'Menampilkan 48 penugasan selesai bulan ini dengan total 1.840 km.'
-            );
-          }}
-          activeOpacity={0.8}
-        >
-          <Text
+        {/* 3. SEGMENTED TABS (TUGAS AKTIF / RIWAYAT) */}
+        <View style={styles.segmentContainer}>
+          <TouchableOpacity
             style={[
-              styles.segmentText,
-              activeSegmentTab === 'riwayat' && styles.segmentTextActive,
+              styles.segmentButton,
+              activeSegmentTab === 'aktif' && styles.segmentButtonActive,
             ]}
+            onPress={() => setActiveSegmentTab('aktif')}
+            activeOpacity={0.8}
           >
-            Riwayat
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* 4. ACTIVE TRIP CARD */}
-      <View style={styles.tripCard}>
-        {/* Card Header */}
-        <View style={styles.tripHeaderRow}>
-          <Text style={styles.tripCode}>#TRIP-2026-089</Text>
-
-          {/* Clean enterprise status badge - no pastel blob */}
-          <View style={styles.statusPillNeutral}>
-            <View style={styles.statusDotBlue} />
-            <Text style={styles.statusPillNeutralText}>Dalam Perjalanan</Text>
-          </View>
-        </View>
-
-        <Text style={styles.tripRoute}>Gudang Cimahi → 4 Titik Bandung Kota</Text>
-
-        {/* 3-Column Metrics */}
-        <View style={styles.metricsBox}>
-          <View style={styles.metricCol}>
-            <View style={styles.metricIconRow}>
-              <Clock size={13} color={colors.primary} strokeWidth={2.2} />
-              <Text style={styles.metricValue}>08.00 WIB</Text>
-            </View>
-            <Text style={styles.metricLabel}>Waktu Mulai</Text>
-          </View>
-
-          <View style={styles.metricDivider} />
-
-          <View style={styles.metricCol}>
-            <View style={styles.metricIconRow}>
-              <MapPin size={13} color={colors.primary} strokeWidth={2.2} />
-              <Text style={styles.metricValue}>4 Stop</Text>
-            </View>
-            <Text style={styles.metricLabel}>Tujuan</Text>
-          </View>
-
-          <View style={styles.metricDivider} />
-
-          <View style={styles.metricCol}>
-            <View style={styles.metricIconRow}>
-              <Milestone size={13} color={colors.primary} strokeWidth={2.2} />
-              <Text style={styles.metricValue}>28,4 km</Text>
-            </View>
-            <Text style={styles.metricLabel}>Total Jarak</Text>
-          </View>
-        </View>
-
-        {/* Horizontal Progress Bar */}
-        <View style={styles.progressContainer}>
-          <View style={styles.progressHeaderRow}>
-            <Text style={styles.progressLabel}>
-              {completedCount} / 4 stop selesai
-            </Text>
-            <Text style={styles.progressPctText}>{progressPercent}%</Text>
-          </View>
-          <View style={styles.progressBarBg}>
-            <View
+            <Text
               style={[
-                styles.progressBarFill,
-                { width: `${Math.max(progressPercent, 12)}%` },
+                styles.segmentText,
+                activeSegmentTab === 'aktif' && styles.segmentTextActive,
               ]}
-            />
-          </View>
-        </View>
-
-        {/* Primary Action Button */}
-        <TouchableOpacity
-          style={styles.actionButton}
-          onPress={() => onOpenDetailStop(2)}
-          activeOpacity={0.85}
-        >
-          <Play size={14} color={colors.white} fill={colors.white} style={{ marginRight: 8 }} />
-          <Text style={styles.actionButtonText}>Lanjutkan Perjalanan</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* 5. SECTION: DETAIL RUTE */}
-      <View style={styles.sectionHeaderRow}>
-        <Text style={styles.sectionTitle}>Detail Rute</Text>
-        <TouchableOpacity
-          style={styles.sectionLinkRow}
-          onPress={() =>
-            Alert.alert(
-              'Peta Navigasi',
-              'Memuat koridor rute OSRM dari Cimahi menuju 4 titik pengantaran Bandung Kota.'
-            )
-          }
-          activeOpacity={0.7}
-        >
-          <Text style={styles.sectionLinkText}>Lihat Rute di Peta</Text>
-          <ChevronRight size={13} color={colors.primary} strokeWidth={2.2} />
-        </TouchableOpacity>
-      </View>
-
-      {/* 6. TIMELINE STOP LIST (ANTI-AI-SLOP: NO PASTEL GREEN BADGE) */}
-      <View style={styles.timelineCard}>
-        {stops.map((stop, index) => {
-          const isLast = index === stops.length - 1;
-          const isDone = stop.status === 'selesai';
-          const isCurrent = stop.status === 'tujuan_saat_ini';
-          const isNext = stop.status === 'berikutnya';
-
-          return (
-            <TouchableOpacity
-              key={stop.id}
-              style={[
-                styles.stopRow,
-                isLast && styles.stopRowLast,
-                isCurrent && styles.stopRowCurrent,
-              ]}
-              onPress={() => onOpenDetailStop(stop.id)}
-              activeOpacity={0.8}
             >
-              {/* Left Timeline Indicator */}
-              <View style={styles.timelineIndicatorCol}>
-                {isDone ? (
-                  <View style={styles.timelineIconDone}>
-                    <CheckCircle2 size={18} color={colors.primary} strokeWidth={2.5} />
-                  </View>
-                ) : isCurrent ? (
-                  <View style={styles.timelineIconCurrent}>
-                    <View style={styles.timelineDotBlue} />
-                  </View>
-                ) : (
-                  <View style={styles.timelineIconPending}>
-                    <Circle size={10} color={colors.textDisabled} strokeWidth={2} />
-                  </View>
-                )}
+              Tugas Aktif
+            </Text>
+          </TouchableOpacity>
 
-                {!isLast && (
-                  <View
-                    style={[
-                      styles.timelineLine,
-                      isDone ? styles.timelineLineDone : styles.timelineLinePending,
-                    ]}
-                  />
-                )}
+          <TouchableOpacity
+            style={[
+              styles.segmentButton,
+              activeSegmentTab === 'riwayat' && styles.segmentButtonActive,
+            ]}
+            onPress={() => {
+              setActiveSegmentTab('riwayat');
+              Alert.alert(
+                'Riwayat Perjalanan',
+                'Menampilkan 48 penugasan selesai bulan ini dengan total 1.840 km.'
+              );
+            }}
+            activeOpacity={0.8}
+          >
+            <Text
+              style={[
+                styles.segmentText,
+                activeSegmentTab === 'riwayat' && styles.segmentTextActive,
+              ]}
+            >
+              Riwayat
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* 4. ACTIVE TRIP CARD */}
+        <View style={styles.tripCard}>
+          {/* Card Header */}
+          <View style={styles.tripHeaderRow}>
+            <Text style={styles.tripCode}>#TRIP-2026-089</Text>
+
+            <View style={styles.statusPillNeutral}>
+              <View style={styles.statusDotBlue} />
+              <Text style={styles.statusPillNeutralText}>Dalam Perjalanan</Text>
+            </View>
+          </View>
+
+          <Text style={styles.tripRoute}>Gudang Cimahi → 4 Titik Bandung Kota</Text>
+
+          {/* 3-Column Metrics */}
+          <View style={styles.metricsBox}>
+            <View style={styles.metricCol}>
+              <View style={styles.metricIconRow}>
+                <Clock size={13} color={colors.primary} strokeWidth={2.2} />
+                <Text style={styles.metricValue}>08.00 WIB</Text>
               </View>
+              <Text style={styles.metricLabel}>Waktu Mulai</Text>
+            </View>
 
-              {/* Stop Info */}
-              <View style={styles.stopInfoCol}>
-                <View style={styles.stopInfoHeaderRow}>
-                  <Text
-                    style={[
-                      styles.stopName,
-                      isCurrent && styles.stopNameCurrent,
-                    ]}
-                    numberOfLines={1}
-                  >
-                    {stop.name}
-                  </Text>
+            <View style={styles.metricDivider} />
 
-                  {/* Clean Enterprise Badges - NO Pastel Green Slop! */}
-                  {isDone && (
-                    <View style={styles.badgeDoneNeutral}>
-                      <Text style={styles.badgeDoneNeutralText}>Selesai</Text>
-                      {stop.time && (
-                        <Text style={styles.badgeDoneNeutralTime}> • {stop.time}</Text>
-                      )}
+            <View style={styles.metricCol}>
+              <View style={styles.metricIconRow}>
+                <MapPin size={13} color={colors.primary} strokeWidth={2.2} />
+                <Text style={styles.metricValue}>4 Stop</Text>
+              </View>
+              <Text style={styles.metricLabel}>Tujuan</Text>
+            </View>
+
+            <View style={styles.metricDivider} />
+
+            <View style={styles.metricCol}>
+              <View style={styles.metricIconRow}>
+                <Milestone size={13} color={colors.primary} strokeWidth={2.2} />
+                <Text style={styles.metricValue}>28,4 km</Text>
+              </View>
+              <Text style={styles.metricLabel}>Total Jarak</Text>
+            </View>
+          </View>
+
+          {/* Horizontal Progress Bar */}
+          <View style={styles.progressContainer}>
+            <View style={styles.progressHeaderRow}>
+              <Text style={styles.progressLabel}>
+                {completedCount} / 4 stop selesai
+              </Text>
+              <Text style={styles.progressPctText}>{progressPercent}%</Text>
+            </View>
+            <View style={styles.progressBarBg}>
+              <View
+                style={[
+                  styles.progressBarFill,
+                  { width: `${Math.max(progressPercent, 12)}%` },
+                ]}
+              />
+            </View>
+          </View>
+
+          {/* Primary Action Button */}
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => onOpenDetailStop(2)}
+            activeOpacity={0.85}
+          >
+            <Play size={14} color={colors.white} fill={colors.white} style={{ marginRight: 8 }} />
+            <Text style={styles.actionButtonText}>Lanjutkan Perjalanan</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* 5. SECTION: DETAIL RUTE */}
+        <View style={styles.sectionHeaderRow}>
+          <Text style={styles.sectionTitle}>Detail Rute</Text>
+          <TouchableOpacity
+            style={styles.sectionLinkRow}
+            onPress={() =>
+              Alert.alert(
+                'Peta Navigasi',
+                'Memuat koridor rute OSRM dari Cimahi menuju 4 titik pengantaran Bandung Kota.'
+              )
+            }
+            activeOpacity={0.7}
+          >
+            <Text style={styles.sectionLinkText}>Lihat Rute di Peta</Text>
+            <ChevronRight size={13} color={colors.primary} strokeWidth={2.2} />
+          </TouchableOpacity>
+        </View>
+
+        {/* 6. TIMELINE STOP LIST */}
+        <View style={styles.timelineCard}>
+          {stops.map((stop, index) => {
+            const isLast = index === stops.length - 1;
+            const isDone = stop.status === 'selesai';
+            const isCurrent = stop.status === 'tujuan_saat_ini';
+            const isNext = stop.status === 'berikutnya';
+
+            return (
+              <TouchableOpacity
+                key={stop.id}
+                style={[
+                  styles.stopRow,
+                  isLast && styles.stopRowLast,
+                  isCurrent && styles.stopRowCurrent,
+                ]}
+                onPress={() => onOpenDetailStop(stop.id)}
+                activeOpacity={0.8}
+              >
+                {/* Left Timeline Indicator */}
+                <View style={styles.timelineIndicatorCol}>
+                  {isDone ? (
+                    <View style={styles.timelineIconDone}>
+                      <CheckCircle2 size={18} color={colors.primary} strokeWidth={2.5} />
+                    </View>
+                  ) : isCurrent ? (
+                    <View style={styles.timelineIconCurrent}>
+                      <View style={styles.timelineDotBlue} />
+                    </View>
+                  ) : (
+                    <View style={styles.timelineIconPending}>
+                      <Circle size={10} color={colors.textDisabled} strokeWidth={2} />
                     </View>
                   )}
 
-                  {isCurrent && (
-                    <View style={styles.badgeCurrent}>
-                      <Text style={styles.badgeCurrentText}>Tujuan Saat Ini</Text>
-                    </View>
-                  )}
-
-                  {isNext && (
-                    <View style={styles.badgeNeutral}>
-                      <Text style={styles.badgeNeutralText}>Berikutnya</Text>
-                    </View>
-                  )}
-
-                  {stop.status === 'menunggu' && (
-                    <View style={styles.badgeNeutral}>
-                      <Text style={styles.badgeNeutralText}>Menunggu</Text>
-                    </View>
+                  {!isLast && (
+                    <View
+                      style={[
+                        styles.timelineLine,
+                        isDone ? styles.timelineLineDone : styles.timelineLinePending,
+                      ]}
+                    />
                   )}
                 </View>
 
-                <Text style={styles.stopAddress} numberOfLines={1}>
-                  {stop.address}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-    </ScrollView>
+                {/* Stop Info */}
+                <View style={styles.stopInfoCol}>
+                  <View style={styles.stopInfoHeaderRow}>
+                    <Text
+                      style={[
+                        styles.stopName,
+                        isCurrent && styles.stopNameCurrent,
+                      ]}
+                      numberOfLines={1}
+                    >
+                      {stop.name}
+                    </Text>
+
+                    {isDone && (
+                      <View style={styles.badgeDoneNeutral}>
+                        <Text style={styles.badgeDoneNeutralText}>Selesai</Text>
+                        {stop.time && (
+                          <Text style={styles.badgeDoneNeutralTime}> • {stop.time}</Text>
+                        )}
+                      </View>
+                    )}
+
+                    {isCurrent && (
+                      <View style={styles.badgeCurrent}>
+                        <Text style={styles.badgeCurrentText}>Tujuan Saat Ini</Text>
+                      </View>
+                    )}
+
+                    {isNext && (
+                      <View style={styles.badgeNeutral}>
+                        <Text style={styles.badgeNeutralText}>Berikutnya</Text>
+                      </View>
+                    )}
+
+                    {stop.status === 'menunggu' && (
+                      <View style={styles.badgeNeutral}>
+                        <Text style={styles.badgeNeutralText}>Menunggu</Text>
+                      </View>
+                    )}
+                  </View>
+
+                  <Text style={styles.stopAddress} numberOfLines={1}>
+                    {stop.address}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -350,26 +341,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.bg,
   },
+  scrollView: {
+    flex: 1,
+  },
   scrollContent: {
     paddingBottom: 110,
-  },
-
-  /* TOP BAR */
-  topBar: {
-    paddingHorizontal: 18,
-    paddingTop: 8,
-    paddingBottom: 10,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  logoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  logoImage: {
-    width: 118,
-    height: 30,
   },
 
   /* PAGE HEADER */
@@ -697,7 +673,7 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
   },
 
-  /* CLEAN ENTERPRISE BADGES */
+  /* BADGES */
   badgeDoneNeutral: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -20,6 +20,7 @@ import {
 } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 import { CircularProgress } from '../components/CircularProgress';
+import { TopBar } from '../components/TopBar';
 
 interface ProfilScreenProps {
   onBackToHome: () => void;
@@ -31,224 +32,211 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = ({
   onNavigatePerjalanan,
 }) => {
   return (
-    <ScrollView
-      style={styles.container}
-      showsVerticalScrollIndicator={false}
-      contentContainerStyle={styles.scrollContent}
-    >
-      {/* 1. TOP HEADER / APP BAR */}
-      <View style={styles.topBar}>
-        <View style={styles.logoRow}>
-          <Image
-            source={require('../../assets/Fleetra Blue Ribbon Logo.png')}
-            style={styles.logoImage}
-            resizeMode="contain"
-          />
+    <View style={styles.container}>
+      {/* 1. MODULAR TOP BAR (FIXED, CONSISTENT HEIGHT) */}
+      <TopBar variant="logo" />
+
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* 2. PAGE TITLE & SUBTITLE */}
+        <View style={styles.pageHeader}>
+          <Text style={styles.pageTitle}>Profil</Text>
+          <Text style={styles.pageSubtitle}>
+            Kelola informasi akun, performa, dan progres kemitraan armada
+          </Text>
         </View>
-      </View>
 
-      {/* 2. PAGE TITLE & SUBTITLE */}
-      <View style={styles.pageHeader}>
-        <Text style={styles.pageTitle}>Profil</Text>
-        <Text style={styles.pageSubtitle}>
-          Kelola informasi akun, performa, dan progres kemitraan armada
-        </Text>
-      </View>
-
-      {/* 3. PROFILE HEADER CARD */}
-      <View style={styles.profileCard}>
-        <View style={styles.profileLeft}>
-          <View style={styles.avatarWrapper}>
-            <Image
-              source={require('../../assets/driver-avatar.png')}
-              style={styles.avatarImage}
-            />
+        {/* 3. PROFILE HEADER CARD */}
+        <View style={styles.profileCard}>
+          <View style={styles.profileLeft}>
+            <View style={styles.avatarWrapper}>
+              <Image
+                source={require('../../assets/driver-avatar.png')}
+                style={styles.avatarImage}
+              />
+            </View>
+            <View style={styles.profileTextGroup}>
+              <Text style={styles.driverName}>Budi Santoso</Text>
+              <Text style={styles.driverRole}>Mitra Pengemudi LCV</Text>
+              <View style={styles.plateRow}>
+                <Truck size={12} color={colors.textSecondary} strokeWidth={2} />
+                <Text style={styles.plateText}>B 9821 KCE</Text>
+              </View>
+            </View>
           </View>
-          <View style={styles.profileTextGroup}>
-            <Text style={styles.driverName}>Budi Santoso</Text>
-            <Text style={styles.driverRole}>Mitra Pengemudi LCV</Text>
-            <View style={styles.plateRow}>
-              <Truck size={12} color={colors.textSecondary} strokeWidth={2} />
-              <Text style={styles.plateText}>B 9821 KCE</Text>
+
+          <TouchableOpacity
+            style={styles.editProfileBtn}
+            onPress={() =>
+              Alert.alert('Edit Profil', 'Fitur pembaruan data diri mitra pengemudi.')
+            }
+            activeOpacity={0.75}
+          >
+            <Text style={styles.editProfileBtnText}>Edit Profil</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* 4. TWIN METRIC CARDS (SAFETY SCORE & KONDISI ARMADA) */}
+        <View style={styles.twinCardsRow}>
+          {/* Left Card: Safety Score */}
+          <View style={styles.twinCard}>
+            <View style={styles.twinCardHeader}>
+              <ShieldCheck size={15} color={colors.primary} strokeWidth={2.2} />
+              <Text style={styles.twinCardTitle}>Safety Score</Text>
+            </View>
+
+            <View style={styles.twinCardBody}>
+              <CircularProgress
+                size={54}
+                strokeWidth={4.5}
+                percentage={94}
+                color={colors.primary}
+                bgColor="#E2E8F0"
+              >
+                <Text style={styles.scoreTextMain}>94</Text>
+                <Text style={styles.scoreTextSub}>/100</Text>
+              </CircularProgress>
+
+              <View style={styles.scoreMetaCol}>
+                <Text style={styles.scoreHeadline}>Sangat Baik</Text>
+                <Text style={styles.scoreSubMeta}>Performa 30 hari</Text>
+                <Text style={styles.scoreSubMeta}>Zero-Incident</Text>
+              </View>
+            </View>
+          </View>
+
+          {/* Right Card: Kondisi Armada */}
+          <View style={styles.twinCard}>
+            <View style={styles.twinCardHeader}>
+              <Truck size={15} color={colors.primary} strokeWidth={2.2} />
+              <Text style={styles.twinCardTitle}>Kondisi Armada</Text>
+            </View>
+
+            <View style={styles.armadaCardBody}>
+              <View style={styles.armadaStatusRow}>
+                <View style={styles.statusDotGreen} />
+                <Text style={styles.armadaStatusText}>Normal (Siap Pakai)</Text>
+              </View>
+              <Text style={styles.armadaModelText}>Gran Max Blind Van</Text>
+              <Text style={styles.armadaOdoText}>128.430 km</Text>
             </View>
           </View>
         </View>
 
-        <TouchableOpacity
-          style={styles.editProfileBtn}
-          onPress={() =>
-            Alert.alert('Edit Profil', 'Fitur pembaruan data diri mitra pengemudi.')
-          }
-          activeOpacity={0.75}
-        >
-          <Text style={styles.editProfileBtnText}>Edit Profil</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* 4. TWIN METRIC CARDS (SAFETY SCORE & KONDISI ARMADA - ANTI-AI-SLOP) */}
-      <View style={styles.twinCardsRow}>
-        {/* Left Card: Safety Score */}
-        <View style={styles.twinCard}>
-          <View style={styles.twinCardHeader}>
-            <ShieldCheck size={15} color={colors.primary} strokeWidth={2.2} />
-            <Text style={styles.twinCardTitle}>Safety Score</Text>
+        {/* 5. PROGRESS RENT-TO-OWN (RTO) CARD */}
+        <View style={styles.rtoCard}>
+          <View style={styles.rtoCardHeader}>
+            <View style={styles.rtoHeaderLeft}>
+              <TrendingUp size={15} color={colors.primary} strokeWidth={2.2} />
+              <Text style={styles.rtoCardTitle}>Progress Rent-To-Own (RTO)</Text>
+            </View>
+            <ChevronRight size={15} color={colors.textDisabled} strokeWidth={2} />
           </View>
 
-          <View style={styles.twinCardBody}>
+          <Text style={styles.rtoTenureSubtitle}>Bulan ke-23 dari 36 bulan tenor</Text>
+
+          <View style={styles.rtoBodyRow}>
+            {/* Circular Donut Progress Ring */}
             <CircularProgress
-              size={54}
-              strokeWidth={4.5}
-              percentage={94}
+              size={72}
+              strokeWidth={5.5}
+              percentage={64.8}
               color={colors.primary}
               bgColor="#E2E8F0"
             >
-              <Text style={styles.scoreTextMain}>94</Text>
-              <Text style={styles.scoreTextSub}>/100</Text>
+              <Text style={styles.rtoLargePct}>64,8%</Text>
             </CircularProgress>
 
-            {/* Clean typography - NO green pill background */}
-            <View style={styles.scoreMetaCol}>
-              <Text style={styles.scoreHeadline}>Sangat Baik</Text>
-              <Text style={styles.scoreSubMeta}>Performa 30 hari</Text>
-              <Text style={styles.scoreSubMeta}>Zero-Incident</Text>
+            {/* Stats Breakdown */}
+            <View style={styles.rtoStatsCol}>
+              <View style={styles.rtoStatItem}>
+                <Text style={styles.rtoStatLabel}>Setoran Terkumpul</Text>
+                <Text style={styles.rtoStatValueBold}>Rp 194.400.000</Text>
+              </View>
+
+              <View style={styles.rtoStatDivider} />
+
+              <View style={styles.rtoStatItem}>
+                <Text style={styles.rtoStatLabel}>Sisa Kewajiban</Text>
+                <Text style={styles.rtoStatValueBold}>Rp 105.600.000</Text>
+              </View>
             </View>
           </View>
         </View>
 
-        {/* Right Card: Kondisi Armada */}
-        <View style={styles.twinCard}>
-          <View style={styles.twinCardHeader}>
-            <Truck size={15} color={colors.primary} strokeWidth={2.2} />
-            <Text style={styles.twinCardTitle}>Kondisi Armada</Text>
-          </View>
-
-          {/* Clean neutral status - NO green pill background */}
-          <View style={styles.armadaCardBody}>
-            <View style={styles.armadaStatusRow}>
-              <View style={styles.statusDotGreen} />
-              <Text style={styles.armadaStatusText}>Normal (Siap Pakai)</Text>
-            </View>
-            <Text style={styles.armadaModelText}>Gran Max Blind Van</Text>
-            <Text style={styles.armadaOdoText}>128.430 km</Text>
-          </View>
-        </View>
-      </View>
-
-      {/* 5. PROGRESS RENT-TO-OWN (RTO) CARD */}
-      <View style={styles.rtoCard}>
-        <View style={styles.rtoCardHeader}>
-          <View style={styles.rtoHeaderLeft}>
-            <TrendingUp size={15} color={colors.primary} strokeWidth={2.2} />
-            <Text style={styles.rtoCardTitle}>Progress Rent-To-Own (RTO)</Text>
-          </View>
-          <ChevronRight size={15} color={colors.textDisabled} strokeWidth={2} />
-        </View>
-
-        <Text style={styles.rtoTenureSubtitle}>Bulan ke-23 dari 36 bulan tenor</Text>
-
-        <View style={styles.rtoBodyRow}>
-          {/* Circular Donut Progress Ring */}
-          <CircularProgress
-            size={72}
-            strokeWidth={5.5}
-            percentage={64.8}
-            color={colors.primary}
-            bgColor="#E2E8F0"
+        {/* 6. NAVIGATION MENU LIST */}
+        <View style={styles.menuCard}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={onNavigatePerjalanan}
+            activeOpacity={0.7}
           >
-            <Text style={styles.rtoLargePct}>64,8%</Text>
-          </CircularProgress>
-
-          {/* Stats Breakdown */}
-          <View style={styles.rtoStatsCol}>
-            {/* Setoran Terkumpul */}
-            <View style={styles.rtoStatItem}>
-              <Text style={styles.rtoStatLabel}>Setoran Terkumpul</Text>
-              <Text style={styles.rtoStatValueBold}>Rp 194.400.000</Text>
+            <View style={styles.menuItemLeft}>
+              <History size={16} color={colors.textSecondary} strokeWidth={2} />
+              <Text style={styles.menuItemTitle}>Riwayat Perjalanan</Text>
             </View>
+            <ChevronRight size={15} color={colors.textDisabled} strokeWidth={2} />
+          </TouchableOpacity>
 
-            <View style={styles.rtoStatDivider} />
+          <View style={styles.menuDivider} />
 
-            {/* Sisa Setoran */}
-            <View style={styles.rtoStatItem}>
-              <Text style={styles.rtoStatLabel}>Sisa Kewajiban</Text>
-              <Text style={styles.rtoStatValueBold}>Rp 105.600.000</Text>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() =>
+              Alert.alert(
+                'Riwayat Setoran RTO',
+                'Menampilkan rekam audit setoran otomatis pay-per-trip dari setiap ritase pengantaran yang diselesaikan.'
+              )
+            }
+            activeOpacity={0.7}
+          >
+            <View style={styles.menuItemLeft}>
+              <CreditCard size={16} color={colors.textSecondary} strokeWidth={2} />
+              <Text style={styles.menuItemTitle}>Riwayat Setoran RTO</Text>
             </View>
-          </View>
+            <ChevronRight size={15} color={colors.textDisabled} strokeWidth={2} />
+          </TouchableOpacity>
+
+          <View style={styles.menuDivider} />
+
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() =>
+              Alert.alert('Pengaturan Akun', 'Pengaturan notifikasi, bahasa, dan keamanan kata sandi.')
+            }
+            activeOpacity={0.7}
+          >
+            <View style={styles.menuItemLeft}>
+              <Settings size={16} color={colors.textSecondary} strokeWidth={2} />
+              <Text style={styles.menuItemTitle}>Pengaturan Akun</Text>
+            </View>
+            <ChevronRight size={15} color={colors.textDisabled} strokeWidth={2} />
+          </TouchableOpacity>
         </View>
-      </View>
 
-      {/* 6. NAVIGATION MENU LIST (FLAT DIVIDER PATTERN PER DESIGN.MD) */}
-      <View style={styles.menuCard}>
-        {/* Riwayat Perjalanan */}
+        {/* 7. DANGER ACTION BUTTON: KELUAR AKUN */}
         <TouchableOpacity
-          style={styles.menuItem}
-          onPress={onNavigatePerjalanan}
-          activeOpacity={0.7}
-        >
-          <View style={styles.menuItemLeft}>
-            <History size={16} color={colors.textSecondary} strokeWidth={2} />
-            <Text style={styles.menuItemTitle}>Riwayat Perjalanan</Text>
-          </View>
-          <ChevronRight size={15} color={colors.textDisabled} strokeWidth={2} />
-        </TouchableOpacity>
-
-        <View style={styles.menuDivider} />
-
-        {/* Riwayat Setoran RTO */}
-        <TouchableOpacity
-          style={styles.menuItem}
+          style={styles.logoutButton}
           onPress={() =>
             Alert.alert(
-              'Riwayat Setoran RTO',
-              'Menampilkan rekam audit setoran otomatis pay-per-trip dari setiap ritase pengantaran yang diselesaikan.'
+              'Keluar Akun',
+              'Apakah Anda yakin ingin keluar dari akun mitra pengemudi FLEETRA?',
+              [
+                { text: 'Batal', style: 'cancel' },
+                { text: 'Keluar', style: 'destructive', onPress: onBackToHome },
+              ]
             )
           }
-          activeOpacity={0.7}
+          activeOpacity={0.8}
         >
-          <View style={styles.menuItemLeft}>
-            <CreditCard size={16} color={colors.textSecondary} strokeWidth={2} />
-            <Text style={styles.menuItemTitle}>Riwayat Setoran RTO</Text>
-          </View>
-          <ChevronRight size={15} color={colors.textDisabled} strokeWidth={2} />
+          <LogOut size={15} color={colors.dangerDark} strokeWidth={2} style={{ marginRight: 6 }} />
+          <Text style={styles.logoutButtonText}>Keluar Akun</Text>
         </TouchableOpacity>
-
-        <View style={styles.menuDivider} />
-
-        {/* Pengaturan Akun */}
-        <TouchableOpacity
-          style={styles.menuItem}
-          onPress={() =>
-            Alert.alert('Pengaturan Akun', 'Pengaturan notifikasi, bahasa, dan keamanan kata sandi.')
-          }
-          activeOpacity={0.7}
-        >
-          <View style={styles.menuItemLeft}>
-            <Settings size={16} color={colors.textSecondary} strokeWidth={2} />
-            <Text style={styles.menuItemTitle}>Pengaturan Akun</Text>
-          </View>
-          <ChevronRight size={15} color={colors.textDisabled} strokeWidth={2} />
-        </TouchableOpacity>
-      </View>
-
-      {/* 7. DANGER ACTION BUTTON: KELUAR AKUN */}
-      <TouchableOpacity
-        style={styles.logoutButton}
-        onPress={() =>
-          Alert.alert(
-            'Keluar Akun',
-            'Apakah Anda yakin ingin keluar dari akun mitra pengemudi FLEETRA?',
-            [
-              { text: 'Batal', style: 'cancel' },
-              { text: 'Keluar', style: 'destructive', onPress: onBackToHome },
-            ]
-          )
-        }
-        activeOpacity={0.8}
-      >
-        <LogOut size={15} color={colors.dangerDark} strokeWidth={2} style={{ marginRight: 6 }} />
-        <Text style={styles.logoutButtonText}>Keluar Akun</Text>
-      </TouchableOpacity>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -257,26 +245,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.bg,
   },
+  scrollView: {
+    flex: 1,
+  },
   scrollContent: {
     paddingBottom: 110,
-  },
-
-  /* TOP BAR */
-  topBar: {
-    paddingHorizontal: 18,
-    paddingTop: 8,
-    paddingBottom: 10,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  logoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  logoImage: {
-    width: 118,
-    height: 30,
   },
 
   /* PAGE HEADER */
