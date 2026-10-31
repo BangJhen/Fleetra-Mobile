@@ -21,20 +21,34 @@ import {
 import { colors } from '../theme/colors';
 import { CircularProgress } from '../components/CircularProgress';
 import { TopBar } from '../components/TopBar';
+import { useApp } from '../context/AppContext';
 
 interface ProfilScreenProps {
-  onBackToHome: () => void;
+  onBackToHome?: () => void;
   onNavigatePerjalanan?: () => void;
 }
 
-export const ProfilScreen: React.FC<ProfilScreenProps> = ({
-  onBackToHome,
-  onNavigatePerjalanan,
-}) => {
+export const ProfilScreen: React.FC<ProfilScreenProps> = (props) => {
+  const {
+    navigateTo,
+    safetyScore,
+    rtoPercent,
+    driverStatus,
+    hasUnreadNotifications,
+  } = useApp();
+
+  const handleBackHome = props.onBackToHome || (() => navigateTo('beranda'));
+  const handlePerjalanan = props.onNavigatePerjalanan || (() => navigateTo('perjalanan'));
+
   return (
     <View style={styles.container}>
       {/* 1. MODULAR TOP BAR (FIXED, CONSISTENT HEIGHT) */}
-      <TopBar variant="logo" />
+      <TopBar
+        variant="logo"
+        showNotificationBell
+        hasUnreadNotifications={hasUnreadNotifications}
+        onPressNotifications={() => navigateTo('notifikasi')}
+      />
 
       <ScrollView
         style={styles.scrollView}
@@ -205,7 +219,7 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = ({
         <View style={styles.menuCard}>
           <TouchableOpacity
             style={styles.menuItem}
-            onPress={onNavigatePerjalanan}
+            onPress={handlePerjalanan}
             activeOpacity={0.7}
           >
             <View style={styles.menuItemLeft}>
@@ -265,7 +279,7 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = ({
               'Apakah Anda yakin ingin keluar dari akun mitra pengemudi FLEETRA?',
               [
                 { text: 'Batal', style: 'cancel' },
-                { text: 'Keluar', style: 'destructive', onPress: onBackToHome },
+                { text: 'Keluar', style: 'destructive', onPress: handleBackHome },
               ]
             )
           }

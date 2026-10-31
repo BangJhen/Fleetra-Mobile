@@ -18,26 +18,83 @@ import {
 import { colors } from '../theme/colors';
 import { TopBar } from '../components/TopBar';
 import { MapWebView } from '../components/MapWebView';
+import { useApp } from '../context/AppContext';
 
 interface DetailStopScreenProps {
-  onBack: () => void;
-  onArriveAtLocation: () => void;
+  onBack?: () => void;
+  onArriveAtLocation?: () => void;
   isCompleted?: boolean;
 }
 
-export const DetailStopScreen: React.FC<DetailStopScreenProps> = ({
-  onBack,
-  onArriveAtLocation,
-  isCompleted = false,
-}) => {
+export const DetailStopScreen: React.FC<DetailStopScreenProps> = (props) => {
+  const {
+    selectedStopId,
+    completedStops,
+    epodRecords,
+    navigateTo,
+    goBack,
+  } = useApp();
+
+  const handleBack = props.onBack || goBack;
+  const isCompleted =
+    props.isCompleted !== undefined
+      ? props.isCompleted
+      : completedStops.includes(selectedStopId);
+  const handleArrive = props.onArriveAtLocation || (() => navigateTo('epod'));
+
+  const stopData =
+    selectedStopId === 1
+      ? {
+          name: 'Gudang Pusat Cimahi',
+          address: 'Jl. Industri Raya No. 12, Cimahi',
+          orderCode: 'ORD-2026-7740',
+          packages: '48 Koli Blind Van',
+          note: 'Pemberangkatan ritase kargo awal',
+          stopNumber: '1 / 4 Stop',
+          distance: '0 km',
+          duration: 'Selesai 08.15',
+        }
+      : selectedStopId === 3
+      ? {
+          name: 'Minimarket Sejahtera',
+          address: 'Jl. Flyover Pasirkoja, Bandung',
+          orderCode: 'ORD-2026-7742',
+          packages: '8 Paket Farmasi',
+          note: 'Hubungi Ibu Ratna (PIC)',
+          stopNumber: '3 / 4 Stop',
+          distance: '+ 6,8 km',
+          duration: '± 18 menit',
+        }
+      : selectedStopId === 4
+      ? {
+          name: 'Toko Makmur Jaya',
+          address: 'Jl. Peta No. 88, Bandung',
+          orderCode: 'ORD-2026-7743',
+          packages: '6 Paket Sembako',
+          note: 'Titik akhir ritase hari ini',
+          stopNumber: '4 / 4 Stop',
+          distance: '+ 11,2 km',
+          duration: '± 28 menit',
+        }
+      : {
+          name: 'Toko Sumber Rejeki',
+          address: 'Jl. Sudirman No. 45, Bandung',
+          orderCode: 'ORD-2026-7741',
+          packages: '12 Paket',
+          note: 'Serahkan ke PIC toko (Bpk. Budi Setiawan)',
+          stopNumber: '2 / 4 Stop',
+          distance: '+ 4,2 km',
+          duration: '± 12 menit',
+        };
+
   return (
     <View style={styles.container}>
       {/* 1. MODULAR TOP BAR (FIXED, SPACIOUS) */}
       <TopBar
         variant="back"
         title="Detail Stop"
-        subtitle="Trip #TRIP-2026-089"
-        onBack={onBack}
+        subtitle={`Trip #TRIP-2026-089 • Stop ${selectedStopId}/4`}
+        onBack={handleBack}
       />
 
       <ScrollView
@@ -49,34 +106,36 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = ({
         <View style={styles.distanceBanner}>
           <View style={styles.bannerItem}>
             <Navigation size={13} color={colors.primary} strokeWidth={2.2} />
-            <Text style={styles.bannerValue}>+ 4,2 km</Text>
+            <Text style={styles.bannerValue}>{stopData.distance}</Text>
           </View>
           <View style={styles.bannerDivider} />
           <View style={styles.bannerItem}>
             <Clock size={13} color={colors.primary} strokeWidth={2.2} />
-            <Text style={styles.bannerValue}>± 12 menit</Text>
+            <Text style={styles.bannerValue}>{stopData.duration}</Text>
           </View>
         </View>
 
         {/* 3. INTERACTIVE WEBVIEW MAP (OpenStreetMap & Leaflet OSRM corridor) */}
         <MapWebView
           height={195}
-          destinationName="Toko Sumber Rejeki"
-          distance="+ 4,2 km"
-          duration="± 12 menit"
+          destinationName={stopData.name}
+          distance={stopData.distance}
+          duration={stopData.duration}
         />
 
         {/* 4. CURRENT STOP CARD */}
         <View style={styles.card}>
           <View style={styles.stopHeaderRow}>
             <View style={styles.stopTextGroup}>
-              <Text style={styles.stopTitle}>Toko Sumber Rejeki</Text>
-              <Text style={styles.stopAddress}>Jl. Sudirman No. 45, Bandung</Text>
+              <Text style={styles.stopTitle}>{stopData.name}</Text>
+              <Text style={styles.stopAddress}>{stopData.address}</Text>
             </View>
 
             <View style={styles.badgesCol}>
-              <Text style={styles.currentStatusText}>Tujuan Saat Ini</Text>
-              <Text style={styles.stopOrderText}>2 / 4 Stop</Text>
+              <Text style={styles.currentStatusText}>
+                {isCompleted ? 'Selesai' : 'Tujuan Saat Ini'}
+              </Text>
+              <Text style={styles.stopOrderText}>{stopData.stopNumber}</Text>
             </View>
           </View>
 
@@ -87,8 +146,8 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = ({
               style={styles.actionBtn}
               onPress={() =>
                 Alert.alert(
-                  'Panduan Navigasi',
-                  'Membuka panduan perutean rute dinamis ke Jl. Sudirman No. 45.'
+                  'Panduan Navigasi OSRM',
+                  `Membuka panduan perutean dinamis ke ${stopData.name} (${stopData.address}).`
                 )
               }
               activeOpacity={0.75}
@@ -103,7 +162,7 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = ({
             <TouchableOpacity
               style={styles.actionBtn}
               onPress={() =>
-                Alert.alert('Hubungi PIC', 'Menghubungi Bpk. Budi Setiawan (+62 812-3456-7890)')
+                Alert.alert('Hubungi PIC', `Menghubungi PIC ${stopData.name} (+62 812-3456-7890)`)
               }
               activeOpacity={0.75}
             >
@@ -117,7 +176,7 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = ({
             <TouchableOpacity
               style={styles.actionBtn}
               onPress={() =>
-                Alert.alert('Kirim Pesan', 'Mengirim pesan WhatsApp konfirmasi kedatangan ke PIC Toko.')
+                Alert.alert('Kirim Pesan', `Mengirim pesan WhatsApp konfirmasi kedatangan ke ${stopData.name}.`)
               }
               activeOpacity={0.75}
             >
@@ -132,8 +191,8 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = ({
               style={styles.actionBtn}
               onPress={() =>
                 Alert.alert(
-                  'Detail Lokasi',
-                  'Akses loading dock berada di gerbang samping toko. Kapasitas parkir LCV tersedia.'
+                  'Detail Titik Serah Terima',
+                  `Akses loading dock untuk ${stopData.name} berada di samping gerbang utama. Parkir armada blind van tersedia.`
                 )
               }
               activeOpacity={0.75}
@@ -146,34 +205,34 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = ({
           </View>
         </View>
 
-        {/* 4. DETAIL PENGANTARAN CARD */}
+        {/* 5. DETAIL PENGANTARAN CARD */}
         <View style={styles.card}>
           <Text style={styles.cardSectionTitle}>Detail Pengantaran</Text>
 
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Kode Order</Text>
-            <Text style={styles.detailValueBold}>ORD-2026-7741</Text>
+            <Text style={styles.detailValueBold}>{stopData.orderCode}</Text>
           </View>
 
           <View style={styles.detailDivider} />
 
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Jumlah Barang</Text>
-            <Text style={styles.detailValue}>12 Paket</Text>
+            <Text style={styles.detailValue}>{stopData.packages}</Text>
           </View>
 
           <View style={styles.detailDivider} />
 
           <View style={styles.detailRow}>
             <Text style={styles.detailLabel}>Catatan Khusus</Text>
-            <Text style={styles.detailValue}>Serahkan ke PIC toko</Text>
+            <Text style={styles.detailValue}>{stopData.note}</Text>
           </View>
         </View>
 
-        {/* 5. PRIMARY CTA BUTTON: TIBA DI LOKASI */}
+        {/* 6. PRIMARY CTA BUTTON: TIBA DI LOKASI / LIHAT e-POD */}
         <TouchableOpacity
           style={styles.primaryActionButton}
-          onPress={onArriveAtLocation}
+          onPress={handleArrive}
           activeOpacity={0.85}
         >
           <Text style={styles.primaryActionText}>

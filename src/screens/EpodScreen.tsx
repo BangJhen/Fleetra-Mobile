@@ -19,19 +19,56 @@ import {
 } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 import { TopBar } from '../components/TopBar';
+import { useApp } from '../context/AppContext';
 
 interface EpodScreenProps {
-  onBack: () => void;
-  onSubmitSuccess: () => void;
+  onBack?: () => void;
+  onSubmitSuccess?: () => void;
 }
 
-export const EpodScreen: React.FC<EpodScreenProps> = ({
-  onBack,
-  onSubmitSuccess,
-}) => {
-  const [recipientName, setRecipientName] = useState('Budi Setiawan');
-  const [hasPhoto, setHasPhoto] = useState(true);
-  const [hasSignature, setHasSignature] = useState(true);
+export const EpodScreen: React.FC<EpodScreenProps> = (props) => {
+  const {
+    selectedStopId,
+    epodRecords,
+    saveEpodRecord,
+    navigateTo,
+    goBack,
+  } = useApp();
+
+  const handleBack = props.onBack || goBack;
+  const existingRecord = epodRecords[selectedStopId];
+
+  const stopTitle =
+    selectedStopId === 1
+      ? 'Gudang Pusat Cimahi'
+      : selectedStopId === 3
+      ? 'Minimarket Sejahtera'
+      : selectedStopId === 4
+      ? 'Toko Makmur Jaya'
+      : 'Toko Sumber Rejeki';
+
+  const stopAddress =
+    selectedStopId === 1
+      ? 'Jl. Industri Raya No. 12, Cimahi'
+      : selectedStopId === 3
+      ? 'Jl. Flyover Pasirkoja, Bandung'
+      : selectedStopId === 4
+      ? 'Jl. Peta No. 88, Bandung'
+      : 'Jl. Sudirman No. 45, Bandung';
+
+  const [recipientName, setRecipientName] = useState(
+    existingRecord
+      ? existingRecord.recipientName
+      : selectedStopId === 1
+      ? 'Bpk. Budi (Gudang Cimahi)'
+      : 'Budi Setiawan'
+  );
+  const [hasPhoto, setHasPhoto] = useState(
+    existingRecord ? existingRecord.hasPhoto : true
+  );
+  const [hasSignature, setHasSignature] = useState(
+    existingRecord ? existingRecord.hasSignature : true
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleClearSignature = () => {
@@ -59,13 +96,30 @@ export const EpodScreen: React.FC<EpodScreenProps> = ({
     setIsSubmitting(true);
     setTimeout(() => {
       setIsSubmitting(false);
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')} WIB`;
+
+      saveEpodRecord({
+        stopId: selectedStopId,
+        recipientName: recipientName.trim(),
+        hasPhoto,
+        hasSignature,
+        submittedAt: timeStr,
+      });
+
       Alert.alert(
-        'e-POD Terverifikasi',
-        'Bukti serah terima untuk Toko Sumber Rejeki (Stop 2/4) telah tersimpan dan terkirim ke Web Dispatcher FLEETRA.',
+        'e-POD Terverifikasi & Tersimpan',
+        `Bukti serah terima untuk ${stopTitle} (Stop ${selectedStopId}/4) telah tersimpan ke in-memory session dan terkirim ke Web Dispatcher FLEETRA.`,
         [
           {
             text: 'Selesai',
-            onPress: onSubmitSuccess,
+            onPress: () => {
+              if (props.onSubmitSuccess) {
+                props.onSubmitSuccess();
+              } else {
+                navigateTo('perjalanan');
+              }
+            },
           },
         ]
       );
@@ -78,8 +132,8 @@ export const EpodScreen: React.FC<EpodScreenProps> = ({
       <TopBar
         variant="back"
         title="Bukti Pengantaran (e-POD)"
-        subtitle="Trip #TRIP-2026-089 • Stop 2/4"
-        onBack={onBack}
+        subtitle={`Trip #TRIP-2026-089 • Stop ${selectedStopId}/4`}
+        onBack={handleBack}
       />
 
       <ScrollView
@@ -90,12 +144,12 @@ export const EpodScreen: React.FC<EpodScreenProps> = ({
         {/* 2. STOP SUMMARY CARD */}
         <View style={styles.stopCard}>
           <View style={styles.stopLeft}>
-            <Text style={styles.stopName}>Toko Sumber Rejeki</Text>
-            <Text style={styles.stopAddress}>Jl. Sudirman No. 45, Bandung</Text>
+            <Text style={styles.stopName}>{stopTitle}</Text>
+            <Text style={styles.stopAddress}>{stopAddress}</Text>
           </View>
           <TouchableOpacity
             style={styles.detailStopLink}
-            onPress={onBack}
+            onPress={handleBack}
             activeOpacity={0.7}
           >
             <Text style={styles.detailStopLinkText}>Detail Stop</Text>

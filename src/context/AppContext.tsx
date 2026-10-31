@@ -1,0 +1,242 @@
+import React, { createContext, useContext, useMemo, useState } from 'react';
+
+export type ScreenState =
+  | 'beranda'
+  | 'perjalanan'
+  | 'detail-stop'
+  | 'epod'
+  | 'profil'
+  | 'notifikasi'
+  | 'sos';
+
+export type TabType = 'beranda' | 'perjalanan' | 'profil';
+
+export interface EpodRecord {
+  stopId: number;
+  recipientName: string;
+  hasPhoto: boolean;
+  hasSignature: boolean;
+  submittedAt: string;
+}
+
+export interface NotificationItem {
+  id: string;
+  title: string;
+  description: string;
+  time: string;
+  category: 'perjalanan' | 'armada' | 'sistem';
+  isUnread: boolean;
+  iconType: 'trip' | 'epod' | 'warning' | 'service' | 'rto';
+}
+
+const INITIAL_NOTIFICATIONS: NotificationItem[] = [
+  {
+    id: '1',
+    title: 'Penugasan Rute Baru Diterima',
+    description: 'Trip #TRIP-2026-089 (4 titik pengantaran Bandung Kota) telah dijadwalkan.',
+    time: '08:00',
+    category: 'perjalanan',
+    isUnread: true,
+    iconType: 'trip',
+  },
+  {
+    id: '2',
+    title: 'Stop 1 Selesai & e-POD Terverifikasi',
+    description: 'Serah terima kargo di Gudang Cimahi berhasil diunggah ke konsol pusat.',
+    time: '08:15',
+    category: 'perjalanan',
+    isUnread: true,
+    iconType: 'epod',
+  },
+  {
+    id: '3',
+    title: 'Peringatan Kemacetan OSRM',
+    description: 'Kepadatan lalu lintas di Jl. Sukajadi (+8 menit). Rekomendasi rute alternatif via Pasirkaliki.',
+    time: '08:35',
+    category: 'armada',
+    isUnread: false,
+    iconType: 'warning',
+  },
+  {
+    id: '4',
+    title: 'Jadwal Pemeliharaan Prediktif',
+    description: 'Armada Gran Max B 9821 KCE terjadwal rotasi ban dan servis oli dalam 1.570 km.',
+    time: 'Kemarin',
+    category: 'armada',
+    isUnread: false,
+    iconType: 'service',
+  },
+  {
+    id: '5',
+    title: 'Setoran RTO Berhasil Diakumulasi',
+    description: 'Setoran pay-per-trip sebesar Rp 45.000 telah dialokasikan ke ekuitas kepemilikan armada.',
+    time: 'Kemarin',
+    category: 'sistem',
+    isUnread: false,
+    iconType: 'rto',
+  },
+];
+
+interface AppContextType {
+  // Navigation
+  currentScreen: ScreenState;
+  prevScreen: ScreenState;
+  navigateTo: (screen: ScreenState) => void;
+  goBack: () => void;
+
+  // Trips & Stops State
+  completedStops: number[];
+  selectedStopId: number;
+  setSelectedStopId: (id: number) => void;
+  activeTripTab: 'aktif' | 'riwayat';
+  setActiveTripTab: (tab: 'aktif' | 'riwayat') => void;
+  epodRecords: Record<number, EpodRecord>;
+  saveEpodRecord: (record: EpodRecord) => void;
+
+  // SOS Emergency State
+  isSosActive: boolean;
+  sosCategory: string | null;
+  sosTimestamp: string | null;
+  activateSos: (category?: string) => void;
+  deactivateSos: () => void;
+
+  // Notifications State
+  notifications: NotificationItem[];
+  hasUnreadNotifications: boolean;
+  markNotificationAsRead: (id: string) => void;
+  markAllNotificationsAsRead: () => void;
+
+  // Driver & Vehicle State
+  driverStatus: 'Aktif' | 'Istirahat';
+  toggleDriverStatus: () => void;
+  fuelPercent: number;
+  odometerKm: number;
+  safetyScore: number;
+  rtoPercent: number;
+}
+
+const AppContext = createContext<AppContextType | undefined>(undefined);
+
+export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  // Navigation state
+  const [currentScreen, setCurrentScreen] = useState<ScreenState>('beranda');
+  const [prevScreen, setPrevScreen] = useState<ScreenState>('beranda');
+
+  // Trip & e-POD state
+  const [completedStops, setCompletedStops] = useState<number[]>([1]);
+  const [selectedStopId, setSelectedStopId] = useState<number>(2);
+  const [activeTripTab, setActiveTripTab] = useState<'aktif' | 'riwayat'>('aktif');
+  const [epodRecords, setEpodRecords] = useState<Record<number, EpodRecord>>({
+    1: {
+      stopId: 1,
+      recipientName: 'Gudang Pusat Cimahi',
+      hasPhoto: true,
+      hasSignature: true,
+      submittedAt: '08:15 WIB',
+    },
+  });
+
+  // SOS state
+  const [isSosActive, setIsSosActive] = useState<boolean>(false);
+  const [sosCategory, setSosCategory] = useState<string | null>(null);
+  const [sosTimestamp, setSosTimestamp] = useState<string | null>(null);
+
+  // Notifications state
+  const [notifications, setNotifications] = useState<NotificationItem[]>(INITIAL_NOTIFICATIONS);
+
+  // Driver / Telemetry state
+  const [driverStatus, setDriverStatus] = useState<'Aktif' | 'Istirahat'>('Aktif');
+  const [fuelPercent] = useState<number>(74);
+  const [odometerKm] = useState<number>(128);
+  const [safetyScore] = useState<number>(94);
+  const [rtoPercent] = useState<number>(64.8);
+
+  const navigateTo = (screen: ScreenState) => {
+    setPrevScreen(currentScreen);
+    setCurrentScreen(screen);
+  };
+
+  const goBack = () => {
+    setCurrentScreen(prevScreen || 'beranda');
+  };
+
+  const saveEpodRecord = (record: EpodRecord) => {
+    setEpodRecords((prev) => ({ ...prev, [record.stopId]: record }));
+    setCompletedStops((prev) => (prev.includes(record.stopId) ? prev : [...prev, record.stopId]));
+  };
+
+  const activateSos = (category?: string) => {
+    setIsSosActive(true);
+    setSosCategory(category || 'Kendala Operasional Darurat');
+    const now = new Date();
+    const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')} WIB`;
+    setSosTimestamp(timeStr);
+  };
+
+  const deactivateSos = () => {
+    setIsSosActive(false);
+    setSosCategory(null);
+    setSosTimestamp(null);
+  };
+
+  const markNotificationAsRead = (id: string) => {
+    setNotifications((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, isUnread: false } : item))
+    );
+  };
+
+  const markAllNotificationsAsRead = () => {
+    setNotifications((prev) => prev.map((item) => ({ ...item, isUnread: false })));
+  };
+
+  const toggleDriverStatus = () => {
+    setDriverStatus((prev) => (prev === 'Aktif' ? 'Istirahat' : 'Aktif'));
+  };
+
+  const hasUnreadNotifications = useMemo(() => {
+    return notifications.some((n) => n.isUnread);
+  }, [notifications]);
+
+  const value = {
+    currentScreen,
+    prevScreen,
+    navigateTo,
+    goBack,
+
+    completedStops,
+    selectedStopId,
+    setSelectedStopId,
+    activeTripTab,
+    setActiveTripTab,
+    epodRecords,
+    saveEpodRecord,
+
+    isSosActive,
+    sosCategory,
+    sosTimestamp,
+    activateSos,
+    deactivateSos,
+
+    notifications,
+    hasUnreadNotifications,
+    markNotificationAsRead,
+    markAllNotificationsAsRead,
+
+    driverStatus,
+    toggleDriverStatus,
+    fuelPercent,
+    odometerKm,
+    safetyScore,
+    rtoPercent,
+  };
+
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+};
+
+export const useApp = () => {
+  const context = useContext(AppContext);
+  if (!context) {
+    throw new Error('useApp must be used within an AppProvider');
+  }
+  return context;
+};

@@ -18,26 +18,49 @@ import {
 } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 import { TopBar } from '../components/TopBar';
+import { useApp } from '../context/AppContext';
 
 interface SosScreenProps {
-  onBack: () => void;
+  onBack?: () => void;
 }
 
-export const SosScreen: React.FC<SosScreenProps> = ({ onBack }) => {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [sosActivated, setSosActivated] = useState(false);
+export const SosScreen: React.FC<SosScreenProps> = (props) => {
+  const {
+    isSosActive,
+    sosCategory,
+    sosTimestamp,
+    activateSos,
+    deactivateSos,
+    goBack,
+  } = useApp();
+
+  const handleBack = props.onBack || goBack;
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(sosCategory);
 
   const handleTriggerSos = (categoryName?: string) => {
-    setSosActivated(true);
+    activateSos(categoryName);
     Alert.alert(
       'Sinyal Darurat Dipancarkan',
       `Pusat Kendali Dispatcher FLEETRA telah menerima sinyal SOS dari armada B 9821 KCE (Budi Santoso) di lokasi Jl. Pasteur No. 142, Bandung.${
         categoryName ? ` Kategori: ${categoryName}.` : ''
-      } Petugas dispatcher dan tim tanggap darurat segera menghubungi Anda.`,
+      } Petugas dispatcher dan tim tanggap darurat segera menghubungi Anda. Kondisi darurat ini tersimpan secara in-memory di seluruh aplikasi.`,
+      [{ text: 'Konfirmasi Diterima' }]
+    );
+  };
+
+  const handleDeactivateSos = () => {
+    Alert.alert(
+      'Akhiri Sinyal Darurat?',
+      'Apakah kendala armada di jalan raya telah tertangani dan kondisi kembali aman?',
       [
+        { text: 'Batal', style: 'cancel' },
         {
-          text: 'Konfirmasi Diterima',
-          onPress: () => {},
+          text: 'Ya, Akhiri SOS',
+          onPress: () => {
+            deactivateSos();
+            setSelectedCategory(null);
+            Alert.alert('Status Normal', 'Sinyal darurat telah dinonaktifkan.');
+          },
         },
       ]
     );
@@ -49,8 +72,8 @@ export const SosScreen: React.FC<SosScreenProps> = ({ onBack }) => {
       <TopBar
         variant="back"
         title="Bantuan Darurat (SOS)"
-        subtitle="Siaga Operasional 24/7"
-        onBack={onBack}
+        subtitle={isSosActive ? `Status: Aktif sejak ${sosTimestamp}` : 'Siaga Operasional 24/7'}
+        onBack={handleBack}
       />
 
       <ScrollView
@@ -61,18 +84,19 @@ export const SosScreen: React.FC<SosScreenProps> = ({ onBack }) => {
         {/* 2. HERO TITLE & SUBTITLE */}
         <View style={styles.heroHeader}>
           <Text style={styles.heroTitle}>
-            Butuh Bantuan{'\n'}Darurat di Perjalanan?
+            {isSosActive ? 'Status Darurat\nSedang Berjalan' : 'Butuh Bantuan\nDarurat di Perjalanan?'}
           </Text>
           <Text style={styles.heroSubtitle}>
-            Tekan tombol SOS untuk memancarkan koordinat telematika prioritas tinggi
-            langsung ke konsol pusat kendali dispatcher.
+            {isSosActive
+              ? `Kategori kendala: ${sosCategory || 'Panggilan Darurat'}. Pusat kendali memantau koordinat GPS Anda secara langsung.`
+              : 'Tekan tombol SOS untuk memancarkan koordinat telematika prioritas tinggi langsung ke konsol pusat kendali dispatcher.'}
           </Text>
         </View>
 
         {/* 3. BIG RED SOS CALL BUTTON */}
         <TouchableOpacity
-          style={[styles.bigSosButton, sosActivated && styles.bigSosButtonActive]}
-          onPress={() => handleTriggerSos()}
+          style={[styles.bigSosButton, isSosActive && styles.bigSosButtonActive]}
+          onPress={() => (isSosActive ? handleDeactivateSos() : handleTriggerSos())}
           activeOpacity={0.85}
         >
           <View style={styles.sosInnerContent}>
@@ -81,16 +105,27 @@ export const SosScreen: React.FC<SosScreenProps> = ({ onBack }) => {
             </View>
             <View style={styles.sosTextCol}>
               <Text style={styles.sosMainText}>
-                {sosActivated ? 'SOS Terpancar (Aktif)' : 'Aktifkan SOS'}
+                {isSosActive ? 'SOS Terpancar (Aktif)' : 'Aktifkan SOS'}
               </Text>
               <Text style={styles.sosSubText}>
-                {sosActivated
-                  ? 'Dispatcher terhubung via telemetry streaming'
+                {isSosActive
+                  ? 'Ketuk untuk mengakhiri atau memperbarui status'
                   : 'Hubungi tim siaga Fleetra sekarang'}
               </Text>
             </View>
           </View>
         </TouchableOpacity>
+
+        {/* Tombol Akhiri SOS Jika Sedang Aktif */}
+        {isSosActive && (
+          <TouchableOpacity
+            style={styles.cancelSosButton}
+            onPress={handleDeactivateSos}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.cancelSosButtonText}>Akhiri Status Darurat (Kondisi Aman)</Text>
+          </TouchableOpacity>
+        )}
 
         {/* 4. SECTION: KATEGORI KENDALA */}
         <View style={styles.categorySection}>
@@ -300,6 +335,23 @@ const styles = StyleSheet.create({
   },
   bigSosButtonActive: {
     backgroundColor: '#B91C1C',
+  },
+  cancelSosButton: {
+    marginHorizontal: 18,
+    marginTop: -6,
+    marginBottom: 16,
+    paddingVertical: 10,
+    backgroundColor: colors.surface2,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cancelSosButtonText: {
+    fontSize: 11.5,
+    fontWeight: '600',
+    color: colors.textSecondary,
   },
   sosInnerContent: {
     flexDirection: 'row',

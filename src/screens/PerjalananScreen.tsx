@@ -18,6 +18,7 @@ import {
 } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 import { TopBar } from '../components/TopBar';
+import { useApp } from '../context/AppContext';
 
 interface StopItem {
   id: number;
@@ -29,9 +30,9 @@ interface StopItem {
 }
 
 interface PerjalananScreenProps {
-  onBackToHome: () => void;
-  onOpenDetailStop: (stopId: number) => void;
-  completedStops: number[];
+  onBackToHome?: () => void;
+  onOpenDetailStop?: (stopId: number) => void;
+  completedStops?: number[];
 }
 
 const PAST_TRIPS = [
@@ -67,28 +68,32 @@ const PAST_TRIPS = [
   },
 ];
 
-export const PerjalananScreen: React.FC<PerjalananScreenProps> = ({
-  onBackToHome,
-  onOpenDetailStop,
-  completedStops,
-}) => {
-  const [activeSegmentTab, setActiveSegmentTab] = useState<'aktif' | 'riwayat'>('aktif');
+export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
+  const {
+    completedStops: contextCompletedStops,
+    activeTripTab,
+    setActiveTripTab,
+    setSelectedStopId,
+    navigateTo,
+    hasUnreadNotifications,
+  } = useApp();
+
+  const completedStops = props.completedStops || contextCompletedStops;
+
+  const onOpenDetailStop = (stopId: number) => {
+    setSelectedStopId(stopId);
+    if (props.onOpenDetailStop) {
+      props.onOpenDetailStop(stopId);
+    } else {
+      navigateTo('detail-stop');
+    }
+  };
+
+  const activeSegmentTab = activeTripTab;
 
   const handleStopPress = (stop: StopItem) => {
-    if (stop.status === 'tujuan_saat_ini') {
+    if (stop.status === 'tujuan_saat_ini' || stop.status === 'selesai') {
       onOpenDetailStop(stop.id);
-    } else if (stop.status === 'selesai') {
-      Alert.alert(
-        `${stop.name} (Selesai)`,
-        `Pengantaran kargo telah diselesaikan pukul ${stop.time || '08.15'} WIB. Seluruh dokumen e-POD dan foto bukti fisik telah diverifikasi oleh PIC toko.`,
-        [
-          {
-            text: 'Lihat e-POD',
-            onPress: () => onOpenDetailStop(stop.id),
-          },
-          { text: 'Tutup', style: 'cancel' },
-        ]
-      );
     } else {
       Alert.alert(
         stop.name,
@@ -142,7 +147,12 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = ({
   return (
     <View style={styles.container}>
       {/* 1. MODULAR TOP BAR (FIXED, CONSISTENT HEIGHT) */}
-      <TopBar variant="logo" />
+      <TopBar
+        variant="logo"
+        showNotificationBell
+        hasUnreadNotifications={hasUnreadNotifications}
+        onPressNotifications={() => navigateTo('notifikasi')}
+      />
 
       <ScrollView
         style={styles.scrollView}
@@ -164,7 +174,7 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = ({
               styles.segmentButton,
               activeSegmentTab === 'aktif' && styles.segmentButtonActive,
             ]}
-            onPress={() => setActiveSegmentTab('aktif')}
+            onPress={() => setActiveTripTab('aktif')}
             activeOpacity={0.8}
           >
             <Text
@@ -182,7 +192,7 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = ({
               styles.segmentButton,
               activeSegmentTab === 'riwayat' && styles.segmentButtonActive,
             ]}
-            onPress={() => setActiveSegmentTab('riwayat')}
+            onPress={() => setActiveTripTab('riwayat')}
             activeOpacity={0.8}
           >
             <Text

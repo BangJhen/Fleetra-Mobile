@@ -17,92 +17,33 @@ import {
 } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 import { TopBar } from '../components/TopBar';
-
-interface NotificationItem {
-  id: string;
-  category: 'perjalanan' | 'armada' | 'sistem';
-  title: string;
-  description: string;
-  time: string;
-  isUnread?: boolean;
-  dateGroup: 'today' | 'yesterday';
-  iconType: 'trip' | 'epod' | 'warning' | 'service' | 'rto';
-}
+import { useApp, NotificationItem } from '../context/AppContext';
 
 interface NotificationsScreenProps {
-  onBack: () => void;
+  onBack?: () => void;
 }
 
-export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onBack }) => {
+export const NotificationsScreen: React.FC<NotificationsScreenProps> = (props) => {
+  const {
+    notifications,
+    markNotificationAsRead,
+    markAllNotificationsAsRead,
+    goBack,
+  } = useApp();
+
+  const handleBack = props.onBack || goBack;
   const [activeFilter, setActiveFilter] = useState<'semua' | 'perjalanan' | 'armada' | 'sistem'>('semua');
-  const [notifications, setNotifications] = useState<NotificationItem[]>([
-    {
-      id: '1',
-      category: 'perjalanan',
-      title: 'Perjalanan Dimulai',
-      description: 'Trip #TRIP-2026-089 telah aktif di koridor Cimahi - Bandung.',
-      time: '5 menit lalu',
-      isUnread: true,
-      dateGroup: 'today',
-      iconType: 'trip',
-    },
-    {
-      id: '2',
-      category: 'perjalanan',
-      title: 'Bukti Pengantaran Diterima',
-      description: 'e-POD untuk Stop 1/4 telah dikonfirmasi oleh penerima.',
-      time: '24 menit lalu',
-      isUnread: false,
-      dateGroup: 'today',
-      iconType: 'epod',
-    },
-    {
-      id: '3',
-      category: 'armada',
-      title: 'Peringatan Armada',
-      description: 'Tekanan ban kendaraan B 9821 KCE terdeteksi di bawah standar.',
-      time: '42 menit lalu',
-      isUnread: false,
-      dateGroup: 'today',
-      iconType: 'warning',
-    },
-    {
-      id: '4',
-      category: 'armada',
-      title: 'Servis Terjadwal',
-      description: 'Jadwal servis berkala kendaraan B 9821 KCE pada 28 Jun 2026.',
-      time: 'Kemarin, 16.20',
-      isUnread: false,
-      dateGroup: 'yesterday',
-      iconType: 'service',
-    },
-    {
-      id: '5',
-      category: 'sistem',
-      title: 'Laporan RTO Tersedia',
-      description: 'Laporan performa RTO bulan Mei sudah dapat diunduh.',
-      time: 'Kemarin, 10.05',
-      isUnread: false,
-      dateGroup: 'yesterday',
-      iconType: 'rto',
-    },
-  ]);
 
   const handleMarkAllAsRead = () => {
-    setNotifications((prev) =>
-      prev.map((item) => ({ ...item, isUnread: false }))
-    );
-    Alert.alert('Sukses', 'Semua notifikasi telah ditandai sebagai dibaca.');
+    markAllNotificationsAsRead();
+    Alert.alert('Sukses', 'Semua notifikasi telah ditandai sebagai dibaca. State in-memory diperbarui.');
   };
 
-  const handleNotificationPress = (item: NotificationItem) => {
-    setNotifications((prev) =>
-      prev.map((notif) => (notif.id === item.id ? { ...notif, isUnread: false } : notif))
-    );
-
+  const handleNotificationPress = (item: any) => {
+    markNotificationAsRead(item.id);
     Alert.alert(
       item.title,
-      `${item.description}\n\nWaktu: ${item.time} WIB • Kategori: ${item.category.toUpperCase()}`,
+      `${item.description}\n\nWaktu: ${item.time} • Kategori: ${item.category.toUpperCase()}`,
       [{ text: 'Tutup' }]
     );
   };
@@ -112,8 +53,8 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onBack
     return item.category === activeFilter;
   });
 
-  const todayItems = filteredItems.filter((item) => item.dateGroup === 'today');
-  const yesterdayItems = filteredItems.filter((item) => item.dateGroup === 'yesterday');
+  const todayItems = filteredItems.filter((item) => !item.time.includes('Kemarin'));
+  const yesterdayItems = filteredItems.filter((item) => item.time.includes('Kemarin'));
 
   const renderIcon = (type: NotificationItem['iconType']) => {
     switch (type) {
@@ -157,7 +98,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onBack
         variant="back"
         title="Notifikasi"
         subtitle="Pusat Pembaruan Operasional"
-        onBack={onBack}
+        onBack={handleBack}
       />
 
       <ScrollView

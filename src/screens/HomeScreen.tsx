@@ -24,10 +24,11 @@ import {
 import { colors } from '../theme/colors';
 import { CircularProgress } from '../components/CircularProgress';
 import { TopBar } from '../components/TopBar';
+import { useApp } from '../context/AppContext';
 
 interface HomeScreenProps {
-  onNavigatePerjalanan: () => void;
-  onNavigateProfil: () => void;
+  onNavigatePerjalanan?: () => void;
+  onNavigateProfil?: () => void;
   onNavigateNotifications?: () => void;
 }
 
@@ -36,14 +37,30 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onNavigateProfil,
   onNavigateNotifications,
 }) => {
+  const {
+    navigateTo,
+    hasUnreadNotifications,
+    driverStatus,
+    toggleDriverStatus,
+    fuelPercent,
+    odometerKm,
+    safetyScore,
+    rtoPercent,
+    completedStops,
+  } = useApp();
+
+  const handlePerjalanan = onNavigatePerjalanan || (() => navigateTo('perjalanan'));
+  const handleProfil = onNavigateProfil || (() => navigateTo('profil'));
+  const handleNotifications = onNavigateNotifications || (() => navigateTo('notifikasi'));
+
   return (
     <View style={styles.container}>
       {/* 1. MODULAR TOP BAR (FIXED, NOT CRAMPED) */}
       <TopBar
         variant="logo"
         showNotificationBell
-        hasUnreadNotifications
-        onPressNotifications={onNavigateNotifications}
+        hasUnreadNotifications={hasUnreadNotifications}
+        onPressNotifications={handleNotifications}
       />
 
       <ScrollView
@@ -54,7 +71,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         {/* 2. DRIVER PROFILE HERO CARD (Interactive: Tap to view profile) */}
         <TouchableOpacity
           style={styles.heroCard}
-          onPress={onNavigateProfil}
+          onPress={handleProfil}
           activeOpacity={0.85}
         >
           <View style={styles.heroLeft}>
@@ -75,9 +92,19 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             </View>
           </View>
 
-          <View style={styles.heroStatusBadge}>
-            <Text style={styles.heroStatusText}>Aktif</Text>
-          </View>
+          <TouchableOpacity
+            style={styles.heroStatusBadge}
+            onPress={() => {
+              toggleDriverStatus();
+              Alert.alert(
+                'Status Mitra Pengemudi',
+                `Status Anda kini: ${driverStatus === 'Aktif' ? 'Istirahat (Off-Duty)' : 'Aktif (On-Duty) dan siap menerima tugas perjalanan.'}`
+              );
+            }}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.heroStatusText}>{driverStatus}</Text>
+          </TouchableOpacity>
         </TouchableOpacity>
 
         {/* 3. CARD: TUGAS HARI INI */}
@@ -91,10 +118,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             </View>
             <TouchableOpacity
               style={styles.cardHeaderRight}
-              onPress={onNavigatePerjalanan}
+              onPress={handlePerjalanan}
               activeOpacity={0.7}
             >
-              <Text style={styles.activeTaskLink}>1 Penugasan Aktif</Text>
+              <Text style={styles.activeTaskLink}>
+                {completedStops.length >= 4
+                  ? 'Semua Stop Selesai'
+                  : `${completedStops.length}/4 Stop Selesai`}
+              </Text>
               <ChevronRight size={14} color={colors.primary} strokeWidth={2.5} />
             </TouchableOpacity>
           </View>
@@ -136,14 +167,16 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             </View>
           </View>
 
-          {/* Action Button: Mulai Perjalanan */}
+          {/* Action Button: Mulai / Lanjutkan Perjalanan */}
           <TouchableOpacity
             style={styles.primaryActionButton}
-            onPress={onNavigatePerjalanan}
+            onPress={handlePerjalanan}
             activeOpacity={0.85}
           >
             <Play size={14} color={colors.white} fill={colors.white} style={{ marginRight: 8 }} />
-            <Text style={styles.primaryActionText}>Mulai Perjalanan</Text>
+            <Text style={styles.primaryActionText}>
+              {completedStops.length > 1 ? 'Lanjutkan Perjalanan' : 'Mulai Perjalanan'}
+            </Text>
           </TouchableOpacity>
         </View>
 
@@ -204,7 +237,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           {/* Kartu Kiri: Safety Score */}
           <TouchableOpacity
             style={styles.halfCard}
-            onPress={onNavigateProfil}
+            onPress={handleProfil}
             activeOpacity={0.85}
           >
             <View style={styles.halfCardHeader}>
@@ -237,7 +270,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           {/* Kartu Kanan: Progress RTO */}
           <TouchableOpacity
             style={styles.halfCard}
-            onPress={onNavigateProfil}
+            onPress={handleProfil}
             activeOpacity={0.85}
           >
             <View style={styles.halfCardHeader}>
