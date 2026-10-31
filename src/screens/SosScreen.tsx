@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import {
   Alert,
+  Modal,
   ScrollView,
   StyleSheet,
   Text,
@@ -13,8 +14,12 @@ import {
   HelpCircle,
   MapPin,
   PhoneCall,
+  Radio,
   ShieldAlert,
+  Truck,
+  User,
   Wrench,
+  X,
 } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 import { TopBar } from '../components/TopBar';
@@ -31,21 +36,41 @@ export const SosScreen: React.FC<SosScreenProps> = (props) => {
     sosTimestamp,
     activateSos,
     deactivateSos,
+    driverProfile,
     goBack,
   } = useApp();
 
   const handleBack = props.onBack || goBack;
   const [selectedCategory, setSelectedCategory] = useState<string | null>(sosCategory);
+  const [isConfirmModalVisible, setIsConfirmModalVisible] = useState<boolean>(false);
+  const [pendingCategory, setPendingCategory] = useState<string | null>(null);
 
-  const handleTriggerSos = (categoryName?: string) => {
-    activateSos(categoryName);
+  const handleOpenConfirmModal = (categoryName?: string, categoryKey?: string) => {
+    if (isSosActive) {
+      handleDeactivateSos();
+      return;
+    }
+    setPendingCategory(categoryName || 'Panggilan Darurat Umum');
+    if (categoryKey) {
+      setSelectedCategory(categoryKey);
+    }
+    setIsConfirmModalVisible(true);
+  };
+
+  const handleConfirmActivateSos = () => {
+    setIsConfirmModalVisible(false);
+    const categoryToActivate = pendingCategory || 'Panggilan Darurat Umum';
+    activateSos(categoryToActivate);
     Alert.alert(
       'Sinyal Darurat Dipancarkan',
-      `Pusat Kendali Dispatcher FLEETRA telah menerima sinyal SOS dari armada B 9821 KCE (Budi Santoso) di lokasi Jl. Pasteur No. 142, Bandung.${
-        categoryName ? ` Kategori: ${categoryName}.` : ''
-      } Petugas dispatcher dan tim tanggap darurat segera menghubungi Anda. Kondisi darurat ini tersimpan secara in-memory di seluruh aplikasi.`,
+      `Pusat Kendali Dispatcher FLEETRA telah menerima sinyal SOS dari armada ${driverProfile.vehiclePlate} (${driverProfile.name}) di lokasi Jl. Pasteur No. 142, Bandung.\n\nKategori: ${categoryToActivate}.\n\nPetugas dispatcher dan tim tanggap darurat segera menghubungi Anda. Status darurat tersimpan aktif di seluruh sistem aplikasi.`,
       [{ text: 'Konfirmasi Diterima' }]
     );
+  };
+
+  const handleCancelConfirm = () => {
+    setIsConfirmModalVisible(false);
+    setPendingCategory(null);
   };
 
   const handleDeactivateSos = () => {
@@ -59,6 +84,7 @@ export const SosScreen: React.FC<SosScreenProps> = (props) => {
           onPress: () => {
             deactivateSos();
             setSelectedCategory(null);
+            setPendingCategory(null);
             Alert.alert('Status Normal', 'Sinyal darurat telah dinonaktifkan.');
           },
         },
@@ -96,7 +122,7 @@ export const SosScreen: React.FC<SosScreenProps> = (props) => {
         {/* 3. BIG RED SOS CALL BUTTON */}
         <TouchableOpacity
           style={[styles.bigSosButton, isSosActive && styles.bigSosButtonActive]}
-          onPress={() => (isSosActive ? handleDeactivateSos() : handleTriggerSos())}
+          onPress={() => (isSosActive ? handleDeactivateSos() : handleOpenConfirmModal())}
           activeOpacity={0.85}
         >
           <View style={styles.sosInnerContent}>
@@ -138,10 +164,9 @@ export const SosScreen: React.FC<SosScreenProps> = (props) => {
                 styles.categoryCard,
                 selectedCategory === 'kendaraan' && styles.categoryCardSelected,
               ]}
-              onPress={() => {
-                setSelectedCategory('kendaraan');
-                handleTriggerSos('Kendala Mesin / Mogok / Ban Pecah');
-              }}
+              onPress={() =>
+                handleOpenConfirmModal('Kendala Mesin / Mogok / Ban Pecah', 'kendaraan')
+              }
               activeOpacity={0.8}
             >
               <View style={styles.categoryIconCircle}>
@@ -156,10 +181,9 @@ export const SosScreen: React.FC<SosScreenProps> = (props) => {
                 styles.categoryCard,
                 selectedCategory === 'kecelakaan' && styles.categoryCardSelected,
               ]}
-              onPress={() => {
-                setSelectedCategory('kecelakaan');
-                handleTriggerSos('Insiden Kecelakaan Lalu Lintas');
-              }}
+              onPress={() =>
+                handleOpenConfirmModal('Insiden Kecelakaan Lalu Lintas', 'kecelakaan')
+              }
               activeOpacity={0.8}
             >
               <View style={styles.categoryIconCircle}>
@@ -174,10 +198,9 @@ export const SosScreen: React.FC<SosScreenProps> = (props) => {
                 styles.categoryCard,
                 selectedCategory === 'keamanan' && styles.categoryCardSelected,
               ]}
-              onPress={() => {
-                setSelectedCategory('keamanan');
-                handleTriggerSos('Isu Keamanan / Pembegalan / Bahaya Kriminal');
-              }}
+              onPress={() =>
+                handleOpenConfirmModal('Isu Keamanan / Pembegalan / Bahaya Kriminal', 'keamanan')
+              }
               activeOpacity={0.8}
             >
               <View style={styles.categoryIconCircle}>
@@ -192,10 +215,9 @@ export const SosScreen: React.FC<SosScreenProps> = (props) => {
                 styles.categoryCard,
                 selectedCategory === 'lainnya' && styles.categoryCardSelected,
               ]}
-              onPress={() => {
-                setSelectedCategory('lainnya');
-                handleTriggerSos('Kendala Operasional Lain');
-              }}
+              onPress={() =>
+                handleOpenConfirmModal('Kendala Operasional Lain', 'lainnya')
+              }
               activeOpacity={0.8}
             >
               <View style={styles.categoryIconCircle}>
@@ -283,6 +305,82 @@ export const SosScreen: React.FC<SosScreenProps> = (props) => {
           </Text>
         </View>
       </ScrollView>
+
+      {/* 8. MODAL ALERT KONFIRMASI SADAR DARURAT SOS */}
+      <Modal
+        visible={isConfirmModalVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={handleCancelConfirm}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            {/* Warning Shield Header */}
+            <View style={styles.modalIconWrapper}>
+              <ShieldAlert size={30} color={colors.dangerDark} strokeWidth={2.2} />
+            </View>
+
+            <Text style={styles.modalTitle}>Konfirmasi Sinyal Darurat SOS</Text>
+
+            <Text style={styles.modalDescription}>
+              Apakah Anda yakin dan sadar ingin mengaktifkan sinyal darurat SOS? Sinyal prioritas tinggi dan telematika langsung akan dikirimkan ke konsol dispatcher FLEETRA.
+            </Text>
+
+            {/* Emergency Context Details */}
+            <View style={styles.modalDetailBox}>
+              <View style={styles.modalDetailRow}>
+                <Radio size={13} color={colors.primary} strokeWidth={2.2} />
+                <Text style={styles.modalDetailLabel}>Kategori</Text>
+                <Text style={styles.modalDetailColon}>:</Text>
+                <Text style={styles.modalDetailValue} numberOfLines={1}>
+                  {pendingCategory || 'Panggilan Darurat Umum'}
+                </Text>
+              </View>
+
+              <View style={styles.modalDetailRow}>
+                <Truck size={13} color={colors.primary} strokeWidth={2.2} />
+                <Text style={styles.modalDetailLabel}>Armada</Text>
+                <Text style={styles.modalDetailColon}>:</Text>
+                <Text style={styles.modalDetailValue} numberOfLines={1}>
+                  {driverProfile.vehiclePlate} ({driverProfile.name})
+                </Text>
+              </View>
+
+              <View style={styles.modalDetailRow}>
+                <MapPin size={13} color={colors.primary} strokeWidth={2.2} />
+                <Text style={styles.modalDetailLabel}>Lokasi</Text>
+                <Text style={styles.modalDetailColon}>:</Text>
+                <Text style={styles.modalDetailValue} numberOfLines={1}>
+                  Jl. Pasteur No. 142, Bandung
+                </Text>
+              </View>
+            </View>
+
+            <Text style={styles.modalDisclaimer}>
+              Pastikan kendaraan Anda telah menepi di bahu jalan yang aman sebelum menunggu respons tim dispatcher.
+            </Text>
+
+            {/* Action Buttons */}
+            <View style={styles.modalButtonsRow}>
+              <TouchableOpacity
+                style={styles.modalBtnCancel}
+                onPress={handleCancelConfirm}
+                activeOpacity={0.75}
+              >
+                <Text style={styles.modalBtnCancelText}>Batal</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.modalBtnConfirm}
+                onPress={handleConfirmActivateSos}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.modalBtnConfirmText}>Ya, Aktifkan SOS</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -553,5 +651,132 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     marginLeft: 8,
     lineHeight: 15,
+  },
+
+  /* MODAL ALERT STYLES */
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(15, 23, 42, 0.65)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  modalContent: {
+    width: '100%',
+    maxWidth: 350,
+    backgroundColor: colors.surface,
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 8,
+  },
+  modalIconWrapper: {
+    width: 58,
+    height: 58,
+    borderRadius: 29,
+    backgroundColor: '#FEF2F2',
+    borderWidth: 2,
+    borderColor: '#FECACA',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  modalTitle: {
+    fontSize: 16.5,
+    fontWeight: '800',
+    color: colors.text,
+    textAlign: 'center',
+    letterSpacing: -0.2,
+    marginBottom: 8,
+  },
+  modalDescription: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 17,
+    marginBottom: 14,
+  },
+  modalDetailBox: {
+    width: '100%',
+    backgroundColor: colors.surface2,
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+    gap: 8,
+    marginBottom: 12,
+  },
+  modalDetailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  modalDetailLabel: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.textMuted,
+    width: 54,
+  },
+  modalDetailColon: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.textMuted,
+    marginRight: 6,
+  },
+  modalDetailValue: {
+    flex: 1,
+    fontSize: 11.5,
+    fontWeight: '700',
+    color: colors.text,
+  },
+  modalDisclaimer: {
+    fontSize: 10.5,
+    color: colors.textMuted,
+    textAlign: 'center',
+    lineHeight: 14.5,
+    marginBottom: 16,
+  },
+  modalButtonsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    width: '100%',
+  },
+  modalBtnCancel: {
+    flex: 1,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: colors.surface2,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalBtnCancelText: {
+    fontSize: 12.5,
+    fontWeight: '700',
+    color: colors.textSecondary,
+  },
+  modalBtnConfirm: {
+    flex: 1.3,
+    height: 44,
+    borderRadius: 12,
+    backgroundColor: colors.dangerDark,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: colors.dangerDark,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 5,
+    elevation: 2,
+  },
+  modalBtnConfirmText: {
+    fontSize: 12.5,
+    fontWeight: '700',
+    color: colors.white,
   },
 });
