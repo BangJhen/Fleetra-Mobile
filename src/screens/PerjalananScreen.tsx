@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   Alert,
-  Modal,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
@@ -9,252 +9,337 @@ import {
   View,
 } from 'react-native';
 import {
-  ArrowLeft,
-  Camera,
-  Check,
   CheckCircle2,
+  ChevronRight,
+  Circle,
   Clock,
-  FileCheck,
   MapPin,
-  Navigation,
-  PenTool,
+  Milestone,
+  Play,
   Truck,
-  X,
 } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 
-interface PerjalananScreenProps {
-  onBackToHome: () => void;
+interface StopItem {
+  id: number;
+  name: string;
+  address: string;
+  status: 'selesai' | 'tujuan_saat_ini' | 'berikutnya' | 'menunggu';
+  time?: string;
+  distance?: string;
 }
 
-export const PerjalananScreen: React.FC<PerjalananScreenProps> = ({ onBackToHome }) => {
-  const [epodModalVisible, setEpodModalVisible] = useState(false);
-  const [photoTaken, setPhotoTaken] = useState(false);
-  const [signed, setSigned] = useState(false);
-  const [completedStops, setCompletedStops] = useState<number[]>([1]);
+interface PerjalananScreenProps {
+  onBackToHome: () => void;
+  onOpenDetailStop: (stopId: number) => void;
+  completedStops: number[];
+}
 
-  const handleConfirmEpod = () => {
-    if (!photoTaken || !signed) {
-      Alert.alert(
-        'Bukti Belum Lengkap',
-        'Harap ambil foto bukti barang dan bubuhkan tanda tangan digital penerima.'
-      );
-      return;
-    }
-    setCompletedStops((prev) => [...prev, 2]);
-    setEpodModalVisible(false);
-    Alert.alert('Sukses', 'Bukti pengiriman e-POD Toko Sumber Rejeki berhasil diunggah!');
-  };
+export const PerjalananScreen: React.FC<PerjalananScreenProps> = ({
+  onBackToHome,
+  onOpenDetailStop,
+  completedStops,
+}) => {
+  const [activeSegmentTab, setActiveSegmentTab] = useState<'aktif' | 'riwayat'>('aktif');
+
+  // Stop list based on mockup
+  const stops: StopItem[] = [
+    {
+      id: 1,
+      name: 'Gudang Logistik Cimahi',
+      address: 'Jl. Industri No. 12, Cimahi',
+      status: completedStops.includes(1) ? 'selesai' : 'tujuan_saat_ini',
+      time: '08.10',
+    },
+    {
+      id: 2,
+      name: 'Toko Sumber Rejeki',
+      address: 'Jl. Sudirman No. 45, Bandung',
+      status: completedStops.includes(2)
+        ? 'selesai'
+        : completedStops.includes(1)
+        ? 'tujuan_saat_ini'
+        : 'berikutnya',
+      time: completedStops.includes(2) ? '09.15' : undefined,
+    },
+    {
+      id: 3,
+      name: 'Minimarket Sejahtera',
+      address: 'Jl. Flyover Pasirkoja, Bandung',
+      status: completedStops.includes(3)
+        ? 'selesai'
+        : completedStops.includes(2)
+        ? 'tujuan_saat_ini'
+        : 'berikutnya',
+    },
+    {
+      id: 4,
+      name: 'Toko Makmur Jaya',
+      address: 'Jl. Peta No. 88, Bandung',
+      status: completedStops.includes(4) ? 'selesai' : 'menunggu',
+    },
+  ];
+
+  const completedCount = completedStops.length;
+  const progressPercent = (completedCount / 4) * 100;
 
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={onBackToHome}>
-          <ArrowLeft size={20} color={colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Rute Perjalanan Aktif</Text>
-        <View style={{ width: 40 }} />
+    <ScrollView
+      style={styles.container}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles.scrollContent}
+    >
+      {/* 1. TOP HEADER / APP BAR */}
+      <View style={styles.topBar}>
+        <View style={styles.logoRow}>
+          <Image
+            source={require('../../assets/Fleetra Blue Ribbon Logo.png')}
+            style={styles.logoImage}
+            resizeMode="contain"
+          />
+        </View>
       </View>
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {/* Trip Overview Card */}
-        <View style={styles.tripCard}>
-          <View style={styles.tripBadgeRow}>
-            <View style={styles.tripCodeBadge}>
-              <Text style={styles.tripCodeText}>#TRIP-2026-089</Text>
-            </View>
-            <View style={styles.livePill}>
-              <View style={styles.pulseDot} />
-              <Text style={styles.livePillText}>Sedang Berjalan</Text>
-            </View>
-          </View>
+      {/* 2. PAGE TITLE & SUBTITLE */}
+      <View style={styles.pageHeader}>
+        <Text style={styles.pageTitle}>Perjalanan</Text>
+        <Text style={styles.pageSubtitle}>
+          Kelola dan jalankan penugasan{'\n'}harian Anda
+        </Text>
+      </View>
 
-          <Text style={styles.tripHeadline}>Gudang Cimahi → 4 Titik Bandung Kota</Text>
-          <Text style={styles.tripSubtext}>Armada: Gran Max Blind Van (B 9821 KCE)</Text>
+      {/* 3. SEGMENTED TABS (TUGAS AKTIF / RIWAYAT) */}
+      <View style={styles.segmentContainer}>
+        <TouchableOpacity
+          style={[
+            styles.segmentButton,
+            activeSegmentTab === 'aktif' && styles.segmentButtonActive,
+          ]}
+          onPress={() => setActiveSegmentTab('aktif')}
+          activeOpacity={0.8}
+        >
+          <Text
+            style={[
+              styles.segmentText,
+              activeSegmentTab === 'aktif' && styles.segmentTextActive,
+            ]}
+          >
+            Tugas Aktif
+          </Text>
+        </TouchableOpacity>
 
-          <View style={styles.summaryStatsRow}>
-            <View style={styles.summaryStatItem}>
-              <MapPin size={14} color={colors.primary} />
-              <Text style={styles.summaryStatVal}>4 Stop</Text>
-              <Text style={styles.summaryStatLbl}>Tujuan</Text>
-            </View>
-            <View style={styles.statDivider} />
-            <View style={styles.summaryStatItem}>
-              <Clock size={14} color={colors.primary} />
-              <Text style={styles.summaryStatVal}>± 1j 15m</Text>
-              <Text style={styles.summaryStatLbl}>Estimasi</Text>
-            </View>
-            <View style={styles.statDivider} />
-            <View style={styles.summaryStatItem}>
-              <Truck size={14} color={colors.primary} />
-              <Text style={styles.summaryStatVal}>28,4 km</Text>
-              <Text style={styles.summaryStatLbl}>Jarak Rute</Text>
-            </View>
-          </View>
-        </View>
+        <TouchableOpacity
+          style={[
+            styles.segmentButton,
+            activeSegmentTab === 'riwayat' && styles.segmentButtonActive,
+          ]}
+          onPress={() => {
+            setActiveSegmentTab('riwayat');
+            Alert.alert(
+              'Riwayat Perjalanan',
+              'Menampilkan 48 penugasan selesai bulan ini dengan total 1.840 km.'
+            );
+          }}
+          activeOpacity={0.8}
+        >
+          <Text
+            style={[
+              styles.segmentText,
+              activeSegmentTab === 'riwayat' && styles.segmentTextActive,
+            ]}
+          >
+            Riwayat
+          </Text>
+        </TouchableOpacity>
+      </View>
 
-        {/* Section Title */}
-        <Text style={styles.sectionTitle}>Daftar Titik Singgah (Stops)</Text>
-
-        {/* Stop 1: Gudang Cimahi (Selesai) */}
-        <View style={styles.stopCard}>
-          <View style={styles.stopIconCol}>
-            <View style={[styles.stopIconCircle, styles.stopIconCompleted]}>
-              <Check size={14} color={colors.white} strokeWidth={3} />
-            </View>
-            <View style={styles.timelineLine} />
-          </View>
-          <View style={styles.stopContent}>
-            <View style={styles.stopHeader}>
-              <Text style={styles.stopName}>1. Gudang Logistik Cimahi (Pickup)</Text>
-              <Text style={styles.completedBadge}>Selesai 08:30</Text>
-            </View>
-            <Text style={styles.stopAddress}>Jl. Raya Baros No. 12, Kota Cimahi</Text>
-            <Text style={styles.cargoInfo}>Muatan: 45 Koli Paket Ritel</Text>
-          </View>
-        </View>
-
-        {/* Stop 2: Toko Sumber Rejeki (Aktif) */}
-        <View style={[styles.stopCard, styles.stopCardActive]}>
-          <View style={styles.stopIconCol}>
-            <View style={[styles.stopIconCircle, styles.stopIconActive]}>
-              <Navigation size={14} color={colors.white} strokeWidth={2.5} />
-            </View>
-            <View style={styles.timelineLine} />
-          </View>
-          <View style={styles.stopContent}>
-            <View style={styles.stopHeader}>
-              <Text style={styles.stopName}>2. Toko Sumber Rejeki (Drop-off)</Text>
-              <Text style={styles.activeBadge}>Menuju Lokasi</Text>
-            </View>
-            <Text style={styles.stopAddress}>Jl. Asia Afrika No. 45, Braga, Bandung</Text>
-            <Text style={styles.cargoInfo}>Muatan: 12 Koli • PIC: Bpk. Ridwan</Text>
-
-            {completedStops.includes(2) ? (
-              <View style={styles.doneEpodRow}>
-                <CheckCircle2 size={16} color={colors.success} />
-                <Text style={styles.doneEpodText}>e-POD Telah Terverifikasi</Text>
-              </View>
-            ) : (
-              <TouchableOpacity
-                style={styles.epodTriggerButton}
-                onPress={() => setEpodModalVisible(true)}
-                activeOpacity={0.85}
-              >
-                <FileCheck size={16} color={colors.white} style={{ marginRight: 6 }} />
-                <Text style={styles.epodTriggerText}>Serah Terima Barang (e-POD)</Text>
-              </TouchableOpacity>
-            )}
+      {/* 4. ACTIVE TRIP CARD */}
+      <View style={styles.tripCard}>
+        {/* Card Header */}
+        <View style={styles.tripHeaderRow}>
+          <Text style={styles.tripCode}>#TRIP-2026-089</Text>
+          <View style={styles.statusPillBlue}>
+            <Truck size={12} color={colors.primary} strokeWidth={2.2} />
+            <Text style={styles.statusPillBlueText}>Dalam Perjalanan</Text>
           </View>
         </View>
 
-        {/* Stop 3: Ritel Prima */}
-        <View style={styles.stopCard}>
-          <View style={styles.stopIconCol}>
-            <View style={[styles.stopIconCircle, styles.stopIconPending]}>
-              <Text style={styles.pendingNumber}>3</Text>
+        <Text style={styles.tripRoute}>Gudang Cimahi → 4 Titik Bandung Kota</Text>
+
+        {/* 3-Column Metrics */}
+        <View style={styles.metricsBox}>
+          <View style={styles.metricCol}>
+            <View style={styles.metricIconRow}>
+              <Clock size={13} color={colors.primary} strokeWidth={2.2} />
+              <Text style={styles.metricValue}>08.00 WIB</Text>
             </View>
-            <View style={styles.timelineLine} />
+            <Text style={styles.metricLabel}>Waktu Mulai</Text>
           </View>
-          <View style={styles.stopContent}>
-            <View style={styles.stopHeader}>
-              <Text style={styles.stopName}>3. Ritel Prima Buah Batu</Text>
-              <Text style={styles.pendingBadge}>Menunggu</Text>
+
+          <View style={styles.metricDivider} />
+
+          <View style={styles.metricCol}>
+            <View style={styles.metricIconRow}>
+              <MapPin size={13} color={colors.primary} strokeWidth={2.2} />
+              <Text style={styles.metricValue}>4 Stop</Text>
             </View>
-            <Text style={styles.stopAddress}>Jl. Buah Batu No. 112, Bandung</Text>
-            <Text style={styles.cargoInfo}>Muatan: 18 Koli • Estimasi: 10:15 WIB</Text>
+            <Text style={styles.metricLabel}>Tujuan</Text>
+          </View>
+
+          <View style={styles.metricDivider} />
+
+          <View style={styles.metricCol}>
+            <View style={styles.metricIconRow}>
+              <Milestone size={13} color={colors.primary} strokeWidth={2.2} />
+              <Text style={styles.metricValue}>28,4 km</Text>
+            </View>
+            <Text style={styles.metricLabel}>Total Jarak</Text>
           </View>
         </View>
 
-        {/* Stop 4: Grosir Sukajadi */}
-        <View style={styles.stopCard}>
-          <View style={styles.stopIconCol}>
-            <View style={[styles.stopIconCircle, styles.stopIconPending]}>
-              <Text style={styles.pendingNumber}>4</Text>
-            </View>
+        {/* Horizontal Progress Bar */}
+        <View style={styles.progressContainer}>
+          <View style={styles.progressHeaderRow}>
+            <Text style={styles.progressLabel}>
+              {completedCount} / 4 stop selesai
+            </Text>
+            <Text style={styles.progressPctText}>{progressPercent}%</Text>
           </View>
-          <View style={styles.stopContent}>
-            <View style={styles.stopHeader}>
-              <Text style={styles.stopName}>4. Grosir Sukajadi Sejahtera</Text>
-              <Text style={styles.pendingBadge}>Menunggu</Text>
-            </View>
-            <Text style={styles.stopAddress}>Jl. Sukajadi No. 78, Pasteur, Bandung</Text>
-            <Text style={styles.cargoInfo}>Muatan: 15 Koli • Estimasi: 11:00 WIB</Text>
+          <View style={styles.progressBarBg}>
+            <View
+              style={[
+                styles.progressBarFill,
+                { width: `${Math.max(progressPercent, 12)}%` },
+              ]}
+            />
           </View>
         </View>
-      </ScrollView>
 
-      {/* MODAL e-POD (FOTO & TANDA TANGAN DIGITAL) */}
-      <Modal visible={epodModalVisible} transparent animationType="slide">
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <View style={styles.modalHeader}>
-              <View>
-                <Text style={styles.modalTitle}>Bukti Serah Terima (e-POD)</Text>
-                <Text style={styles.modalSub}>Toko Sumber Rejeki (#TRIP-2026-089)</Text>
-              </View>
-              <TouchableOpacity onPress={() => setEpodModalVisible(false)}>
-                <X size={20} color={colors.textMuted} />
-              </TouchableOpacity>
-            </View>
+        {/* Primary Action Button */}
+        <TouchableOpacity
+          style={styles.actionButton}
+          onPress={() => onOpenDetailStop(2)}
+          activeOpacity={0.85}
+        >
+          <Play size={15} color={colors.white} fill={colors.white} style={{ marginRight: 8 }} />
+          <Text style={styles.actionButtonText}>Lanjutkan Perjalanan</Text>
+        </TouchableOpacity>
+      </View>
 
-            {/* Step 1: Foto Barang */}
-            <Text style={styles.inputLabel}>1. Foto Bukti Penyerahan Kargo</Text>
+      {/* 5. SECTION: DETAIL RUTE */}
+      <View style={styles.sectionHeaderRow}>
+        <Text style={styles.sectionTitle}>Detail Rute</Text>
+        <TouchableOpacity
+          style={styles.sectionLinkRow}
+          onPress={() =>
+            Alert.alert(
+              'Peta Navigasi',
+              'Memuat koridor rute OSRM dari Cimahi menuju 4 titik pengantaran Bandung Kota.'
+            )
+          }
+          activeOpacity={0.7}
+        >
+          <Text style={styles.sectionLinkText}>Lihat Rute di Peta</Text>
+          <ChevronRight size={14} color={colors.primary} strokeWidth={2.2} />
+        </TouchableOpacity>
+      </View>
+
+      {/* 6. TIMELINE STOP LIST */}
+      <View style={styles.timelineCard}>
+        {stops.map((stop, index) => {
+          const isLast = index === stops.length - 1;
+          const isDone = stop.status === 'selesai';
+          const isCurrent = stop.status === 'tujuan_saat_ini';
+          const isNext = stop.status === 'berikutnya';
+
+          return (
             <TouchableOpacity
-              style={[styles.uploadBox, photoTaken && styles.uploadBoxDone]}
-              onPress={() => setPhotoTaken(!photoTaken)}
+              key={stop.id}
+              style={[
+                styles.stopRow,
+                isLast && styles.stopRowLast,
+                isCurrent && styles.stopRowCurrent,
+              ]}
+              onPress={() => onOpenDetailStop(stop.id)}
               activeOpacity={0.8}
             >
-              {photoTaken ? (
-                <View style={styles.uploadedRow}>
-                  <CheckCircle2 size={24} color={colors.success} />
-                  <Text style={styles.uploadedText}>Foto Berhasil Diambil (kargo_089_stop2.jpg)</Text>
-                </View>
-              ) : (
-                <View style={styles.uploadPlaceholder}>
-                  <Camera size={26} color={colors.primary} />
-                  <Text style={styles.uploadText}>Ketuk untuk Ambil Foto Barang</Text>
-                </View>
-              )}
-            </TouchableOpacity>
+              {/* Left Timeline Indicator */}
+              <View style={styles.timelineIndicatorCol}>
+                {isDone ? (
+                  <View style={styles.timelineIconDone}>
+                    <CheckCircle2 size={18} color={colors.success} strokeWidth={2.5} />
+                  </View>
+                ) : isCurrent ? (
+                  <View style={styles.timelineIconCurrent}>
+                    <View style={styles.timelineDotBlue} />
+                  </View>
+                ) : (
+                  <View style={styles.timelineIconPending}>
+                    <Circle size={10} color={colors.textDisabled} strokeWidth={2} />
+                  </View>
+                )}
 
-            {/* Step 2: Tanda Tangan Penerima */}
-            <Text style={styles.inputLabel}>2. Tanda Tangan Digital Penerima</Text>
-            <TouchableOpacity
-              style={[styles.signBox, signed && styles.signBoxDone]}
-              onPress={() => setSigned(!signed)}
-              activeOpacity={0.8}
-            >
-              {signed ? (
-                <View style={styles.signedContent}>
-                  <Text style={styles.signatureSample}>Budi & Ridwan S.</Text>
-                  <Text style={styles.signedCaption}>Tanda tangan terverifikasi digital</Text>
-                </View>
-              ) : (
-                <View style={styles.uploadPlaceholder}>
-                  <PenTool size={24} color={colors.textMuted} />
-                  <Text style={styles.signPlaceholderText}>Sentuh di sini untuk bubuhkan tanda tangan</Text>
-                </View>
-              )}
-            </TouchableOpacity>
+                {!isLast && (
+                  <View
+                    style={[
+                      styles.timelineLine,
+                      isDone ? styles.timelineLineDone : styles.timelineLinePending,
+                    ]}
+                  />
+                )}
+              </View>
 
-            {/* Konfirmasi Tombol */}
-            <TouchableOpacity
-              style={styles.confirmEpodButton}
-              onPress={handleConfirmEpod}
-              activeOpacity={0.85}
-            >
-              <Check size={18} color={colors.white} strokeWidth={2.5} style={{ marginRight: 6 }} />
-              <Text style={styles.confirmEpodText}>Konfirmasi Serah Terima</Text>
+              {/* Stop Info */}
+              <View style={styles.stopInfoCol}>
+                <View style={styles.stopInfoHeaderRow}>
+                  <Text
+                    style={[
+                      styles.stopName,
+                      isCurrent && styles.stopNameCurrent,
+                    ]}
+                    numberOfLines={1}
+                  >
+                    {stop.name}
+                  </Text>
+
+                  {/* Status Badge */}
+                  {isDone && (
+                    <View style={styles.badgeDone}>
+                      <Text style={styles.badgeDoneText}>Selesai</Text>
+                      {stop.time && (
+                        <Text style={styles.badgeDoneSub}>{stop.time}</Text>
+                      )}
+                    </View>
+                  )}
+
+                  {isCurrent && (
+                    <View style={styles.badgeCurrent}>
+                      <Text style={styles.badgeCurrentText}>Tujuan Saat Ini</Text>
+                    </View>
+                  )}
+
+                  {isNext && (
+                    <View style={styles.badgeNext}>
+                      <Text style={styles.badgeNextText}>Berikutnya</Text>
+                    </View>
+                  )}
+
+                  {stop.status === 'menunggu' && (
+                    <View style={styles.badgeWaiting}>
+                      <Text style={styles.badgeWaitingText}>Menunggu</Text>
+                    </View>
+                  )}
+                </View>
+
+                <Text style={styles.stopAddress} numberOfLines={1}>
+                  {stop.address}
+                </Text>
+              </View>
             </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-    </View>
+          );
+        })}
+      </View>
+    </ScrollView>
   );
 };
 
@@ -263,354 +348,393 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.bg,
   },
-  header: {
+  scrollContent: {
+    paddingBottom: 110,
+  },
+
+  /* TOP BAR */
+  topBar: {
+    paddingHorizontal: 18,
+    paddingTop: 8,
+    paddingBottom: 4,
+  },
+  logoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logoImage: {
+    width: 120,
+    height: 30,
+  },
+
+  /* PAGE HEADER */
+  pageHeader: {
+    paddingHorizontal: 18,
+    marginTop: 6,
+    marginBottom: 14,
+  },
+  pageTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: colors.text,
+    letterSpacing: -0.3,
+  },
+  pageSubtitle: {
+    fontSize: 13,
+    color: colors.textMuted,
+    marginTop: 4,
+    lineHeight: 18,
+  },
+
+  /* SEGMENTED TABS */
+  segmentContainer: {
+    flexDirection: 'row',
+    backgroundColor: colors.surface2,
+    marginHorizontal: 18,
+    padding: 3,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: 16,
+  },
+  segmentButton: {
+    flex: 1,
+    paddingVertical: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 9,
+  },
+  segmentButtonActive: {
+    backgroundColor: colors.surface,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 1.5 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  segmentText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: colors.textMuted,
+  },
+  segmentTextActive: {
+    color: colors.primary,
+    fontWeight: '700',
+  },
+
+  /* ACTIVE TRIP CARD */
+  tripCard: {
+    backgroundColor: colors.surface,
+    marginHorizontal: 18,
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: 18,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  tripHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 14,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    marginBottom: 6,
   },
-  backButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: colors.surface2,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerTitle: {
+  tripCode: {
     fontSize: 16,
     fontWeight: '700',
     color: colors.text,
+    letterSpacing: -0.2,
   },
-  scrollContent: {
-    padding: 16,
-    paddingBottom: 120,
-  },
-  tripCard: {
-    backgroundColor: colors.surface,
+  statusPillBlue: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.primaryMuted,
+    paddingHorizontal: 9,
+    paddingVertical: 4.5,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: colors.border,
-    padding: 16,
-    marginBottom: 16,
+    borderColor: '#BFDBFE',
   },
-  tripBadgeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  tripCodeBadge: {
-    backgroundColor: colors.primaryLight,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  tripCodeText: {
-    color: colors.primary,
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  livePill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.successLight,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  pulseDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: colors.success,
-    marginRight: 5,
-  },
-  livePillText: {
+  statusPillBlueText: {
     fontSize: 11,
-    fontWeight: '700',
-    color: colors.success,
+    fontWeight: '600',
+    color: colors.primary,
+    marginLeft: 5,
   },
-  tripHeadline: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  tripSubtext: {
-    fontSize: 12,
-    color: colors.textMuted,
-    marginTop: 2,
+  tripRoute: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: colors.textSecondary,
     marginBottom: 14,
   },
-  summaryStatsRow: {
+
+  /* METRICS BOX */
+  metricsBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-around',
-    backgroundColor: colors.bg,
+    backgroundColor: '#F8FAFC',
     borderRadius: 12,
-    paddingVertical: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderWidth: 1,
+    borderColor: '#EDF2F7',
+    marginBottom: 14,
   },
-  summaryStatItem: {
+  metricCol: {
+    flex: 1,
     alignItems: 'center',
   },
-  summaryStatVal: {
+  metricIconRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 3,
+  },
+  metricValue: {
     fontSize: 12,
     fontWeight: '700',
     color: colors.text,
-    marginTop: 2,
+    marginLeft: 4,
   },
-  summaryStatLbl: {
+  metricLabel: {
     fontSize: 10,
-    color: colors.textDisabled,
-    marginTop: 1,
+    color: colors.textMuted,
   },
-  statDivider: {
+  metricDivider: {
     width: 1,
     height: 24,
     backgroundColor: colors.border,
   },
-  sectionTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.text,
-    marginBottom: 12,
+
+  /* PROGRESS BAR */
+  progressContainer: {
+    marginBottom: 16,
   },
-  stopCard: {
+  progressHeaderRow: {
     flexDirection: 'row',
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: 14,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  progressLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.textSecondary,
+  },
+  progressPctText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: colors.primary,
+  },
+  progressBarBg: {
+    height: 7,
+    backgroundColor: '#E2E8F0',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: colors.primary,
+    borderRadius: 4,
+  },
+
+  /* ACTION BUTTON */
+  actionButton: {
+    flexDirection: 'row',
+    backgroundColor: colors.primary,
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  actionButtonText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: colors.white,
+  },
+
+  /* SECTION HEADER */
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 18,
     marginBottom: 10,
   },
-  stopCardActive: {
-    borderColor: colors.primary,
-    borderWidth: 1.5,
+  sectionTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: colors.text,
   },
-  stopIconCol: {
+  sectionLinkRow: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 12,
   },
-  stopIconCircle: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+  sectionLinkText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.primary,
+    marginRight: 2,
+  },
+
+  /* TIMELINE STOP LIST */
+  timelineCard: {
+    backgroundColor: colors.surface,
+    marginHorizontal: 18,
+    borderRadius: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.03,
+    shadowRadius: 5,
+    elevation: 1,
+  },
+  stopRow: {
+    flexDirection: 'row',
+    paddingVertical: 12,
+    alignItems: 'flex-start',
+  },
+  stopRowLast: {
+    borderBottomWidth: 0,
+  },
+  stopRowCurrent: {
+    backgroundColor: '#F8FAFC',
+    marginHorizontal: -8,
+    paddingHorizontal: 8,
+    borderRadius: 10,
+  },
+
+  /* TIMELINE INDICATOR */
+  timelineIndicatorCol: {
+    alignItems: 'center',
+    width: 24,
+    marginRight: 10,
+  },
+  timelineIconDone: {
+    width: 20,
+    height: 20,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  stopIconCompleted: {
-    backgroundColor: colors.success,
+  timelineIconCurrent: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 2,
+    borderColor: colors.primary,
+    backgroundColor: colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  stopIconActive: {
+  timelineDotBlue: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
     backgroundColor: colors.primary,
   },
-  stopIconPending: {
-    backgroundColor: colors.surface2,
-  },
-  pendingNumber: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: colors.textMuted,
+  timelineIconPending: {
+    width: 20,
+    height: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   timelineLine: {
     width: 2,
-    flex: 1,
-    backgroundColor: colors.border,
+    height: 38,
     marginTop: 4,
   },
-  stopContent: {
+  timelineLineDone: {
+    backgroundColor: colors.success,
+  },
+  timelineLinePending: {
+    backgroundColor: '#E2E8F0',
+  },
+
+  /* STOP INFO */
+  stopInfoCol: {
     flex: 1,
   },
-  stopHeader: {
+  stopInfoHeaderRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginBottom: 3,
   },
   stopName: {
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: '600',
     color: colors.text,
     flex: 1,
+    marginRight: 8,
   },
-  completedBadge: {
-    fontSize: 10.5,
-    fontWeight: '700',
-    color: colors.success,
-  },
-  activeBadge: {
-    fontSize: 10.5,
-    fontWeight: '700',
+  stopNameCurrent: {
     color: colors.primary,
-    backgroundColor: colors.primaryLight,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 8,
-  },
-  pendingBadge: {
-    fontSize: 10.5,
-    color: colors.textDisabled,
+    fontWeight: '700',
   },
   stopAddress: {
-    fontSize: 11.5,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  cargoInfo: {
     fontSize: 11,
     color: colors.textMuted,
-    marginTop: 4,
-  },
-  epodTriggerButton: {
-    backgroundColor: colors.primary,
-    height: 40,
-    borderRadius: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 10,
-  },
-  epodTriggerText: {
-    color: colors.white,
-    fontSize: 12,
-    fontWeight: '700',
-  },
-  doneEpodRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 8,
-    backgroundColor: colors.successLight,
-    padding: 6,
-    borderRadius: 8,
-  },
-  doneEpodText: {
-    fontSize: 11.5,
-    fontWeight: '600',
-    color: colors.success,
-    marginLeft: 6,
   },
 
-  /* MODAL */
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(15, 23, 42, 0.55)',
-    justifyContent: 'flex-end',
+  /* BADGES */
+  badgeDone: {
+    alignItems: 'flex-end',
   },
-  modalContent: {
-    backgroundColor: colors.surface,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    padding: 20,
-    paddingBottom: 36,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  modalTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  modalSub: {
-    fontSize: 11.5,
-    color: colors.textMuted,
-    marginTop: 2,
-  },
-  inputLabel: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: colors.text,
-    marginTop: 12,
-    marginBottom: 6,
-  },
-  uploadBox: {
-    height: 72,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    borderStyle: 'dashed',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.bg,
-  },
-  uploadBoxDone: {
-    borderColor: colors.success,
-    borderStyle: 'solid',
-    backgroundColor: colors.successLight,
-  },
-  uploadPlaceholder: {
-    alignItems: 'center',
-  },
-  uploadText: {
-    fontSize: 11.5,
-    color: colors.primary,
-    fontWeight: '600',
-    marginTop: 4,
-  },
-  uploadedRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  uploadedText: {
-    fontSize: 12,
-    color: colors.successDark,
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-  signBox: {
-    height: 90,
-    borderRadius: 12,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    borderStyle: 'dashed',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.bg,
-  },
-  signBoxDone: {
-    borderColor: colors.primary,
-    borderStyle: 'solid',
-    backgroundColor: colors.surface,
-  },
-  signPlaceholderText: {
-    fontSize: 11.5,
-    color: colors.textMuted,
-    marginTop: 4,
-  },
-  signedContent: {
-    alignItems: 'center',
-  },
-  signatureSample: {
-    fontSize: 22,
-    fontStyle: 'italic',
-    fontWeight: '700',
-    color: colors.primaryDark,
-  },
-  signedCaption: {
+  badgeDoneText: {
     fontSize: 10,
-    color: colors.textMuted,
-    marginTop: 4,
-  },
-  confirmEpodButton: {
-    height: 48,
-    backgroundColor: colors.primary,
-    borderRadius: 14,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 20,
-  },
-  confirmEpodText: {
-    color: colors.white,
-    fontSize: 14,
     fontWeight: '700',
+    color: colors.success,
+  },
+  badgeDoneSub: {
+    fontSize: 9,
+    color: colors.textMuted,
+  },
+  badgeCurrent: {
+    backgroundColor: colors.primaryMuted,
+    paddingHorizontal: 7,
+    paddingVertical: 2.5,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
+  },
+  badgeCurrentText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: colors.primary,
+  },
+  badgeNext: {
+    backgroundColor: '#FEF3C7',
+    paddingHorizontal: 7,
+    paddingVertical: 2.5,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#FDE68A',
+  },
+  badgeNextText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: colors.warningDark,
+  },
+  badgeWaiting: {
+    backgroundColor: colors.surface2,
+    paddingHorizontal: 7,
+    paddingVertical: 2.5,
+    borderRadius: 10,
+  },
+  badgeWaitingText: {
+    fontSize: 9,
+    fontWeight: '600',
+    color: colors.textDisabled,
   },
 });

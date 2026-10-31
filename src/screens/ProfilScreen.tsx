@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Alert,
   Image,
   ScrollView,
   StyleSheet,
@@ -8,11 +9,13 @@ import {
   View,
 } from 'react-native';
 import {
-  ArrowLeft,
-  Award,
-  CheckCircle2,
-  FileCheck2,
-  Phone,
+  ChevronRight,
+  Clock,
+  CreditCard,
+  FileText,
+  History,
+  LogOut,
+  Settings,
   ShieldCheck,
   TrendingUp,
   Truck,
@@ -23,153 +26,231 @@ import { CircularProgress } from '../components/CircularProgress';
 
 interface ProfilScreenProps {
   onBackToHome: () => void;
+  onNavigatePerjalanan?: () => void;
 }
 
-export const ProfilScreen: React.FC<ProfilScreenProps> = ({ onBackToHome }) => {
+export const ProfilScreen: React.FC<ProfilScreenProps> = ({
+  onBackToHome,
+  onNavigatePerjalanan,
+}) => {
   return (
-    <View style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={onBackToHome}>
-          <ArrowLeft size={20} color={colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Profil & Kemitraan RTO</Text>
-        <View style={{ width: 40 }} />
+    <ScrollView
+      style={styles.container}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles.scrollContent}
+    >
+      {/* 1. TOP HEADER / APP BAR */}
+      <View style={styles.topBar}>
+        <View style={styles.logoRow}>
+          <Image
+            source={require('../../assets/Fleetra Blue Ribbon Logo.png')}
+            style={styles.logoImage}
+            resizeMode="contain"
+          />
+        </View>
       </View>
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {/* Profile Card */}
-        <View style={styles.profileCard}>
+      {/* 2. PAGE TITLE & SUBTITLE */}
+      <View style={styles.pageHeader}>
+        <Text style={styles.pageTitle}>Profil</Text>
+        <Text style={styles.pageSubtitle}>
+          Kelola informasi akun, performa,{'\n'}dan progres kepemilikan armada.
+        </Text>
+      </View>
+
+      {/* 3. PROFILE HEADER CARD */}
+      <View style={styles.profileCard}>
+        <View style={styles.profileLeft}>
           <View style={styles.avatarWrapper}>
             <Image
               source={require('../../assets/driver-avatar.png')}
               style={styles.avatarImage}
             />
           </View>
-          <View style={styles.profileTextCol}>
+          <View style={styles.profileTextGroup}>
             <Text style={styles.driverName}>Budi Santoso</Text>
-            <Text style={styles.driverId}>ID Mitra: #DRV-1042 • Pengemudi Aktif</Text>
-            <View style={styles.statusBadgeRow}>
-              <View style={styles.badgePillGreen}>
-                <UserCheck size={12} color={colors.success} />
-                <Text style={styles.badgePillGreenText}>Terverifikasi</Text>
-              </View>
-              <View style={styles.badgePillBlue}>
-                <Truck size={12} color={colors.primary} />
-                <Text style={styles.badgePillBlueText}>Gran Max Blind Van</Text>
-              </View>
+            <Text style={styles.driverRole}>Mitra Pengemudi</Text>
+            <View style={styles.plateRow}>
+              <Truck size={12} color={colors.textMuted} strokeWidth={2} />
+              <Text style={styles.plateText}>B 9821 KCE</Text>
             </View>
           </View>
         </View>
 
-        {/* 1. SEWA-BELI (RENT-TO-OWN / RTO) EQUITY CARD */}
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <View style={styles.cardHeaderLeft}>
-              <TrendingUp size={18} color={colors.primary} strokeWidth={2.2} />
-              <Text style={styles.cardTitle}>Progres Kepemilikan Sewa-Beli (RTO)</Text>
-            </View>
+        <TouchableOpacity
+          style={styles.editProfileBtn}
+          onPress={() =>
+            Alert.alert('Edit Profil', 'Fitur pembaruan data diri mitra pengemudi.')
+          }
+          activeOpacity={0.75}
+        >
+          <Text style={styles.editProfileBtnText}>Edit Profil</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* 4. TWIN METRIC CARDS (SAFETY SCORE & KONDISI ARMADA) */}
+      <View style={styles.twinCardsRow}>
+        {/* Left Card: Safety Score */}
+        <View style={styles.twinCard}>
+          <View style={styles.twinCardHeader}>
+            <ShieldCheck size={16} color={colors.primary} strokeWidth={2.2} />
+            <Text style={styles.twinCardTitle}>Safety Score</Text>
           </View>
 
-          <View style={styles.rtoHeroRow}>
+          <View style={styles.twinCardBody}>
             <CircularProgress
-              size={72}
-              strokeWidth={6}
-              percentage={64.8}
+              size={54}
+              strokeWidth={4.5}
+              percentage={94}
               color={colors.primary}
               bgColor="#E2E8F0"
             >
-              <Text style={styles.rtoPctBig}>64,8%</Text>
+              <Text style={styles.scoreTextMain}>94</Text>
+              <Text style={styles.scoreTextSub}>/100</Text>
             </CircularProgress>
 
-            <View style={styles.rtoHeroText}>
-              <Text style={styles.rtoTenureTitle}>Bulan ke-23 dari 36 Bulan</Text>
-              <Text style={styles.rtoSub}>Unit: Daihatsu Gran Max Blind Van (B 9821 KCE)</Text>
-              <Text style={styles.rtoEst}>Tersisa 13 Bulan menuju BPKB Hak Milik Pribadi</Text>
-            </View>
-          </View>
-
-          {/* Equity Breakdown */}
-          <View style={styles.equityDetailsBox}>
-            <View style={styles.equityRow}>
-              <Text style={styles.equityLabel}>Akumulasi Ekuitas Terbayar</Text>
-              <Text style={styles.equityValuePrimary}>Rp 64.800.000</Text>
-            </View>
-            <View style={styles.divider} />
-            <View style={styles.equityRow}>
-              <Text style={styles.equityLabel}>Sisa Kewajiban Pokok</Text>
-              <Text style={styles.equityValue}>Rp 35.200.000</Text>
-            </View>
-            <View style={styles.divider} />
-            <View style={styles.equityRow}>
-              <Text style={styles.equityLabel}>Saldo Escrow Setoran Berjalan</Text>
-              <Text style={styles.equityValueGreen}>Rp 1.450.000</Text>
+            <View style={styles.scoreMetaCol}>
+              <View style={styles.badgeGreenPill}>
+                <Text style={styles.badgeGreenPillText}>Sangat Baik</Text>
+              </View>
+              <Text style={styles.scoreSubMeta}>Performa berkendara</Text>
+              <Text style={styles.scoreSubMeta}>30 hari terakhir</Text>
             </View>
           </View>
         </View>
 
-        {/* 2. DRIVER SAFETY SCORING BREAKDOWN */}
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <View style={styles.cardHeaderLeft}>
-              <ShieldCheck size={18} color={colors.primary} strokeWidth={2.2} />
-              <Text style={styles.cardTitle}>Analitik Keselamatan Berkendara</Text>
-            </View>
-            <View style={styles.scoreBadgePill}>
-              <Text style={styles.scoreBadgeText}>Sangat Baik</Text>
-            </View>
+        {/* Right Card: Kondisi Armada */}
+        <View style={styles.twinCard}>
+          <View style={styles.twinCardHeader}>
+            <Truck size={16} color={colors.primary} strokeWidth={2.2} />
+            <Text style={styles.twinCardTitle}>Kondisi Armada</Text>
           </View>
 
-          <View style={styles.safetyScoreBanner}>
-            <Text style={styles.safetyBigScore}>94</Text>
-            <View style={{ marginLeft: 10 }}>
-              <Text style={styles.safetyScoreScale}>/100 Total Poin</Text>
-              <Text style={styles.safetyScoreSub}>Evaluasi 30 Hari Terakhir</Text>
+          <View style={styles.armadaCardBody}>
+            <View style={styles.badgeGreenPill}>
+              <Text style={styles.badgeGreenPillText}>Normal</Text>
             </View>
+            <Text style={styles.armadaModelText}>Gran Max Blind Van</Text>
+            <Text style={styles.armadaOdoText}>128.430 km</Text>
           </View>
+        </View>
+      </View>
 
-          <View style={styles.safetyMetricsGrid}>
-            <View style={styles.safetyMetricCell}>
-              <Text style={styles.safetyMetricNum}>0</Text>
-              <Text style={styles.safetyMetricLbl}>Pengereman Mendadak</Text>
+      {/* 5. PROGRESS RENT-TO-OWN (RTO) CARD */}
+      <View style={styles.rtoCard}>
+        <View style={styles.rtoCardHeader}>
+          <View style={styles.rtoHeaderLeft}>
+            <TrendingUp size={16} color={colors.primary} strokeWidth={2.2} />
+            <Text style={styles.rtoCardTitle}>Progress Rent-To-Own (RTO)</Text>
+          </View>
+          <ChevronRight size={16} color={colors.textDisabled} strokeWidth={2} />
+        </View>
+
+        <Text style={styles.rtoTenureSubtitle}>Bulan ke-23 dari 36</Text>
+
+        <View style={styles.rtoBodyRow}>
+          {/* Circular Donut Progress Ring */}
+          <CircularProgress
+            size={76}
+            strokeWidth={6}
+            percentage={64.8}
+            color={colors.primary}
+            bgColor="#E2E8F0"
+          >
+            <Text style={styles.rtoLargePct}>64,8%</Text>
+          </CircularProgress>
+
+          {/* Stats Breakdown */}
+          <View style={styles.rtoStatsCol}>
+            {/* Setoran Terkumpul */}
+            <View style={styles.rtoStatItem}>
+              <Text style={styles.rtoStatLabel}>Setoran Terkumpul</Text>
+              <Text style={styles.rtoStatValueBold}>Rp 194.400.000</Text>
             </View>
-            <View style={styles.cellDivider} />
-            <View style={styles.safetyMetricCell}>
-              <Text style={styles.safetyMetricNum}>1</Text>
-              <Text style={styles.safetyMetricLbl}>Akselerasi Agresif</Text>
-            </View>
-            <View style={styles.cellDivider} />
-            <View style={styles.safetyMetricCell}>
-              <Text style={styles.safetyMetricNum}>0</Text>
-              <Text style={styles.safetyMetricLbl}>Overspeeding</Text>
+
+            <View style={styles.rtoStatDivider} />
+
+            {/* Sisa Setoran */}
+            <View style={styles.rtoStatItem}>
+              <Text style={styles.rtoStatLabel}>Sisa Setoran</Text>
+              <Text style={styles.rtoStatValueBold}>Rp 105.600.000</Text>
             </View>
           </View>
         </View>
+      </View>
 
-        {/* 3. STATUS KEPATUHAN TILANG ELEKTRONIK (ETLE) */}
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <View style={styles.cardHeaderLeft}>
-              <FileCheck2 size={18} color={colors.primary} strokeWidth={2.2} />
-              <Text style={styles.cardTitle}>Status Hukum Tilang Elektronik (ETLE)</Text>
-            </View>
+      {/* 6. NAVIGATION MENU LIST */}
+      <View style={styles.menuCard}>
+        {/* Riwayat Perjalanan */}
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={onNavigatePerjalanan}
+          activeOpacity={0.7}
+        >
+          <View style={styles.menuItemLeft}>
+            <History size={18} color={colors.textSecondary} strokeWidth={2} />
+            <Text style={styles.menuItemTitle}>Riwayat Perjalanan</Text>
           </View>
+          <ChevronRight size={16} color={colors.textDisabled} strokeWidth={2} />
+        </TouchableOpacity>
 
-          <View style={styles.etleCleanBox}>
-            <CheckCircle2 size={24} color={colors.success} />
-            <View style={{ marginLeft: 10, flex: 1 }}>
-              <Text style={styles.etleCleanTitle}>Nihil Catatan Pelanggaran ETLE</Text>
-              <Text style={styles.etleCleanSub}>
-                Tidak ada sengketa tilang kamera polisi aktif pada kendaraan B 9821 KCE. Legalitas dokumen STNK aman.
-              </Text>
-            </View>
+        <View style={styles.menuDivider} />
+
+        {/* Riwayat Setoran RTO */}
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() =>
+            Alert.alert(
+              'Riwayat Setoran RTO',
+              'Menampilkan rekam audit setoran otomatis pay-per-trip dari setiap ritase pengantaran yang diselesaikan.'
+            )
+          }
+          activeOpacity={0.7}
+        >
+          <View style={styles.menuItemLeft}>
+            <CreditCard size={18} color={colors.textSecondary} strokeWidth={2} />
+            <Text style={styles.menuItemTitle}>Riwayat Setoran RTO</Text>
           </View>
-        </View>
-      </ScrollView>
-    </View>
+          <ChevronRight size={16} color={colors.textDisabled} strokeWidth={2} />
+        </TouchableOpacity>
+
+        <View style={styles.menuDivider} />
+
+        {/* Pengaturan Akun */}
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() =>
+            Alert.alert('Pengaturan Akun', 'Pengaturan notifikasi, bahasa, dan keamanan kata sandi.')
+          }
+          activeOpacity={0.7}
+        >
+          <View style={styles.menuItemLeft}>
+            <Settings size={18} color={colors.textSecondary} strokeWidth={2} />
+            <Text style={styles.menuItemTitle}>Pengaturan Akun</Text>
+          </View>
+          <ChevronRight size={16} color={colors.textDisabled} strokeWidth={2} />
+        </TouchableOpacity>
+      </View>
+
+      {/* 7. DANGER ACTION BUTTON: KELUAR AKUN */}
+      <TouchableOpacity
+        style={styles.logoutButton}
+        onPress={() =>
+          Alert.alert(
+            'Keluar Akun',
+            'Apakah Anda yakin ingin keluar dari akun mitra pengemudi FLEETRA?',
+            [
+              { text: 'Batal', style: 'cancel' },
+              { text: 'Keluar', style: 'destructive', onPress: onBackToHome },
+            ]
+          )
+        }
+        activeOpacity={0.8}
+      >
+        <LogOut size={16} color={colors.danger} strokeWidth={2} style={{ marginRight: 8 }} />
+        <Text style={styles.logoutButtonText}>Keluar Akun</Text>
+      </TouchableOpacity>
+    </ScrollView>
   );
 };
 
@@ -178,268 +259,319 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.bg,
   },
-  header: {
+  scrollContent: {
+    paddingBottom: 110,
+  },
+
+  /* TOP BAR */
+  topBar: {
+    paddingHorizontal: 18,
+    paddingTop: 8,
+    paddingBottom: 4,
+  },
+  logoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 14,
-    backgroundColor: colors.surface,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
-  backButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: colors.surface2,
-    alignItems: 'center',
-    justifyContent: 'center',
+  logoImage: {
+    width: 120,
+    height: 30,
   },
-  headerTitle: {
-    fontSize: 16,
+
+  /* PAGE HEADER */
+  pageHeader: {
+    paddingHorizontal: 18,
+    marginTop: 6,
+    marginBottom: 14,
+  },
+  pageTitle: {
+    fontSize: 22,
     fontWeight: '700',
     color: colors.text,
+    letterSpacing: -0.3,
   },
-  scrollContent: {
-    padding: 16,
-    paddingBottom: 120,
+  pageSubtitle: {
+    fontSize: 13,
+    color: colors.textMuted,
+    marginTop: 4,
+    lineHeight: 18,
   },
+
+  /* PROFILE CARD */
   profileCard: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     backgroundColor: colors.surface,
-    borderRadius: 20,
+    marginHorizontal: 18,
+    borderRadius: 16,
+    padding: 16,
     borderWidth: 1,
     borderColor: colors.border,
-    padding: 16,
-    marginBottom: 16,
+    marginBottom: 14,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.03,
+    shadowRadius: 5,
+    elevation: 2,
+  },
+  profileLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
   },
   avatarWrapper: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    borderWidth: 2,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    borderWidth: 1.5,
     borderColor: colors.primary,
     overflow: 'hidden',
+    backgroundColor: colors.surface,
   },
   avatarImage: {
     width: '100%',
     height: '100%',
   },
-  profileTextCol: {
-    marginLeft: 14,
+  profileTextGroup: {
+    marginLeft: 12,
     flex: 1,
   },
   driverName: {
-    fontSize: 17,
+    fontSize: 15,
     fontWeight: '700',
     color: colors.text,
   },
-  driverId: {
-    fontSize: 11.5,
-    color: colors.textMuted,
-    marginTop: 2,
-  },
-  statusBadgeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 6,
-  },
-  badgePillGreen: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.successLight,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 8,
-    marginRight: 6,
-  },
-  badgePillGreenText: {
-    fontSize: 10.5,
-    fontWeight: '700',
-    color: colors.success,
-    marginLeft: 3,
-  },
-  badgePillBlue: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.primaryLight,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 8,
-  },
-  badgePillBlueText: {
-    fontSize: 10.5,
-    fontWeight: '600',
-    color: colors.primary,
-    marginLeft: 3,
-  },
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: 16,
-    marginBottom: 16,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 14,
-  },
-  cardHeaderLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  cardTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.text,
-    marginLeft: 8,
-  },
-  rtoHeroRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 14,
-  },
-  rtoPctBig: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: colors.text,
-  },
-  rtoHeroText: {
-    marginLeft: 14,
-    flex: 1,
-  },
-  rtoTenureTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  rtoSub: {
-    fontSize: 11.5,
-    color: colors.textSecondary,
-    marginTop: 2,
-  },
-  rtoEst: {
-    fontSize: 11,
-    color: colors.primary,
-    fontWeight: '600',
-    marginTop: 4,
-  },
-  equityDetailsBox: {
-    backgroundColor: colors.bg,
-    borderRadius: 14,
-    padding: 12,
-  },
-  equityRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  equityLabel: {
-    fontSize: 12,
-    color: colors.textMuted,
-  },
-  equityValuePrimary: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: colors.primary,
-  },
-  equityValue: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: colors.text,
-  },
-  equityValueGreen: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: colors.success,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: colors.border,
-    marginVertical: 8,
-  },
-  scoreBadgePill: {
-    backgroundColor: colors.successLight,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 10,
-  },
-  scoreBadgeText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: colors.success,
-  },
-  safetyScoreBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.bg,
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 12,
-  },
-  safetyBigScore: {
-    fontSize: 34,
-    fontWeight: '800',
-    color: colors.primary,
-  },
-  safetyScoreScale: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  safetyScoreSub: {
+  driverRole: {
     fontSize: 11,
     color: colors.textMuted,
     marginTop: 1,
   },
-  safetyMetricsGrid: {
+  plateRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
+    marginTop: 3,
   },
-  safetyMetricCell: {
+  plateText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.textSecondary,
+    marginLeft: 4,
+  },
+  editProfileBtn: {
+    paddingHorizontal: 12,
+    paddingVertical: 7,
+    borderRadius: 20,
+    backgroundColor: colors.surface2,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  editProfileBtnText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.textSecondary,
+  },
+
+  /* TWIN CARDS */
+  twinCardsRow: {
+    flexDirection: 'row',
+    marginHorizontal: 18,
+    gap: 12,
+    marginBottom: 14,
+  },
+  twinCard: {
     flex: 1,
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: colors.border,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.03,
+    shadowRadius: 5,
+    elevation: 1,
+  },
+  twinCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  twinCardTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.text,
+    marginLeft: 6,
+  },
+  twinCardBody: {
+    flexDirection: 'row',
     alignItems: 'center',
   },
-  safetyMetricNum: {
-    fontSize: 16,
+  scoreTextMain: {
+    fontSize: 13,
+    fontWeight: '800',
+    color: colors.primary,
+  },
+  scoreTextSub: {
+    fontSize: 8,
+    fontWeight: '600',
+    color: colors.textMuted,
+  },
+  scoreMetaCol: {
+    marginLeft: 10,
+    flex: 1,
+  },
+  badgeGreenPill: {
+    backgroundColor: colors.successLight,
+    paddingHorizontal: 7,
+    paddingVertical: 2.5,
+    borderRadius: 8,
+    alignSelf: 'flex-start',
+    marginBottom: 4,
+  },
+  badgeGreenPillText: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: colors.success,
+  },
+  scoreSubMeta: {
+    fontSize: 9,
+    color: colors.textMuted,
+    lineHeight: 12,
+  },
+
+  armadaCardBody: {
+    justifyContent: 'center',
+    paddingTop: 2,
+  },
+  armadaModelText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.text,
+    marginTop: 4,
+  },
+  armadaOdoText: {
+    fontSize: 11,
+    color: colors.textMuted,
+    marginTop: 2,
+  },
+
+  /* RTO CARD */
+  rtoCard: {
+    backgroundColor: colors.surface,
+    marginHorizontal: 18,
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: 14,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.03,
+    shadowRadius: 5,
+    elevation: 2,
+  },
+  rtoCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 2,
+  },
+  rtoHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  rtoCardTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: colors.text,
+    marginLeft: 6,
+  },
+  rtoTenureSubtitle: {
+    fontSize: 11,
+    color: colors.textMuted,
+    marginBottom: 14,
+  },
+  rtoBodyRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  rtoLargePct: {
+    fontSize: 14,
+    fontWeight: '800',
+    color: colors.primary,
+  },
+  rtoStatsCol: {
+    marginLeft: 16,
+    flex: 1,
+  },
+  rtoStatItem: {
+    paddingVertical: 2,
+  },
+  rtoStatLabel: {
+    fontSize: 10,
+    color: colors.textMuted,
+    marginBottom: 2,
+  },
+  rtoStatValueBold: {
+    fontSize: 13,
     fontWeight: '700',
     color: colors.text,
   },
-  safetyMetricLbl: {
-    fontSize: 10,
-    color: colors.textMuted,
-    marginTop: 2,
-    textAlign: 'center',
+  rtoStatDivider: {
+    height: 1,
+    backgroundColor: colors.borderLight,
+    marginVertical: 6,
   },
-  cellDivider: {
-    width: 1,
-    height: 28,
-    backgroundColor: colors.border,
+
+  /* MENU CARD */
+  menuCard: {
+    backgroundColor: colors.surface,
+    marginHorizontal: 18,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: 16,
+    overflow: 'hidden',
   },
-  etleCleanBox: {
+  menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.successLight,
-    padding: 12,
-    borderRadius: 12,
+    justifyContent: 'space-between',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
   },
-  etleCleanTitle: {
+  menuItemLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  menuItemTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.text,
+    marginLeft: 12,
+  },
+  menuDivider: {
+    height: 1,
+    backgroundColor: colors.borderLight,
+    marginLeft: 46,
+  },
+
+  /* LOGOUT BUTTON */
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 18,
+    paddingVertical: 13,
+    borderRadius: 14,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: '#FEE2E2',
+  },
+  logoutButtonText: {
     fontSize: 13,
     fontWeight: '700',
-    color: colors.successDark,
-  },
-  etleCleanSub: {
-    fontSize: 11,
-    color: colors.successDark,
-    marginTop: 2,
-    lineHeight: 15,
+    color: colors.danger,
   },
 });

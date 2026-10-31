@@ -28,11 +28,13 @@ import { CircularProgress } from '../components/CircularProgress';
 interface HomeScreenProps {
   onNavigatePerjalanan: () => void;
   onNavigateProfil: () => void;
+  onNavigateNotifications?: () => void;
 }
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({
   onNavigatePerjalanan,
   onNavigateProfil,
+  onNavigateNotifications,
 }) => {
   return (
     <ScrollView
@@ -53,6 +55,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         <TouchableOpacity
           style={styles.bellButton}
           activeOpacity={0.75}
+          onPress={onNavigateNotifications}
           accessibilityLabel="Notifikasi"
         >
           <Bell size={22} color={colors.text} strokeWidth={2} />
@@ -644,3 +647,4 @@ const styles = StyleSheet.create({
     marginTop: 1,
   },
 });
+

@@ -40,3 +40,4 @@ export const colors = {
   cyan: '#0891B2',
   cyanLight: '#ECFEFF',
 };
+
