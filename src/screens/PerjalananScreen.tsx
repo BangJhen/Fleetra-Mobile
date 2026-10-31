@@ -289,6 +289,7 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
             {/* 6. TIMELINE STOP LIST */}
             <View style={styles.timelineCard}>
               {stops.map((stop, index) => {
+                const isFirst = index === 0;
                 const isLast = index === stops.length - 1;
                 const isDone = stop.status === 'selesai';
                 const isCurrent = stop.status === 'tujuan_saat_ini';
@@ -307,6 +308,21 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
                   >
                     {/* Left Timeline Indicator */}
                     <View style={styles.timelineIndicatorCol}>
+                      {/* Top connector from previous stop */}
+                      {!isFirst ? (
+                        <View
+                          style={[
+                            styles.timelineTopLine,
+                            isDone || isCurrent
+                              ? styles.timelineLineDone
+                              : styles.timelineLinePending,
+                          ]}
+                        />
+                      ) : (
+                        <View style={styles.timelineTopSpacer} />
+                      )}
+
+                      {/* Node Icon */}
                       {isDone ? (
                         <View style={styles.timelineIconDone}>
                           <CheckCircle2 size={18} color={colors.primary} strokeWidth={2.5} />
@@ -321,17 +337,18 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
                         </View>
                       )}
 
+                      {/* Bottom connector to next stop with direction arrow */}
                       {!isLast && (
-                        <View style={styles.timelineConnector}>
+                        <View style={styles.timelineBottomCol}>
                           <View
                             style={[
-                              styles.timelineLine,
+                              styles.timelineBottomLine,
                               isDone ? styles.timelineLineDone : styles.timelineLinePending,
                             ]}
                           />
                           <View style={styles.timelineArrowBox}>
                             <ChevronDown
-                              size={12}
+                              size={11}
                               color={isDone ? colors.primary : '#94A3B8'}
                               strokeWidth={2.5}
                             />
@@ -678,17 +695,14 @@ const styles = StyleSheet.create({
   },
   stopRow: {
     flexDirection: 'row',
-    paddingVertical: 8,
-    alignItems: 'flex-start',
+    alignItems: 'stretch',
+    minHeight: 54,
   },
   stopRowLast: {
     borderBottomWidth: 0,
   },
   stopRowCurrent: {
-    backgroundColor: '#F8FAFC',
-    marginHorizontal: -8,
-    paddingHorizontal: 8,
-    borderRadius: 10,
+    backgroundColor: 'transparent',
   },
 
   /* TIMELINE INDICATOR */
@@ -696,6 +710,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: 22,
     marginRight: 12,
+  },
+  timelineTopSpacer: {
+    height: 6,
+  },
+  timelineTopLine: {
+    width: 2,
+    height: 6,
   },
   timelineIconDone: {
     width: 20,
@@ -725,14 +746,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  timelineConnector: {
+  timelineBottomCol: {
+    flex: 1,
     alignItems: 'center',
-    width: 20,
-    height: 38,
-    marginTop: 2,
-    marginBottom: -8,
+    width: 22,
+    position: 'relative',
   },
-  timelineLine: {
+  timelineBottomLine: {
     width: 2,
     flex: 1,
   },
@@ -743,14 +763,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#CBD5E1',
   },
   timelineArrowBox: {
-    marginTop: -3,
+    position: 'absolute',
+    top: '32%',
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: colors.surface,
+    paddingVertical: 1,
   },
 
   /* STOP INFO */
   stopInfoCol: {
     flex: 1,
+    paddingVertical: 6,
+    justifyContent: 'center',
   },
   stopInfoHeaderRow: {
     flexDirection: 'row',

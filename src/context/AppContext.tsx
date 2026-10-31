@@ -7,9 +7,29 @@ export type ScreenState =
   | 'epod'
   | 'profil'
   | 'notifikasi'
-  | 'sos';
+  | 'sos'
+  | 'edit-profil'
+  | 'riwayat-setoran'
+  | 'pengaturan-akun';
 
 export type TabType = 'beranda' | 'perjalanan' | 'profil';
+
+export interface DriverProfile {
+  name: string;
+  phone: string;
+  emergencyContact: string;
+  simNumber: string;
+  simExpiry: string;
+  vehiclePlate: string;
+  vehicleModel: string;
+}
+
+export interface AppSettings {
+  pushNotifications: boolean;
+  navSound: boolean;
+  hapticFeedback: boolean;
+  batterySaver: boolean;
+}
 
 export interface EpodRecord {
   stopId: number;
@@ -109,6 +129,10 @@ interface AppContextType {
   // Driver & Vehicle State
   driverStatus: 'Aktif' | 'Istirahat';
   toggleDriverStatus: () => void;
+  driverProfile: DriverProfile;
+  updateDriverProfile: (updated: Partial<DriverProfile>) => void;
+  settings: AppSettings;
+  toggleSetting: (key: keyof AppSettings) => void;
   fuelPercent: number;
   odometerKm: number;
   safetyScore: number;
@@ -146,10 +170,33 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   // Driver / Telemetry state
   const [driverStatus, setDriverStatus] = useState<'Aktif' | 'Istirahat'>('Aktif');
+  const [driverProfile, setDriverProfile] = useState<DriverProfile>({
+    name: 'Budi Santoso',
+    phone: '+62 812-3456-7890',
+    emergencyContact: '+62 813-2233-4455 (Istri)',
+    simNumber: '9204-1284-9012 (SIM B1 Umum)',
+    simExpiry: '14 Nov 2028',
+    vehiclePlate: 'B 9821 KCE',
+    vehicleModel: 'Daihatsu Gran Max Blind Van 1.3L',
+  });
+  const [settings, setSettings] = useState<AppSettings>({
+    pushNotifications: true,
+    navSound: true,
+    hapticFeedback: true,
+    batterySaver: false,
+  });
   const [fuelPercent] = useState<number>(74);
   const [odometerKm] = useState<number>(128);
   const [safetyScore] = useState<number>(94);
   const [rtoPercent] = useState<number>(64.8);
+
+  const updateDriverProfile = (updated: Partial<DriverProfile>) => {
+    setDriverProfile((prev) => ({ ...prev, ...updated }));
+  };
+
+  const toggleSetting = (key: keyof AppSettings) => {
+    setSettings((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const navigateTo = (screen: ScreenState) => {
     setPrevScreen(currentScreen);
@@ -224,6 +271,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     driverStatus,
     toggleDriverStatus,
+    driverProfile,
+    updateDriverProfile,
+    settings,
+    toggleSetting,
     fuelPercent,
     odometerKm,
     safetyScore,

@@ -34,6 +34,7 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = (props) => {
     rtoPercent,
     driverStatus,
     hasUnreadNotifications,
+    driverProfile,
   } = useApp();
 
   const handleBackHome = props.onBackToHome || (() => navigateTo('beranda'));
@@ -65,24 +66,18 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = (props) => {
               />
             </View>
             <View style={styles.profileTextGroup}>
-              <Text style={styles.driverName}>Budi Santoso</Text>
+              <Text style={styles.driverName}>{driverProfile.name}</Text>
               <Text style={styles.driverRole}>Mitra Pengemudi</Text>
               <View style={styles.plateRow}>
                 <Truck size={12} color={colors.textSecondary} strokeWidth={2} />
-                <Text style={styles.plateText}>B 9821 KCE</Text>
+                <Text style={styles.plateText}>{driverProfile.vehiclePlate}</Text>
               </View>
             </View>
           </View>
 
           <TouchableOpacity
             style={styles.editProfileBtn}
-            onPress={() =>
-              Alert.alert(
-                'Profil Mitra Pengemudi',
-                '• Nama: Budi Santoso\n• ID Mitra: DRV-BDG-2024-042\n• SIM: B1 Umum (Berlaku s.d. 14 Nov 2028)\n• Kontak: +62 812-3456-7890\n• Armada: Daihatsu Gran Max Blind Van 1.3L\n• Nomor Polisi: B 9821 KCE',
-                [{ text: 'Tutup' }]
-              )
-            }
+            onPress={() => navigateTo('edit-profil')}
             activeOpacity={0.75}
           >
             <Text style={styles.editProfileBtnText}>Edit Profil</Text>
@@ -155,16 +150,10 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = (props) => {
           </TouchableOpacity>
         </View>
 
-        {/* 5. PROGRESS RENT-TO-OWN (RTO) CARD (Interactive contract) */}
+        {/* 5. PROGRESS RENT-TO-OWN (RTO) CARD (Navigates to Riwayat Setoran) */}
         <TouchableOpacity
           style={styles.rtoCard}
-          onPress={() =>
-            Alert.alert(
-              'Detail Skema Sewa-Beli (RTO)',
-              '• Total Nilai Armada: Rp 300.000.000\n• Tenor: 36 Bulan (Saat ini: Bulan ke-23)\n• Ekuitas Terkumpul: Rp 194.400.000 (64,8%)\n• Sisa Kewajiban: Rp 105.600.000 (13 bulan tersisa)\n• Model Pembayaran: Pay-per-trip otomatis dari setiap ritase logistik.\n\nArmada akan dialihkan kepemilikannya penuh (BPKB atas nama Budi Santoso) setelah bulan ke-36.',
-              [{ text: 'Tutup' }]
-            )
-          }
+          onPress={() => navigateTo('riwayat-setoran')}
           activeOpacity={0.85}
         >
           <View style={styles.rtoCardHeader}>
@@ -224,13 +213,7 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = (props) => {
 
           <TouchableOpacity
             style={styles.menuItem}
-            onPress={() =>
-              Alert.alert(
-                'Riwayat Setoran RTO Terakhir',
-                '• #TRIP-2026-089 (Hari Ini): Menunggu e-POD selesai\n• #TRIP-2026-088 (31 Okt): +Rp 45.000\n• #TRIP-2026-087 (28 Okt): +Rp 60.000\n• #TRIP-2026-086 (26 Okt): +Rp 75.000\n\nTotal alokasi ekuitas bulan ini: Rp 4.250.000 (Otomatis masuk ke cicilan armada).',
-                [{ text: 'Tutup' }]
-              )
-            }
+            onPress={() => navigateTo('riwayat-setoran')}
             activeOpacity={0.7}
           >
             <View style={styles.menuItemLeft}>
@@ -244,13 +227,7 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = (props) => {
 
           <TouchableOpacity
             style={styles.menuItem}
-            onPress={() =>
-              Alert.alert(
-                'Pengaturan Akun & Aplikasi',
-                '• Notifikasi Perjalanan: Aktif\n• Suara Navigasi OSRM: Aktif\n• Mode Streaming Telematika: Efisiensi Baterai (Tiap 5 Detik)\n• Bahasa: Bahasa Indonesia\n• Versi Aplikasi: FLEETRA Mobile v1.0.0-mvp (Build 2026.11)',
-                [{ text: 'Tutup' }]
-              )
-            }
+            onPress={() => navigateTo('pengaturan-akun')}
             activeOpacity={0.7}
           >
             <View style={styles.menuItemLeft}>

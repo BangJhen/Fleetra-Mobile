@@ -13,6 +13,9 @@ import { EpodScreen } from './src/screens/EpodScreen';
 import { ProfilScreen } from './src/screens/ProfilScreen';
 import { NotificationsScreen } from './src/screens/NotificationsScreen';
 import { SosScreen } from './src/screens/SosScreen';
+import { EditProfileScreen } from './src/screens/EditProfileScreen';
+import { RiwayatSetoranScreen } from './src/screens/RiwayatSetoranScreen';
+import { PengaturanAkunScreen } from './src/screens/PengaturanAkunScreen';
 import { FloatingBottomBar } from './src/components/FloatingBottomBar';
 import { FloatingSosButton } from './src/components/FloatingSosButton';
 
@@ -70,6 +73,15 @@ function MainAppContent() {
 
         {/* 7. SOS SCREEN */}
         {currentScreen === 'sos' && <SosScreen />}
+
+        {/* 8. EDIT PROFIL SCREEN */}
+        {currentScreen === 'edit-profil' && <EditProfileScreen />}
+
+        {/* 9. RIWAYAT SETORAN RTO SCREEN */}
+        {currentScreen === 'riwayat-setoran' && <RiwayatSetoranScreen />}
+
+        {/* 10. PENGATURAN AKUN SCREEN */}
+        {currentScreen === 'pengaturan-akun' && <PengaturanAkunScreen />}
 
         {/* FLOATING ACTION BUTTONS (Visible on main tabs) */}
         {isMainTab && (

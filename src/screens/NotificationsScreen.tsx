@@ -28,6 +28,8 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = (props) =
     notifications,
     markNotificationAsRead,
     markAllNotificationsAsRead,
+    navigateTo,
+    setActiveTripTab,
     goBack,
   } = useApp();
 
@@ -39,8 +41,44 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = (props) =
     Alert.alert('Sukses', 'Semua notifikasi telah ditandai sebagai dibaca. State in-memory diperbarui.');
   };
 
-  const handleNotificationPress = (item: any) => {
+  const handleNotificationPress = (item: NotificationItem) => {
     markNotificationAsRead(item.id);
+
+    if (item.iconType === 'trip' || item.category === 'perjalanan') {
+      Alert.alert(
+        item.title,
+        `${item.description}\n\nWaktu: ${item.time}`,
+        [
+          { text: 'Tutup', style: 'cancel' },
+          {
+            text: 'Lihat Riwayat Perjalanan',
+            onPress: () => {
+              setActiveTripTab('riwayat');
+              navigateTo('perjalanan');
+            },
+          },
+        ]
+      );
+      return;
+    }
+
+    if (item.iconType === 'rto') {
+      Alert.alert(
+        item.title,
+        `${item.description}\n\nWaktu: ${item.time}`,
+        [
+          { text: 'Tutup', style: 'cancel' },
+          {
+            text: 'Buka Riwayat Setoran',
+            onPress: () => {
+              navigateTo('riwayat-setoran');
+            },
+          },
+        ]
+      );
+      return;
+    }
+
     Alert.alert(
       item.title,
       `${item.description}\n\nWaktu: ${item.time} • Kategori: ${item.category.toUpperCase()}`,
