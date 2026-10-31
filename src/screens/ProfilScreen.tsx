@@ -56,11 +56,12 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = ({
               <Image
                 source={require('../../assets/driver-avatar.png')}
                 style={styles.avatarImage}
+                resizeMode="cover"
               />
             </View>
             <View style={styles.profileTextGroup}>
               <Text style={styles.driverName}>Budi Santoso</Text>
-              <Text style={styles.driverRole}>Mitra Pengemudi LCV</Text>
+              <Text style={styles.driverRole}>Mitra Pengemudi</Text>
               <View style={styles.plateRow}>
                 <Truck size={12} color={colors.textSecondary} strokeWidth={2} />
                 <Text style={styles.plateText}>B 9821 KCE</Text>
@@ -278,7 +279,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     marginHorizontal: 18,
     borderRadius: 16,
-    padding: 14,
+    padding: 16,
     borderWidth: 1,
     borderColor: colors.border,
     marginBottom: 14,
@@ -294,53 +295,58 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   avatarWrapper: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    borderWidth: 1.5,
-    borderColor: colors.border,
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+    borderWidth: 2,
+    borderColor: colors.primary,
     overflow: 'hidden',
     backgroundColor: colors.surface2,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   avatarImage: {
     width: '100%',
     height: '100%',
+    borderRadius: 27,
   },
   profileTextGroup: {
-    marginLeft: 12,
+    marginLeft: 14,
     flex: 1,
+    justifyContent: 'center',
   },
   driverName: {
-    fontSize: 14.5,
+    fontSize: 16,
     fontWeight: '700',
     color: colors.text,
+    letterSpacing: -0.2,
   },
   driverRole: {
-    fontSize: 11,
+    fontSize: 12,
     color: colors.textMuted,
-    marginTop: 1,
+    marginTop: 2,
   },
   plateRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 2,
+    marginTop: 4,
   },
   plateText: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '600',
     color: colors.textSecondary,
-    marginLeft: 4,
+    marginLeft: 5,
   },
   editProfileBtn: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    borderRadius: 20,
     backgroundColor: colors.surface2,
     borderWidth: 1,
     borderColor: colors.border,
   },
   editProfileBtnText: {
-    fontSize: 10.5,
+    fontSize: 11.5,
     fontWeight: '600',
     color: colors.textSecondary,
   },

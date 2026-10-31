@@ -57,6 +57,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               <Image
                 source={require('../../assets/driver-avatar.png')}
                 style={styles.avatarImage}
+                resizeMode="cover"
               />
             </View>
             <View style={styles.driverInfo}>
@@ -293,28 +294,32 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   avatarWrapper: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    borderWidth: 1.5,
-    borderColor: colors.border,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    borderWidth: 2,
+    borderColor: colors.primary,
     overflow: 'hidden',
     backgroundColor: colors.surface2,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   avatarImage: {
     width: '100%',
     height: '100%',
+    borderRadius: 26,
   },
   driverInfo: {
-    marginLeft: 12,
+    marginLeft: 14,
     flex: 1,
+    justifyContent: 'center',
   },
   greetingText: {
     fontSize: 11,
     color: colors.textMuted,
   },
   driverName: {
-    fontSize: 15,
+    fontSize: 15.5,
     fontWeight: '700',
     color: colors.text,
     letterSpacing: -0.2,
@@ -322,12 +327,13 @@ const styles = StyleSheet.create({
   vehicleRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 2,
+    marginTop: 3,
   },
   vehicleText: {
-    fontSize: 11,
+    fontSize: 11.5,
+    fontWeight: '500',
     color: colors.textSecondary,
-    marginLeft: 4,
+    marginLeft: 5,
   },
   heroStatusBadge: {
     flexDirection: 'row',
