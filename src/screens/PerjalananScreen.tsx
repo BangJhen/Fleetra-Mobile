@@ -276,12 +276,7 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = ({
               <Text style={styles.sectionTitle}>Detail Rute</Text>
               <TouchableOpacity
                 style={styles.sectionLinkRow}
-                onPress={() =>
-                  Alert.alert(
-                    'Peta Navigasi',
-                    'Memuat koridor rute OSRM dari Cimahi menuju 4 titik pengantaran Bandung Kota.'
-                  )
-                }
+                onPress={() => onOpenDetailStop(2)}
                 activeOpacity={0.7}
               >
                 <Text style={styles.sectionLinkText}>Lihat Rute di Peta</Text>

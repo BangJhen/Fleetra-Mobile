@@ -17,6 +17,7 @@ import {
 } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 import { TopBar } from '../components/TopBar';
+import { MapWebView } from '../components/MapWebView';
 
 interface DetailStopScreenProps {
   onBack: () => void;
@@ -57,7 +58,15 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = ({
           </View>
         </View>
 
-        {/* 3. CURRENT STOP CARD */}
+        {/* 3. INTERACTIVE WEBVIEW MAP (OpenStreetMap & Leaflet OSRM corridor) */}
+        <MapWebView
+          height={195}
+          destinationName="Toko Sumber Rejeki"
+          distance="+ 4,2 km"
+          duration="± 12 menit"
+        />
+
+        {/* 4. CURRENT STOP CARD */}
         <View style={styles.card}>
           <View style={styles.stopHeaderRow}>
             <View style={styles.stopTextGroup}>
