@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   Alert,
-  Linking,
   ScrollView,
   StyleSheet,
   Text,
@@ -10,15 +9,12 @@ import {
 } from 'react-native';
 import {
   ArrowLeft,
-  ChevronRight,
   Clock,
   Compass,
-  FileText,
   Info,
   MapPin,
   MessageSquare,
   Navigation,
-  Package,
   Phone,
 } from 'lucide-react-native';
 import { colors } from '../theme/colors';
@@ -44,7 +40,7 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = ({
           activeOpacity={0.7}
           accessibilityLabel="Kembali"
         >
-          <ArrowLeft size={20} color={colors.text} strokeWidth={2.2} />
+          <ArrowLeft size={18} color={colors.text} strokeWidth={2.2} />
         </TouchableOpacity>
 
         <View style={styles.headerTitleCenter}>
@@ -62,12 +58,12 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = ({
         {/* 2. TOP DISTANCE & ETA BANNER */}
         <View style={styles.distanceBanner}>
           <View style={styles.bannerItem}>
-            <Navigation size={14} color={colors.primary} strokeWidth={2.2} />
+            <Navigation size={13} color={colors.primary} strokeWidth={2.2} />
             <Text style={styles.bannerValue}>+ 4,2 km</Text>
           </View>
           <View style={styles.bannerDivider} />
           <View style={styles.bannerItem}>
-            <Clock size={14} color={colors.primary} strokeWidth={2.2} />
+            <Clock size={13} color={colors.primary} strokeWidth={2.2} />
             <Text style={styles.bannerValue}>± 12 menit</Text>
           </View>
         </View>
@@ -98,7 +94,7 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = ({
               onPress={() =>
                 Alert.alert(
                   'Panduan Navigasi',
-                  'Membuka panduan perutean Google Maps / Mapbox ke Jl. Sudirman No. 45.'
+                  'Membuka panduan perutean rute dinamis ke Jl. Sudirman No. 45.'
                 )
               }
               activeOpacity={0.75}
@@ -143,7 +139,7 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = ({
               onPress={() =>
                 Alert.alert(
                   'Detail Lokasi',
-                  'Akses bongkar muat berada di samping toko. Pintu gerbang loading dock warna biru.'
+                  'Akses loading dock berada di gerbang samping toko. Kapasitas parkir LCV tersedia.'
                 )
               }
               activeOpacity={0.75}
@@ -151,7 +147,7 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = ({
               <View style={styles.actionIconCircle}>
                 <Info size={18} color={colors.primary} strokeWidth={2.2} />
               </View>
-              <Text style={styles.actionBtnLabel}>Detail Lokasi</Text>
+              <Text style={styles.actionBtnLabel}>Detail</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -175,7 +171,7 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = ({
           <View style={styles.detailDivider} />
 
           <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Catatan</Text>
+            <Text style={styles.detailLabel}>Catatan Khusus</Text>
             <Text style={styles.detailValue}>Serahkan ke PIC toko</Text>
           </View>
         </View>
@@ -194,10 +190,7 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = ({
 
         {/* 6. STOP BERIKUTNYA CARD */}
         <View style={styles.nextStopCard}>
-          <View style={styles.nextStopHeader}>
-            <Text style={styles.nextStopTitle}>Stop Berikutnya</Text>
-          </View>
-
+          <Text style={styles.nextStopTitle}>Stop Berikutnya</Text>
           <View style={styles.nextStopBody}>
             <View style={styles.nextStopLeft}>
               <Text style={styles.nextStopName}>Minimarket Sejahtera</Text>
@@ -232,24 +225,26 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingTop: 8,
-    paddingBottom: 12,
+    paddingBottom: 10,
     backgroundColor: colors.surface,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
   backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.surface2,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   headerTitleCenter: {
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
     color: colors.text,
   },
@@ -259,13 +254,13 @@ const styles = StyleSheet.create({
     marginTop: 1,
   },
   headerRightPlaceholder: {
-    width: 40,
+    width: 38,
   },
 
   /* TOP DISTANCE & ETA BANNER */
   distanceBanner: {
     flexDirection: 'row',
-    backgroundColor: colors.primaryMuted,
+    backgroundColor: colors.surface,
     marginHorizontal: 18,
     marginTop: 14,
     borderRadius: 12,
@@ -274,22 +269,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-around',
     borderWidth: 1,
-    borderColor: '#BFDBFE',
+    borderColor: colors.border,
   },
   bannerItem: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   bannerValue: {
-    fontSize: 13,
+    fontSize: 12.5,
     fontWeight: '700',
     color: colors.primary,
     marginLeft: 6,
   },
   bannerDivider: {
     width: 1,
-    height: 18,
-    backgroundColor: '#BFDBFE',
+    height: 16,
+    backgroundColor: colors.border,
   },
 
   /* CARDS */
@@ -305,7 +300,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.03,
     shadowRadius: 5,
-    elevation: 2,
+    elevation: 1,
   },
 
   /* STOP HEADER */
@@ -313,48 +308,50 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 16,
+    marginBottom: 14,
   },
   stopTextGroup: {
     flex: 1,
     marginRight: 10,
   },
   stopTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
     color: colors.text,
     letterSpacing: -0.2,
   },
   stopAddress: {
-    fontSize: 12,
+    fontSize: 11.5,
     color: colors.textMuted,
-    marginTop: 3,
+    marginTop: 2,
   },
   badgesCol: {
     alignItems: 'flex-end',
   },
   currentPill: {
     backgroundColor: colors.primaryMuted,
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 10,
+    paddingHorizontal: 7,
+    paddingVertical: 2.5,
+    borderRadius: 6,
     borderWidth: 1,
     borderColor: '#BFDBFE',
     marginBottom: 4,
   },
   currentPillText: {
-    fontSize: 10,
+    fontSize: 9.5,
     fontWeight: '700',
     color: colors.primary,
   },
   stopOrderPill: {
     backgroundColor: colors.surface2,
-    paddingHorizontal: 8,
-    paddingVertical: 2.5,
-    borderRadius: 10,
+    paddingHorizontal: 7,
+    paddingVertical: 2,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   stopOrderPillText: {
-    fontSize: 10,
+    fontSize: 9.5,
     fontWeight: '600',
     color: colors.textSecondary,
   },
@@ -364,54 +361,54 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     borderTopWidth: 1,
-    borderTopColor: colors.borderLight,
-    paddingTop: 14,
+    borderTopColor: colors.border,
+    paddingTop: 12,
   },
   actionBtn: {
     alignItems: 'center',
-    width: 65,
+    width: 60,
   },
   actionIconCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: colors.primaryMuted,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: colors.surface2,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 6,
+    marginBottom: 5,
     borderWidth: 1,
-    borderColor: '#BFDBFE',
+    borderColor: colors.border,
   },
   actionBtnLabel: {
-    fontSize: 11,
+    fontSize: 10.5,
     fontWeight: '600',
     color: colors.textSecondary,
   },
 
   /* DETAIL PENGANTARAN */
   cardSectionTitle: {
-    fontSize: 14,
+    fontSize: 13.5,
     fontWeight: '700',
     color: colors.text,
-    marginBottom: 12,
+    marginBottom: 10,
   },
   detailRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 8,
+    paddingVertical: 7,
   },
   detailLabel: {
-    fontSize: 12,
+    fontSize: 11.5,
     color: colors.textMuted,
   },
   detailValueBold: {
-    fontSize: 13,
+    fontSize: 12.5,
     fontWeight: '700',
     color: colors.text,
   },
   detailValue: {
-    fontSize: 12,
+    fontSize: 11.5,
     fontWeight: '600',
     color: colors.text,
   },
@@ -425,26 +422,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: colors.primary,
     marginHorizontal: 18,
-    marginTop: 18,
-    paddingVertical: 14,
-    borderRadius: 14,
+    marginTop: 16,
+    height: 48,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.28,
-    shadowRadius: 6,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 2,
   },
   btnDotWhite: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
     backgroundColor: colors.white,
     marginRight: 8,
   },
   primaryActionText: {
-    fontSize: 14,
+    fontSize: 13.5,
     fontWeight: '700',
     color: colors.white,
   },
@@ -459,15 +456,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  nextStopHeader: {
-    marginBottom: 8,
-  },
   nextStopTitle: {
-    fontSize: 11,
+    fontSize: 10.5,
     fontWeight: '700',
     color: colors.textMuted,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
+    marginBottom: 6,
   },
   nextStopBody: {
     flexDirection: 'row',
@@ -479,7 +474,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   nextStopName: {
-    fontSize: 13,
+    fontSize: 12.5,
     fontWeight: '600',
     color: colors.text,
   },

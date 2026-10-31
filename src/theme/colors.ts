@@ -1,6 +1,6 @@
 /**
  * FLEETRA Design System Color Tokens
- * Aligned strictly with DESIGN.md (100% Light Mode)
+ * Aligned strictly with DESIGN.md (100% Light Mode, Anti-AI-Slop)
  */
 export const colors = {
   // Brand Primary
@@ -15,29 +15,34 @@ export const colors = {
   surface2: '#F1F5F9',
   surface3: '#E2E8F0',
   border: '#E2E8F0',
-  borderLight: '#EDF2F7',
+  borderLight: '#F1F5F9',
 
-  // Text
+  // Typography
   text: '#0F172A',
   textSecondary: '#475569',
   textMuted: '#64748B',
   textDisabled: '#94A3B8',
   white: '#FFFFFF',
 
-  // Status & Semantics
-  success: '#16A34A',
-  successLight: '#DCFCE7',
-  successDark: '#065F46',
+  // Status & Semantics (Calibrated per DESIGN.md - No pastel puffiness)
+  success: '#065F46', // Emerald 900
+  successText: '#065F46',
+  successDot: '#10B981', // Clean dot indicator
+  successLight: '#F1F5F9', // Neutral background with border instead of green AI slop!
 
-  warning: '#D97706',
-  warningLight: '#FEF3C7',
-  warningDark: '#92400E',
+  warning: '#92400E', // Amber 800
+  warningText: '#92400E',
+  warningDot: '#F59E0B',
+  warningLight: '#FFFBEB',
 
-  danger: '#EF4444',
+  danger: '#991B1B', // Red 800
   dangerDark: '#DC2626',
-  dangerLight: '#FEE2E2',
+  dangerDot: '#EF4444',
+  dangerLight: '#FEF2F2',
 
   cyan: '#0891B2',
   cyanLight: '#ECFEFF',
-};
 
+  violet: '#7C3AED',
+  violetLight: '#F5F3FF',
+};

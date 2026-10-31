@@ -10,13 +10,8 @@ import {
 import {
   AlertTriangle,
   ArrowLeft,
-  Check,
   CheckCheck,
   CheckCircle2,
-  Clock,
-  FileText,
-  Play,
-  RotateCcw,
   TrendingUp,
   Truck,
   Wrench,
@@ -45,7 +40,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onBack
       id: '1',
       category: 'perjalanan',
       title: 'Perjalanan Dimulai',
-      description: 'Trip #TRIP-2026-089 telah dimulai.',
+      description: 'Trip #TRIP-2026-089 telah aktif di koridor Cimahi - Bandung.',
       time: '5 menit lalu',
       isUnread: true,
       dateGroup: 'today',
@@ -65,7 +60,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onBack
       id: '3',
       category: 'armada',
       title: 'Peringatan Armada',
-      description: 'Tekanan ban kendaraan B 9821 KCE terdeteksi rendah.',
+      description: 'Tekanan ban kendaraan B 9821 KCE terdeteksi di bawah standar.',
       time: '42 menit lalu',
       isUnread: false,
       dateGroup: 'today',
@@ -75,7 +70,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onBack
       id: '4',
       category: 'armada',
       title: 'Servis Terjadwal',
-      description: 'Jadwal servis kendaraan B 9821 KCE pada 28 Jun 2026.',
+      description: 'Jadwal servis berkala kendaraan B 9821 KCE pada 28 Jun 2026.',
       time: 'Kemarin, 16.20',
       isUnread: false,
       dateGroup: 'yesterday',
@@ -113,31 +108,31 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onBack
       case 'trip':
         return (
           <View style={[styles.iconWrapper, { backgroundColor: colors.primaryMuted }]}>
-            <Truck size={18} color={colors.primary} strokeWidth={2.2} />
+            <Truck size={17} color={colors.primary} strokeWidth={2.2} />
           </View>
         );
       case 'epod':
         return (
-          <View style={[styles.iconWrapper, { backgroundColor: colors.successLight }]}>
-            <CheckCircle2 size={18} color={colors.success} strokeWidth={2.2} />
+          <View style={[styles.iconWrapper, { backgroundColor: colors.surface2 }]}>
+            <CheckCircle2 size={17} color={colors.primary} strokeWidth={2.2} />
           </View>
         );
       case 'warning':
         return (
-          <View style={[styles.iconWrapper, { backgroundColor: '#FEF3C7' }]}>
-            <AlertTriangle size={18} color={colors.warning} strokeWidth={2.2} />
+          <View style={[styles.iconWrapper, { backgroundColor: '#FFFBEB' }]}>
+            <AlertTriangle size={17} color={colors.warning} strokeWidth={2.2} />
           </View>
         );
       case 'service':
         return (
-          <View style={[styles.iconWrapper, { backgroundColor: colors.cyanLight }]}>
-            <Wrench size={18} color={colors.cyan} strokeWidth={2.2} />
+          <View style={[styles.iconWrapper, { backgroundColor: colors.surface2 }]}>
+            <Wrench size={17} color={colors.textSecondary} strokeWidth={2.2} />
           </View>
         );
       case 'rto':
         return (
-          <View style={[styles.iconWrapper, { backgroundColor: '#EDE9FE' }]}>
-            <TrendingUp size={18} color="#7C3AED" strokeWidth={2.2} />
+          <View style={[styles.iconWrapper, { backgroundColor: colors.primaryMuted }]}>
+            <TrendingUp size={17} color={colors.primary} strokeWidth={2.2} />
           </View>
         );
     }
@@ -153,7 +148,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onBack
           activeOpacity={0.7}
           accessibilityLabel="Kembali"
         >
-          <ArrowLeft size={20} color={colors.text} strokeWidth={2.2} />
+          <ArrowLeft size={18} color={colors.text} strokeWidth={2.2} />
         </TouchableOpacity>
 
         <Text style={styles.headerTitle}>Notifikasi</Text>
@@ -165,11 +160,11 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onBack
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* 2. SUBHEADER BANNER */}
+        {/* 2. SUBHEADER */}
         <View style={styles.subHeader}>
           <Text style={styles.subHeaderTitle}>Pembaruan Perjalanan</Text>
           <Text style={styles.subHeaderDesc}>
-            Lihat semua aktivitas penting dari armada dan pengantaran.
+            Log aktivitas operasional armada, ritase kargo, dan sistem kemitraan.
           </Text>
         </View>
 
@@ -211,7 +206,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onBack
                 onPress={handleMarkAllAsRead}
                 activeOpacity={0.7}
               >
-                <CheckCheck size={14} color={colors.primary} strokeWidth={2.2} />
+                <CheckCheck size={13} color={colors.primary} strokeWidth={2.2} />
                 <Text style={styles.markAllText}>Tandai semua dibaca</Text>
               </TouchableOpacity>
             </View>
@@ -292,26 +287,28 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingTop: 8,
-    paddingBottom: 12,
+    paddingBottom: 10,
     backgroundColor: colors.surface,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
   backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.surface2,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   headerTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
     color: colors.text,
   },
   headerRightPlaceholder: {
-    width: 40,
+    width: 38,
   },
 
   /* SUBHEADER */
@@ -321,14 +318,15 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   subHeaderTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
     color: colors.text,
   },
   subHeaderDesc: {
-    fontSize: 12,
+    fontSize: 11.5,
     color: colors.textMuted,
     marginTop: 2,
+    lineHeight: 16,
   },
 
   /* FILTERS */
@@ -336,12 +334,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 18,
     gap: 8,
-    marginBottom: 16,
+    marginBottom: 14,
   },
   filterChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 7,
-    borderRadius: 20,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
@@ -351,7 +349,7 @@ const styles = StyleSheet.create({
     borderColor: colors.primary,
   },
   filterChipText: {
-    fontSize: 12,
+    fontSize: 11.5,
     fontWeight: '600',
     color: colors.textSecondary,
   },
@@ -362,7 +360,7 @@ const styles = StyleSheet.create({
   /* SECTIONS */
   sectionContainer: {
     marginHorizontal: 18,
-    marginBottom: 16,
+    marginBottom: 14,
   },
   sectionHeaderRow: {
     flexDirection: 'row',
@@ -371,7 +369,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   sectionTitle: {
-    fontSize: 13,
+    fontSize: 11.5,
     fontWeight: '700',
     color: colors.textSecondary,
     textTransform: 'uppercase',
@@ -412,7 +410,9 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    marginRight: 10,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
   },
   itemContent: {
     flex: 1,
@@ -421,10 +421,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 3,
+    marginBottom: 2,
   },
   itemTitle: {
-    fontSize: 13,
+    fontSize: 12.5,
     fontWeight: '700',
     color: colors.text,
     flex: 1,
@@ -439,20 +439,20 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
   },
   unreadDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
     backgroundColor: colors.primary,
     marginLeft: 5,
   },
   itemDesc: {
-    fontSize: 12,
+    fontSize: 11.5,
     color: colors.textSecondary,
-    lineHeight: 16,
+    lineHeight: 15,
   },
   itemDivider: {
     height: 1,
     backgroundColor: colors.borderLight,
-    marginLeft: 48,
+    marginLeft: 46,
   },
 });

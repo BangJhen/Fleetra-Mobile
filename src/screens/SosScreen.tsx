@@ -11,16 +11,10 @@ import {
   AlertCircle,
   AlertTriangle,
   ArrowLeft,
-  CheckCircle2,
-  ChevronRight,
   HelpCircle,
   MapPin,
-  Phone,
   PhoneCall,
-  Shield,
   ShieldAlert,
-  Siren,
-  Truck,
   Wrench,
 } from 'lucide-react-native';
 import { colors } from '../theme/colors';
@@ -36,13 +30,13 @@ export const SosScreen: React.FC<SosScreenProps> = ({ onBack }) => {
   const handleTriggerSos = (categoryName?: string) => {
     setSosActivated(true);
     Alert.alert(
-      'Sinyal Darurat Dikirim!',
-      `Pusat Kendali Dispatcher FLEETRA telah menerima sinyal SOS dari B 9821 KCE (Budi Santoso) di lokasi Jl. Pasteur No. 142, Bandung.${
+      'Sinyal Darurat Dipancarkan',
+      `Pusat Kendali Dispatcher FLEETRA telah menerima sinyal SOS dari armada B 9821 KCE (Budi Santoso) di lokasi Jl. Pasteur No. 142, Bandung.${
         categoryName ? ` Kategori: ${categoryName}.` : ''
-      } Operator segera menghubungi Anda.`,
+      } Petugas dispatcher dan tim tanggap darurat segera menghubungi Anda.`,
       [
         {
-          text: 'Mengerti',
+          text: 'Konfirmasi Diterima',
           onPress: () => {},
         },
       ]
@@ -59,10 +53,10 @@ export const SosScreen: React.FC<SosScreenProps> = ({ onBack }) => {
           activeOpacity={0.7}
           accessibilityLabel="Kembali"
         >
-          <ArrowLeft size={20} color={colors.text} strokeWidth={2.2} />
+          <ArrowLeft size={18} color={colors.text} strokeWidth={2.2} />
         </TouchableOpacity>
 
-        <Text style={styles.headerTitle}>SOS</Text>
+        <Text style={styles.headerTitle}>Bantuan Darurat (SOS)</Text>
 
         <View style={styles.headerRightPlaceholder} />
       </View>
@@ -74,14 +68,15 @@ export const SosScreen: React.FC<SosScreenProps> = ({ onBack }) => {
         {/* 2. HERO TITLE & SUBTITLE */}
         <View style={styles.heroHeader}>
           <Text style={styles.heroTitle}>
-            Butuh Bantuan{'\n'}Darurat?
+            Butuh Bantuan{'\n'}Darurat di Perjalanan?
           </Text>
           <Text style={styles.heroSubtitle}>
-            Tekan tombol SOS untuk menghubungi tim bantuan Fleetra dengan cepat.
+            Tekan tombol SOS untuk memancarkan koordinat telematika prioritas tinggi
+            langsung ke konsol pusat kendali dispatcher.
           </Text>
         </View>
 
-        {/* 3. BIG RED SOS CALL BUTTON */}
+        {/* 3. BIG RED SOS CALL BUTTON (CLEAN SOLID CRIMSON) */}
         <TouchableOpacity
           style={[styles.bigSosButton, sosActivated && styles.bigSosButtonActive]}
           onPress={() => handleTriggerSos()}
@@ -89,7 +84,7 @@ export const SosScreen: React.FC<SosScreenProps> = ({ onBack }) => {
         >
           <View style={styles.sosInnerContent}>
             <View style={styles.sosIconCircle}>
-              <PhoneCall size={26} color={colors.white} strokeWidth={2.2} />
+              <PhoneCall size={24} color={colors.white} strokeWidth={2.2} />
             </View>
             <View style={styles.sosTextCol}>
               <Text style={styles.sosMainText}>
@@ -97,16 +92,16 @@ export const SosScreen: React.FC<SosScreenProps> = ({ onBack }) => {
               </Text>
               <Text style={styles.sosSubText}>
                 {sosActivated
-                  ? 'Dispatcher terhubung via telemetry'
-                  : 'Hubungi tim Fleetra sekarang'}
+                  ? 'Dispatcher terhubung via telemetry streaming'
+                  : 'Hubungi tim siaga Fleetra sekarang'}
               </Text>
             </View>
           </View>
         </TouchableOpacity>
 
-        {/* 4. SECTION: BUTUH BANTUAN LAIN? */}
+        {/* 4. SECTION: KATEGORI KENDALA */}
         <View style={styles.categorySection}>
-          <Text style={styles.categorySectionTitle}>Butuh Bantuan Lain?</Text>
+          <Text style={styles.categorySectionTitle}>Pilih Kategori Kendala</Text>
 
           <View style={styles.categoryGrid}>
             {/* Masalah Kendaraan */}
@@ -117,14 +112,14 @@ export const SosScreen: React.FC<SosScreenProps> = ({ onBack }) => {
               ]}
               onPress={() => {
                 setSelectedCategory('kendaraan');
-                handleTriggerSos('Masalah Kendaraan (Mogok / Mesin)');
+                handleTriggerSos('Kendala Mesin / Mogok / Ban Pecah');
               }}
               activeOpacity={0.8}
             >
               <View style={styles.categoryIconCircle}>
-                <Wrench size={20} color={colors.primary} strokeWidth={2.2} />
+                <Wrench size={18} color={colors.primary} strokeWidth={2.2} />
               </View>
-              <Text style={styles.categoryLabel}>Masalah{'\n'}Kendaraan</Text>
+              <Text style={styles.categoryLabel}>Kendaraan</Text>
             </TouchableOpacity>
 
             {/* Kecelakaan */}
@@ -139,8 +134,8 @@ export const SosScreen: React.FC<SosScreenProps> = ({ onBack }) => {
               }}
               activeOpacity={0.8}
             >
-              <View style={[styles.categoryIconCircle, { backgroundColor: '#FEE2E2' }]}>
-                <AlertTriangle size={20} color={colors.danger} strokeWidth={2.2} />
+              <View style={styles.categoryIconCircle}>
+                <AlertTriangle size={18} color={colors.dangerDark} strokeWidth={2.2} />
               </View>
               <Text style={styles.categoryLabel}>Kecelakaan</Text>
             </TouchableOpacity>
@@ -153,12 +148,12 @@ export const SosScreen: React.FC<SosScreenProps> = ({ onBack }) => {
               ]}
               onPress={() => {
                 setSelectedCategory('keamanan');
-                handleTriggerSos('Isu Keamanan / Pembegalan');
+                handleTriggerSos('Isu Keamanan / Pembegalan / Bahaya Kriminal');
               }}
               activeOpacity={0.8}
             >
-              <View style={[styles.categoryIconCircle, { backgroundColor: '#FEF3C7' }]}>
-                <ShieldAlert size={20} color={colors.warningDark} strokeWidth={2.2} />
+              <View style={styles.categoryIconCircle}>
+                <ShieldAlert size={18} color={colors.warning} strokeWidth={2.2} />
               </View>
               <Text style={styles.categoryLabel}>Keamanan</Text>
             </TouchableOpacity>
@@ -171,12 +166,12 @@ export const SosScreen: React.FC<SosScreenProps> = ({ onBack }) => {
               ]}
               onPress={() => {
                 setSelectedCategory('lainnya');
-                handleTriggerSos('Bantuan Operasional Lain');
+                handleTriggerSos('Kendala Operasional Lain');
               }}
               activeOpacity={0.8}
             >
               <View style={styles.categoryIconCircle}>
-                <HelpCircle size={20} color={colors.primary} strokeWidth={2.2} />
+                <HelpCircle size={18} color={colors.textSecondary} strokeWidth={2.2} />
               </View>
               <Text style={styles.categoryLabel}>Lainnya</Text>
             </TouchableOpacity>
@@ -187,10 +182,10 @@ export const SosScreen: React.FC<SosScreenProps> = ({ onBack }) => {
         <View style={styles.locationCard}>
           <View style={styles.locationLeft}>
             <View style={styles.locationIconWrapper}>
-              <MapPin size={18} color={colors.primary} strokeWidth={2.2} />
+              <MapPin size={16} color={colors.primary} strokeWidth={2.2} />
             </View>
             <View style={styles.locationTextGroup}>
-              <Text style={styles.locationLabel}>Lokasi Saat Ini</Text>
+              <Text style={styles.locationLabel}>Koordinat Lokasi Saat Ini</Text>
               <Text style={styles.locationAddress}>
                 Jl. Pasteur No. 142, Bandung
               </Text>
@@ -200,18 +195,18 @@ export const SosScreen: React.FC<SosScreenProps> = ({ onBack }) => {
           <TouchableOpacity
             style={styles.viewMapLink}
             onPress={() =>
-              Alert.alert('Koordinat GPS', 'Lat: -6.8992, Lng: 107.5954 (Presisi ± 3 meter)')
+              Alert.alert('Koordinat GPS', 'Lat: -6.8992, Lng: 107.5954 (Presisi ± 3m)')
             }
             activeOpacity={0.7}
           >
-            <Text style={styles.viewMapText}>Lihat di Peta</Text>
+            <Text style={styles.viewMapText}>Cek Titik</Text>
           </TouchableOpacity>
         </View>
 
-        {/* 6. STEP TIMELINE: YANG TERJADI SETELAH ANDA MENEKAN SOS */}
+        {/* 6. STEP TIMELINE: SOP PENANGANAN DARURAT */}
         <View style={styles.timelineCard}>
           <Text style={styles.timelineTitle}>
-            Yang Terjadi Setelah Anda Menekan SOS
+            Tahap Penanganan Setelah Tombol Ditekan
           </Text>
 
           <View style={styles.stepsRow}>
@@ -233,7 +228,7 @@ export const SosScreen: React.FC<SosScreenProps> = ({ onBack }) => {
                 <Text style={styles.stepNumberText}>2</Text>
               </View>
               <Text style={styles.stepDesc}>
-                Bantuan{'\n'}diproses
+                Bantuan teknis{'\n'}dikoordinasikan
               </Text>
             </View>
 
@@ -245,7 +240,7 @@ export const SosScreen: React.FC<SosScreenProps> = ({ onBack }) => {
                 <Text style={styles.stepNumberText}>3</Text>
               </View>
               <Text style={styles.stepDesc}>
-                Pendampingan{'\n'}hingga selesai
+                Pendampingan{'\n'}hingga aman
               </Text>
             </View>
           </View>
@@ -253,10 +248,10 @@ export const SosScreen: React.FC<SosScreenProps> = ({ onBack }) => {
 
         {/* 7. BOTTOM WARNING / DISCLAIMER BOX */}
         <View style={styles.warningBox}>
-          <AlertCircle size={16} color={colors.textMuted} strokeWidth={2} style={{ marginTop: 2 }} />
+          <AlertCircle size={15} color={colors.textMuted} strokeWidth={2} style={{ marginTop: 2 }} />
           <Text style={styles.warningText}>
-            Fitur ini hanya digunakan untuk kondisi darurat di perjalanan. Pastikan
-            Anda berada di lokasi yang aman.
+            Fitur ini hanya digunakan khusus kondisi darurat operasional di jalan raya.
+            Pastikan kendaraan menepi di lokasi aman saat menunggu instruksi dispatcher.
           </Text>
         </View>
       </ScrollView>
@@ -280,89 +275,91 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingTop: 8,
-    paddingBottom: 12,
+    paddingBottom: 10,
     backgroundColor: colors.surface,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
   backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.surface2,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   headerTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
     color: colors.text,
   },
   headerRightPlaceholder: {
-    width: 40,
+    width: 38,
   },
 
   /* HERO HEADER */
   heroHeader: {
     paddingHorizontal: 18,
     marginTop: 14,
-    marginBottom: 16,
+    marginBottom: 14,
   },
   heroTitle: {
-    fontSize: 24,
+    fontSize: 21,
     fontWeight: '800',
     color: colors.text,
     letterSpacing: -0.4,
-    lineHeight: 30,
+    lineHeight: 27,
   },
   heroSubtitle: {
-    fontSize: 13,
+    fontSize: 12,
     color: colors.textMuted,
-    marginTop: 8,
-    lineHeight: 18,
+    marginTop: 6,
+    lineHeight: 17,
   },
 
   /* BIG RED SOS BUTTON */
   bigSosButton: {
     backgroundColor: colors.dangerDark,
     marginHorizontal: 18,
-    borderRadius: 18,
-    paddingVertical: 18,
-    paddingHorizontal: 20,
+    borderRadius: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 18,
     shadowColor: colors.dangerDark,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.35,
-    shadowRadius: 10,
-    elevation: 4,
-    marginBottom: 20,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 3,
+    marginBottom: 16,
   },
   bigSosButtonActive: {
-    backgroundColor: colors.danger,
+    backgroundColor: '#B91C1C',
   },
   sosInnerContent: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   sosIconCircle: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 16,
+    marginRight: 14,
   },
   sosTextCol: {
     flex: 1,
   },
   sosMainText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '800',
     color: colors.white,
     letterSpacing: -0.3,
   },
   sosSubText: {
-    fontSize: 12,
+    fontSize: 11.5,
     color: '#FEE2E2',
     marginTop: 2,
   },
@@ -370,13 +367,13 @@ const styles = StyleSheet.create({
   /* CATEGORY SECTION */
   categorySection: {
     marginHorizontal: 18,
-    marginBottom: 16,
+    marginBottom: 14,
   },
   categorySectionTitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
     color: colors.text,
-    marginBottom: 12,
+    marginBottom: 10,
   },
   categoryGrid: {
     flexDirection: 'row',
@@ -385,38 +382,34 @@ const styles = StyleSheet.create({
   categoryCard: {
     flex: 1,
     backgroundColor: colors.surface,
-    borderRadius: 14,
-    paddingVertical: 14,
-    paddingHorizontal: 8,
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 6,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
     borderColor: colors.border,
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 1.5 },
-    shadowOpacity: 0.03,
-    shadowRadius: 4,
-    elevation: 1,
   },
   categoryCardSelected: {
     borderColor: colors.primary,
     backgroundColor: colors.primaryMuted,
   },
   categoryIconCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.primaryMuted,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: colors.surface2,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   categoryLabel: {
-    fontSize: 11,
+    fontSize: 10.5,
     fontWeight: '600',
     color: colors.text,
     textAlign: 'center',
-    lineHeight: 14,
   },
 
   /* LOCATION CARD */
@@ -430,7 +423,7 @@ const styles = StyleSheet.create({
     padding: 14,
     borderWidth: 1,
     borderColor: colors.border,
-    marginBottom: 16,
+    marginBottom: 14,
   },
   locationLeft: {
     flexDirection: 'row',
@@ -439,29 +432,31 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   locationIconWrapper: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.primaryMuted,
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: colors.surface2,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   locationTextGroup: {
     flex: 1,
   },
   locationLabel: {
-    fontSize: 11,
+    fontSize: 10.5,
     color: colors.textMuted,
   },
   locationAddress: {
-    fontSize: 13,
+    fontSize: 12.5,
     fontWeight: '700',
     color: colors.text,
-    marginTop: 2,
+    marginTop: 1,
   },
   viewMapLink: {
-    paddingHorizontal: 8,
+    paddingHorizontal: 6,
     paddingVertical: 4,
   },
   viewMapText: {
@@ -478,13 +473,13 @@ const styles = StyleSheet.create({
     padding: 16,
     borderWidth: 1,
     borderColor: colors.border,
-    marginBottom: 16,
+    marginBottom: 14,
   },
   timelineTitle: {
-    fontSize: 13,
+    fontSize: 12.5,
     fontWeight: '700',
     color: colors.text,
-    marginBottom: 16,
+    marginBottom: 14,
   },
   stepsRow: {
     flexDirection: 'row',
@@ -496,40 +491,40 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   stepNumberBadge: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: colors.primaryMuted,
-    borderWidth: 1.5,
-    borderColor: colors.primary,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: colors.surface2,
+    borderWidth: 1,
+    borderColor: colors.border,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   stepNumberText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '800',
-    color: colors.primary,
+    color: colors.textSecondary,
   },
   stepDesc: {
-    fontSize: 11,
+    fontSize: 10.5,
     color: colors.textSecondary,
     textAlign: 'center',
-    lineHeight: 14,
+    lineHeight: 13.5,
     fontWeight: '500',
   },
   stepConnector: {
-    height: 2,
-    backgroundColor: '#E2E8F0',
+    height: 1.5,
+    backgroundColor: colors.border,
     flex: 0.5,
-    marginTop: 13,
+    marginTop: 12,
   },
 
   /* WARNING BOX */
   warningBox: {
     flexDirection: 'row',
     marginHorizontal: 18,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 12,
     borderWidth: 1,
@@ -537,9 +532,9 @@ const styles = StyleSheet.create({
   },
   warningText: {
     flex: 1,
-    fontSize: 11,
+    fontSize: 10.5,
     color: colors.textMuted,
     marginLeft: 8,
-    lineHeight: 16,
+    lineHeight: 15,
   },
 });

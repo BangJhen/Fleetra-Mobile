@@ -10,16 +10,13 @@ import {
 } from 'react-native';
 import {
   ChevronRight,
-  Clock,
   CreditCard,
-  FileText,
   History,
   LogOut,
   Settings,
   ShieldCheck,
   TrendingUp,
   Truck,
-  UserCheck,
 } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 import { CircularProgress } from '../components/CircularProgress';
@@ -54,7 +51,7 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = ({
       <View style={styles.pageHeader}>
         <Text style={styles.pageTitle}>Profil</Text>
         <Text style={styles.pageSubtitle}>
-          Kelola informasi akun, performa,{'\n'}dan progres kepemilikan armada.
+          Kelola informasi akun, performa, dan progres kemitraan armada
         </Text>
       </View>
 
@@ -69,9 +66,9 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = ({
           </View>
           <View style={styles.profileTextGroup}>
             <Text style={styles.driverName}>Budi Santoso</Text>
-            <Text style={styles.driverRole}>Mitra Pengemudi</Text>
+            <Text style={styles.driverRole}>Mitra Pengemudi LCV</Text>
             <View style={styles.plateRow}>
-              <Truck size={12} color={colors.textMuted} strokeWidth={2} />
+              <Truck size={12} color={colors.textSecondary} strokeWidth={2} />
               <Text style={styles.plateText}>B 9821 KCE</Text>
             </View>
           </View>
@@ -88,12 +85,12 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = ({
         </TouchableOpacity>
       </View>
 
-      {/* 4. TWIN METRIC CARDS (SAFETY SCORE & KONDISI ARMADA) */}
+      {/* 4. TWIN METRIC CARDS (SAFETY SCORE & KONDISI ARMADA - ANTI-AI-SLOP) */}
       <View style={styles.twinCardsRow}>
         {/* Left Card: Safety Score */}
         <View style={styles.twinCard}>
           <View style={styles.twinCardHeader}>
-            <ShieldCheck size={16} color={colors.primary} strokeWidth={2.2} />
+            <ShieldCheck size={15} color={colors.primary} strokeWidth={2.2} />
             <Text style={styles.twinCardTitle}>Safety Score</Text>
           </View>
 
@@ -109,12 +106,11 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = ({
               <Text style={styles.scoreTextSub}>/100</Text>
             </CircularProgress>
 
+            {/* Clean typography - NO green pill background */}
             <View style={styles.scoreMetaCol}>
-              <View style={styles.badgeGreenPill}>
-                <Text style={styles.badgeGreenPillText}>Sangat Baik</Text>
-              </View>
-              <Text style={styles.scoreSubMeta}>Performa berkendara</Text>
-              <Text style={styles.scoreSubMeta}>30 hari terakhir</Text>
+              <Text style={styles.scoreHeadline}>Sangat Baik</Text>
+              <Text style={styles.scoreSubMeta}>Performa 30 hari</Text>
+              <Text style={styles.scoreSubMeta}>Zero-Incident</Text>
             </View>
           </View>
         </View>
@@ -122,13 +118,15 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = ({
         {/* Right Card: Kondisi Armada */}
         <View style={styles.twinCard}>
           <View style={styles.twinCardHeader}>
-            <Truck size={16} color={colors.primary} strokeWidth={2.2} />
+            <Truck size={15} color={colors.primary} strokeWidth={2.2} />
             <Text style={styles.twinCardTitle}>Kondisi Armada</Text>
           </View>
 
+          {/* Clean neutral status - NO green pill background */}
           <View style={styles.armadaCardBody}>
-            <View style={styles.badgeGreenPill}>
-              <Text style={styles.badgeGreenPillText}>Normal</Text>
+            <View style={styles.armadaStatusRow}>
+              <View style={styles.statusDotGreen} />
+              <Text style={styles.armadaStatusText}>Normal (Siap Pakai)</Text>
             </View>
             <Text style={styles.armadaModelText}>Gran Max Blind Van</Text>
             <Text style={styles.armadaOdoText}>128.430 km</Text>
@@ -140,19 +138,19 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = ({
       <View style={styles.rtoCard}>
         <View style={styles.rtoCardHeader}>
           <View style={styles.rtoHeaderLeft}>
-            <TrendingUp size={16} color={colors.primary} strokeWidth={2.2} />
+            <TrendingUp size={15} color={colors.primary} strokeWidth={2.2} />
             <Text style={styles.rtoCardTitle}>Progress Rent-To-Own (RTO)</Text>
           </View>
-          <ChevronRight size={16} color={colors.textDisabled} strokeWidth={2} />
+          <ChevronRight size={15} color={colors.textDisabled} strokeWidth={2} />
         </View>
 
-        <Text style={styles.rtoTenureSubtitle}>Bulan ke-23 dari 36</Text>
+        <Text style={styles.rtoTenureSubtitle}>Bulan ke-23 dari 36 bulan tenor</Text>
 
         <View style={styles.rtoBodyRow}>
           {/* Circular Donut Progress Ring */}
           <CircularProgress
-            size={76}
-            strokeWidth={6}
+            size={72}
+            strokeWidth={5.5}
             percentage={64.8}
             color={colors.primary}
             bgColor="#E2E8F0"
@@ -172,14 +170,14 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = ({
 
             {/* Sisa Setoran */}
             <View style={styles.rtoStatItem}>
-              <Text style={styles.rtoStatLabel}>Sisa Setoran</Text>
+              <Text style={styles.rtoStatLabel}>Sisa Kewajiban</Text>
               <Text style={styles.rtoStatValueBold}>Rp 105.600.000</Text>
             </View>
           </View>
         </View>
       </View>
 
-      {/* 6. NAVIGATION MENU LIST */}
+      {/* 6. NAVIGATION MENU LIST (FLAT DIVIDER PATTERN PER DESIGN.MD) */}
       <View style={styles.menuCard}>
         {/* Riwayat Perjalanan */}
         <TouchableOpacity
@@ -188,10 +186,10 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = ({
           activeOpacity={0.7}
         >
           <View style={styles.menuItemLeft}>
-            <History size={18} color={colors.textSecondary} strokeWidth={2} />
+            <History size={16} color={colors.textSecondary} strokeWidth={2} />
             <Text style={styles.menuItemTitle}>Riwayat Perjalanan</Text>
           </View>
-          <ChevronRight size={16} color={colors.textDisabled} strokeWidth={2} />
+          <ChevronRight size={15} color={colors.textDisabled} strokeWidth={2} />
         </TouchableOpacity>
 
         <View style={styles.menuDivider} />
@@ -208,10 +206,10 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = ({
           activeOpacity={0.7}
         >
           <View style={styles.menuItemLeft}>
-            <CreditCard size={18} color={colors.textSecondary} strokeWidth={2} />
+            <CreditCard size={16} color={colors.textSecondary} strokeWidth={2} />
             <Text style={styles.menuItemTitle}>Riwayat Setoran RTO</Text>
           </View>
-          <ChevronRight size={16} color={colors.textDisabled} strokeWidth={2} />
+          <ChevronRight size={15} color={colors.textDisabled} strokeWidth={2} />
         </TouchableOpacity>
 
         <View style={styles.menuDivider} />
@@ -225,10 +223,10 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = ({
           activeOpacity={0.7}
         >
           <View style={styles.menuItemLeft}>
-            <Settings size={18} color={colors.textSecondary} strokeWidth={2} />
+            <Settings size={16} color={colors.textSecondary} strokeWidth={2} />
             <Text style={styles.menuItemTitle}>Pengaturan Akun</Text>
           </View>
-          <ChevronRight size={16} color={colors.textDisabled} strokeWidth={2} />
+          <ChevronRight size={15} color={colors.textDisabled} strokeWidth={2} />
         </TouchableOpacity>
       </View>
 
@@ -247,7 +245,7 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = ({
         }
         activeOpacity={0.8}
       >
-        <LogOut size={16} color={colors.danger} strokeWidth={2} style={{ marginRight: 8 }} />
+        <LogOut size={15} color={colors.dangerDark} strokeWidth={2} style={{ marginRight: 6 }} />
         <Text style={styles.logoutButtonText}>Keluar Akun</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -267,34 +265,36 @@ const styles = StyleSheet.create({
   topBar: {
     paddingHorizontal: 18,
     paddingTop: 8,
-    paddingBottom: 4,
+    paddingBottom: 10,
+    backgroundColor: colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
   logoRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   logoImage: {
-    width: 120,
+    width: 118,
     height: 30,
   },
 
   /* PAGE HEADER */
   pageHeader: {
     paddingHorizontal: 18,
-    marginTop: 6,
-    marginBottom: 14,
+    marginTop: 14,
+    marginBottom: 12,
   },
   pageTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '700',
     color: colors.text,
     letterSpacing: -0.3,
   },
   pageSubtitle: {
-    fontSize: 13,
+    fontSize: 12.5,
     color: colors.textMuted,
-    marginTop: 4,
-    lineHeight: 18,
+    marginTop: 3,
   },
 
   /* PROFILE CARD */
@@ -305,15 +305,15 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     marginHorizontal: 18,
     borderRadius: 16,
-    padding: 16,
+    padding: 14,
     borderWidth: 1,
     borderColor: colors.border,
     marginBottom: 14,
     shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 1.5 },
     shadowOpacity: 0.03,
-    shadowRadius: 5,
-    elevation: 2,
+    shadowRadius: 4,
+    elevation: 1,
   },
   profileLeft: {
     flexDirection: 'row',
@@ -321,13 +321,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   avatarWrapper: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     borderWidth: 1.5,
-    borderColor: colors.primary,
+    borderColor: colors.border,
     overflow: 'hidden',
-    backgroundColor: colors.surface,
+    backgroundColor: colors.surface2,
   },
   avatarImage: {
     width: '100%',
@@ -338,7 +338,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   driverName: {
-    fontSize: 15,
+    fontSize: 14.5,
     fontWeight: '700',
     color: colors.text,
   },
@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
   plateRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 3,
+    marginTop: 2,
   },
   plateText: {
     fontSize: 11,
@@ -359,15 +359,15 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   editProfileBtn: {
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 16,
     backgroundColor: colors.surface2,
     borderWidth: 1,
     borderColor: colors.border,
   },
   editProfileBtnText: {
-    fontSize: 11,
+    fontSize: 10.5,
     fontWeight: '600',
     color: colors.textSecondary,
   },
@@ -389,7 +389,7 @@ const styles = StyleSheet.create({
     shadowColor: '#0F172A',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.03,
-    shadowRadius: 5,
+    shadowRadius: 4,
     elevation: 1,
   },
   twinCardHeader: {
@@ -421,39 +421,47 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     flex: 1,
   },
-  badgeGreenPill: {
-    backgroundColor: colors.successLight,
-    paddingHorizontal: 7,
-    paddingVertical: 2.5,
-    borderRadius: 8,
-    alignSelf: 'flex-start',
-    marginBottom: 4,
-  },
-  badgeGreenPillText: {
-    fontSize: 9,
+  scoreHeadline: {
+    fontSize: 12,
     fontWeight: '700',
-    color: colors.success,
+    color: colors.text,
   },
   scoreSubMeta: {
-    fontSize: 9,
+    fontSize: 9.5,
     color: colors.textMuted,
-    lineHeight: 12,
+    lineHeight: 13,
+    marginTop: 1,
   },
 
   armadaCardBody: {
     justifyContent: 'center',
-    paddingTop: 2,
+  },
+  armadaStatusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 3,
+  },
+  statusDotGreen: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#10B981',
+    marginRight: 5,
+  },
+  armadaStatusText: {
+    fontSize: 10.5,
+    fontWeight: '600',
+    color: colors.textSecondary,
   },
   armadaModelText: {
     fontSize: 12,
     fontWeight: '700',
     color: colors.text,
-    marginTop: 4,
   },
   armadaOdoText: {
-    fontSize: 11,
+    fontSize: 10.5,
     color: colors.textMuted,
-    marginTop: 2,
+    marginTop: 1,
   },
 
   /* RTO CARD */
@@ -469,7 +477,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.03,
     shadowRadius: 5,
-    elevation: 2,
+    elevation: 1,
   },
   rtoCardHeader: {
     flexDirection: 'row',
@@ -490,38 +498,38 @@ const styles = StyleSheet.create({
   rtoTenureSubtitle: {
     fontSize: 11,
     color: colors.textMuted,
-    marginBottom: 14,
+    marginBottom: 12,
   },
   rtoBodyRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   rtoLargePct: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '800',
     color: colors.primary,
   },
   rtoStatsCol: {
-    marginLeft: 16,
+    marginLeft: 14,
     flex: 1,
   },
   rtoStatItem: {
-    paddingVertical: 2,
+    paddingVertical: 1,
   },
   rtoStatLabel: {
     fontSize: 10,
     color: colors.textMuted,
-    marginBottom: 2,
+    marginBottom: 1,
   },
   rtoStatValueBold: {
-    fontSize: 13,
+    fontSize: 12.5,
     fontWeight: '700',
     color: colors.text,
   },
   rtoStatDivider: {
     height: 1,
     backgroundColor: colors.borderLight,
-    marginVertical: 6,
+    marginVertical: 5,
   },
 
   /* MENU CARD */
@@ -531,14 +539,14 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: colors.border,
-    marginBottom: 16,
+    marginBottom: 14,
     overflow: 'hidden',
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 14,
+    paddingVertical: 13,
     paddingHorizontal: 16,
   },
   menuItemLeft: {
@@ -546,15 +554,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   menuItemTitle: {
-    fontSize: 13,
+    fontSize: 12.5,
     fontWeight: '600',
     color: colors.text,
-    marginLeft: 12,
+    marginLeft: 10,
   },
   menuDivider: {
     height: 1,
     backgroundColor: colors.borderLight,
-    marginLeft: 46,
+    marginLeft: 42,
   },
 
   /* LOGOUT BUTTON */
@@ -563,15 +571,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginHorizontal: 18,
-    paddingVertical: 13,
-    borderRadius: 14,
+    height: 44,
+    borderRadius: 12,
     backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: '#FEE2E2',
+    borderColor: colors.border,
   },
   logoutButtonText: {
-    fontSize: 13,
+    fontSize: 12.5,
     fontWeight: '700',
-    color: colors.danger,
+    color: colors.dangerDark,
   },
 });

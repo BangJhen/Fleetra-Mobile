@@ -104,7 +104,7 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = ({
       <View style={styles.pageHeader}>
         <Text style={styles.pageTitle}>Perjalanan</Text>
         <Text style={styles.pageSubtitle}>
-          Kelola dan jalankan penugasan{'\n'}harian Anda
+          Kelola dan jalankan penugasan harian Anda
         </Text>
       </View>
 
@@ -158,9 +158,11 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = ({
         {/* Card Header */}
         <View style={styles.tripHeaderRow}>
           <Text style={styles.tripCode}>#TRIP-2026-089</Text>
-          <View style={styles.statusPillBlue}>
-            <Truck size={12} color={colors.primary} strokeWidth={2.2} />
-            <Text style={styles.statusPillBlueText}>Dalam Perjalanan</Text>
+
+          {/* Clean enterprise status badge - no pastel blob */}
+          <View style={styles.statusPillNeutral}>
+            <View style={styles.statusDotBlue} />
+            <Text style={styles.statusPillNeutralText}>Dalam Perjalanan</Text>
           </View>
         </View>
 
@@ -221,7 +223,7 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = ({
           onPress={() => onOpenDetailStop(2)}
           activeOpacity={0.85}
         >
-          <Play size={15} color={colors.white} fill={colors.white} style={{ marginRight: 8 }} />
+          <Play size={14} color={colors.white} fill={colors.white} style={{ marginRight: 8 }} />
           <Text style={styles.actionButtonText}>Lanjutkan Perjalanan</Text>
         </TouchableOpacity>
       </View>
@@ -240,11 +242,11 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = ({
           activeOpacity={0.7}
         >
           <Text style={styles.sectionLinkText}>Lihat Rute di Peta</Text>
-          <ChevronRight size={14} color={colors.primary} strokeWidth={2.2} />
+          <ChevronRight size={13} color={colors.primary} strokeWidth={2.2} />
         </TouchableOpacity>
       </View>
 
-      {/* 6. TIMELINE STOP LIST */}
+      {/* 6. TIMELINE STOP LIST (ANTI-AI-SLOP: NO PASTEL GREEN BADGE) */}
       <View style={styles.timelineCard}>
         {stops.map((stop, index) => {
           const isLast = index === stops.length - 1;
@@ -267,7 +269,7 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = ({
               <View style={styles.timelineIndicatorCol}>
                 {isDone ? (
                   <View style={styles.timelineIconDone}>
-                    <CheckCircle2 size={18} color={colors.success} strokeWidth={2.5} />
+                    <CheckCircle2 size={18} color={colors.primary} strokeWidth={2.5} />
                   </View>
                 ) : isCurrent ? (
                   <View style={styles.timelineIconCurrent}>
@@ -302,12 +304,12 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = ({
                     {stop.name}
                   </Text>
 
-                  {/* Status Badge */}
+                  {/* Clean Enterprise Badges - NO Pastel Green Slop! */}
                   {isDone && (
-                    <View style={styles.badgeDone}>
-                      <Text style={styles.badgeDoneText}>Selesai</Text>
+                    <View style={styles.badgeDoneNeutral}>
+                      <Text style={styles.badgeDoneNeutralText}>Selesai</Text>
                       {stop.time && (
-                        <Text style={styles.badgeDoneSub}>{stop.time}</Text>
+                        <Text style={styles.badgeDoneNeutralTime}> • {stop.time}</Text>
                       )}
                     </View>
                   )}
@@ -319,14 +321,14 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = ({
                   )}
 
                   {isNext && (
-                    <View style={styles.badgeNext}>
-                      <Text style={styles.badgeNextText}>Berikutnya</Text>
+                    <View style={styles.badgeNeutral}>
+                      <Text style={styles.badgeNeutralText}>Berikutnya</Text>
                     </View>
                   )}
 
                   {stop.status === 'menunggu' && (
-                    <View style={styles.badgeWaiting}>
-                      <Text style={styles.badgeWaitingText}>Menunggu</Text>
+                    <View style={styles.badgeNeutral}>
+                      <Text style={styles.badgeNeutralText}>Menunggu</Text>
                     </View>
                   )}
                 </View>
@@ -356,34 +358,36 @@ const styles = StyleSheet.create({
   topBar: {
     paddingHorizontal: 18,
     paddingTop: 8,
-    paddingBottom: 4,
+    paddingBottom: 10,
+    backgroundColor: colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
   logoRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   logoImage: {
-    width: 120,
+    width: 118,
     height: 30,
   },
 
   /* PAGE HEADER */
   pageHeader: {
     paddingHorizontal: 18,
-    marginTop: 6,
-    marginBottom: 14,
+    marginTop: 14,
+    marginBottom: 12,
   },
   pageTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '700',
     color: colors.text,
     letterSpacing: -0.3,
   },
   pageSubtitle: {
-    fontSize: 13,
+    fontSize: 12.5,
     color: colors.textMuted,
-    marginTop: 4,
-    lineHeight: 18,
+    marginTop: 3,
   },
 
   /* SEGMENTED TABS */
@@ -395,11 +399,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: colors.border,
-    marginBottom: 16,
+    marginBottom: 14,
   },
   segmentButton: {
     flex: 1,
-    paddingVertical: 9,
+    paddingVertical: 8,
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 9,
@@ -408,12 +412,12 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     shadowColor: '#0F172A',
     shadowOffset: { width: 0, height: 1.5 },
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.06,
     shadowRadius: 3,
     elevation: 2,
   },
   segmentText: {
-    fontSize: 13,
+    fontSize: 12.5,
     fontWeight: '500',
     color: colors.textMuted,
   },
@@ -430,12 +434,12 @@ const styles = StyleSheet.create({
     padding: 16,
     borderWidth: 1,
     borderColor: colors.border,
-    marginBottom: 18,
+    marginBottom: 16,
     shadowColor: '#0F172A',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 2,
+    shadowOpacity: 0.03,
+    shadowRadius: 5,
+    elevation: 1,
   },
   tripHeaderRow: {
     flexDirection: 'row',
@@ -444,32 +448,38 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   tripCode: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
     color: colors.text,
     letterSpacing: -0.2,
   },
-  statusPillBlue: {
+  statusPillNeutral: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.primaryMuted,
-    paddingHorizontal: 9,
-    paddingVertical: 4.5,
-    borderRadius: 20,
+    backgroundColor: colors.surface2,
+    paddingHorizontal: 8,
+    paddingVertical: 3.5,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#BFDBFE',
+    borderColor: colors.border,
   },
-  statusPillBlueText: {
-    fontSize: 11,
+  statusDotBlue: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.primary,
+    marginRight: 5,
+  },
+  statusPillNeutralText: {
+    fontSize: 10,
     fontWeight: '600',
-    color: colors.primary,
-    marginLeft: 5,
+    color: colors.textSecondary,
   },
   tripRoute: {
-    fontSize: 13,
+    fontSize: 12.5,
     fontWeight: '500',
     color: colors.textSecondary,
-    marginBottom: 14,
+    marginBottom: 12,
   },
 
   /* METRICS BOX */
@@ -478,7 +488,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#F8FAFC',
     borderRadius: 12,
-    paddingVertical: 12,
+    paddingVertical: 10,
     paddingHorizontal: 8,
     borderWidth: 1,
     borderColor: '#EDF2F7',
@@ -491,7 +501,7 @@ const styles = StyleSheet.create({
   metricIconRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 3,
+    marginBottom: 2,
   },
   metricValue: {
     fontSize: 12,
@@ -505,22 +515,22 @@ const styles = StyleSheet.create({
   },
   metricDivider: {
     width: 1,
-    height: 24,
+    height: 22,
     backgroundColor: colors.border,
   },
 
   /* PROGRESS BAR */
   progressContainer: {
-    marginBottom: 16,
+    marginBottom: 14,
   },
   progressHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 6,
+    marginBottom: 5,
   },
   progressLabel: {
-    fontSize: 12,
+    fontSize: 11.5,
     fontWeight: '600',
     color: colors.textSecondary,
   },
@@ -530,30 +540,30 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
   progressBarBg: {
-    height: 7,
+    height: 6,
     backgroundColor: '#E2E8F0',
-    borderRadius: 4,
+    borderRadius: 3,
     overflow: 'hidden',
   },
   progressBarFill: {
     height: '100%',
     backgroundColor: colors.primary,
-    borderRadius: 4,
+    borderRadius: 3,
   },
 
   /* ACTION BUTTON */
   actionButton: {
     flexDirection: 'row',
     backgroundColor: colors.primary,
-    paddingVertical: 12,
+    height: 46,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.2,
     shadowRadius: 5,
-    elevation: 3,
+    elevation: 2,
   },
   actionButtonText: {
     fontSize: 13,
@@ -567,10 +577,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 18,
-    marginBottom: 10,
+    marginBottom: 8,
   },
   sectionTitle: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '700',
     color: colors.text,
   },
@@ -579,7 +589,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   sectionLinkText: {
-    fontSize: 12,
+    fontSize: 11.5,
     fontWeight: '600',
     color: colors.primary,
     marginRight: 2,
@@ -590,14 +600,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     marginHorizontal: 18,
     borderRadius: 16,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingVertical: 6,
+    paddingHorizontal: 14,
     borderWidth: 1,
     borderColor: colors.border,
     shadowColor: '#0F172A',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.03,
-    shadowRadius: 5,
+    shadowRadius: 4,
     elevation: 1,
   },
   stopRow: {
@@ -650,12 +660,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   timelineLine: {
-    width: 2,
-    height: 38,
+    width: 1.5,
+    height: 36,
     marginTop: 4,
   },
   timelineLineDone: {
-    backgroundColor: colors.success,
+    backgroundColor: colors.primary,
   },
   timelineLinePending: {
     backgroundColor: '#E2E8F0',
@@ -669,7 +679,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 3,
+    marginBottom: 2,
   },
   stopName: {
     fontSize: 13,
@@ -687,16 +697,23 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
   },
 
-  /* BADGES */
-  badgeDone: {
-    alignItems: 'flex-end',
+  /* CLEAN ENTERPRISE BADGES */
+  badgeDoneNeutral: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface2,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
-  badgeDoneText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: colors.success,
+  badgeDoneNeutralText: {
+    fontSize: 9.5,
+    fontWeight: '600',
+    color: colors.textSecondary,
   },
-  badgeDoneSub: {
+  badgeDoneNeutralTime: {
     fontSize: 9,
     color: colors.textMuted,
   },
@@ -704,37 +721,26 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primaryMuted,
     paddingHorizontal: 7,
     paddingVertical: 2.5,
-    borderRadius: 10,
+    borderRadius: 6,
     borderWidth: 1,
     borderColor: '#BFDBFE',
   },
   badgeCurrentText: {
-    fontSize: 9,
+    fontSize: 9.5,
     fontWeight: '700',
     color: colors.primary,
   },
-  badgeNext: {
-    backgroundColor: '#FEF3C7',
-    paddingHorizontal: 7,
-    paddingVertical: 2.5,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: '#FDE68A',
-  },
-  badgeNextText: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: colors.warningDark,
-  },
-  badgeWaiting: {
+  badgeNeutral: {
     backgroundColor: colors.surface2,
-    paddingHorizontal: 7,
-    paddingVertical: 2.5,
-    borderRadius: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
-  badgeWaitingText: {
-    fontSize: 9,
-    fontWeight: '600',
-    color: colors.textDisabled,
+  badgeNeutralText: {
+    fontSize: 9.5,
+    fontWeight: '500',
+    color: colors.textMuted,
   },
 });

@@ -10,7 +10,6 @@ import {
 import {
   BarChart2,
   Bell,
-  CheckCircle2,
   ChevronRight,
   ClipboardList,
   Clock,
@@ -58,13 +57,13 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           onPress={onNavigateNotifications}
           accessibilityLabel="Notifikasi"
         >
-          <Bell size={22} color={colors.text} strokeWidth={2} />
+          <Bell size={20} color={colors.text} strokeWidth={2} />
           <View style={styles.badgeDot} />
         </TouchableOpacity>
       </View>
 
-      {/* 2. DRIVER GREETING & VEHICLE HERO SECTION */}
-      <View style={styles.heroSection}>
+      {/* 2. DRIVER PROFILE HERO CARD (CLEAN CODE-DEFINED, NO ASSET BACKGROUND) */}
+      <View style={styles.heroCard}>
         <View style={styles.heroLeft}>
           <View style={styles.avatarWrapper}>
             <Image
@@ -76,18 +75,15 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             <Text style={styles.greetingText}>Selamat bertugas,</Text>
             <Text style={styles.driverName}>Budi Santoso</Text>
             <View style={styles.vehicleRow}>
-              <Truck size={12} color={colors.textMuted} strokeWidth={2} />
-              <Text style={styles.vehicleText}>B 9821 KCE • Gran Max Blind Van</Text>
+              <Truck size={12} color={colors.textSecondary} strokeWidth={2} />
+              <Text style={styles.vehicleText}>Gran Max Blind Van • B 9821 KCE</Text>
             </View>
           </View>
         </View>
 
-        <View style={styles.heroRight}>
-          <Image
-            source={require('../../assets/van-illustration.png')}
-            style={styles.vanImage}
-            resizeMode="contain"
-          />
+        <View style={styles.heroStatusBadge}>
+          <View style={styles.liveDot} />
+          <Text style={styles.heroStatusText}>Aktif</Text>
         </View>
       </View>
 
@@ -96,7 +92,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         <View style={styles.cardHeader}>
           <View style={styles.cardHeaderLeft}>
             <View style={styles.iconBoxBlue}>
-              <ClipboardList size={18} color={colors.white} strokeWidth={2.2} />
+              <ClipboardList size={16} color={colors.white} strokeWidth={2.2} />
             </View>
             <Text style={styles.cardTitle}>Tugas Hari Ini</Text>
           </View>
@@ -140,7 +136,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             <View style={styles.metricItem}>
               <View style={styles.metricIconRow}>
                 <BarChart2 size={13} color={colors.primary} strokeWidth={2.2} />
-                <Text style={styles.metricValue}>± 1 jam 15 menit</Text>
+                <Text style={styles.metricValue}>± 1j 15m</Text>
               </View>
               <Text style={styles.metricLabel}>Estimasi</Text>
             </View>
@@ -158,16 +154,18 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         </TouchableOpacity>
       </View>
 
-      {/* 4. CARD: STATUS ARMADA */}
+      {/* 4. CARD: STATUS ARMADA (ANTI-AI-SLOP: NO PUFFY GREEN BACKGROUND) */}
       <View style={styles.card}>
         <View style={styles.cardHeader}>
           <View style={styles.cardHeaderLeft}>
-            <Truck size={18} color={colors.primary} strokeWidth={2.2} />
+            <Truck size={17} color={colors.primary} strokeWidth={2.2} />
             <Text style={[styles.cardTitle, { marginLeft: 8 }]}>Status Armada</Text>
           </View>
-          <View style={styles.statusPillGreen}>
-            <CheckCircle2 size={13} color={colors.success} strokeWidth={2.5} />
-            <Text style={styles.statusPillGreenText}>Siap Digunakan</Text>
+
+          {/* Clean enterprise status indicator - subtle dot, neutral surface */}
+          <View style={styles.statusPillNeutral}>
+            <View style={styles.statusDotGreen} />
+            <Text style={styles.statusPillNeutralText}>Siap Digunakan</Text>
           </View>
         </View>
 
@@ -175,7 +173,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           {/* Kolom 1: Bahan Bakar */}
           <View style={styles.armadaCol}>
             <View style={styles.iconCircleLightBlue}>
-              <Fuel size={20} color={colors.primary} strokeWidth={2.2} />
+              <Fuel size={18} color={colors.primary} strokeWidth={2.2} />
             </View>
             <View style={styles.armadaColText}>
               <Text style={styles.armadaLabel}>Bahan Bakar</Text>
@@ -189,17 +187,18 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           {/* Kolom 2: Odometer Hari Ini */}
           <View style={styles.armadaCol}>
             <View style={styles.iconCircleLightBlue}>
-              <Milestone size={20} color={colors.primary} strokeWidth={2.2} />
+              <Milestone size={18} color={colors.primary} strokeWidth={2.2} />
             </View>
             <View style={styles.armadaColText}>
               <Text style={styles.armadaLabel}>Odometer Hari Ini</Text>
               <Text style={styles.armadaValue}>128 km</Text>
+              <Text style={styles.armadaSubLabel}>Ritase Ke-2</Text>
             </View>
           </View>
         </View>
       </View>
 
-      {/* 5. DUA KARTU METRIK: SAFETY SCORE & PROGRESS RTO */}
+      {/* 5. DUA KARTU METRIK: SAFETY SCORE & PROGRESS RTO (ANTI-AI-SLOP) */}
       <View style={styles.twinCardsRow}>
         {/* Kartu Kiri: Safety Score */}
         <TouchableOpacity
@@ -209,7 +208,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         >
           <View style={styles.halfCardHeader}>
             <View style={styles.halfCardHeaderLeft}>
-              <ShieldCheck size={16} color={colors.primary} strokeWidth={2.2} />
+              <ShieldCheck size={15} color={colors.primary} strokeWidth={2.2} />
               <Text style={styles.halfCardTitle}>Safety Score</Text>
             </View>
             <ChevronRight size={14} color={colors.textDisabled} strokeWidth={2} />
@@ -217,7 +216,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
           <View style={styles.halfCardBody}>
             <CircularProgress
-              size={56}
+              size={54}
               strokeWidth={4.5}
               percentage={94}
               color={colors.primary}
@@ -227,8 +226,10 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               <Text style={styles.scoreTextSub}>/100</Text>
             </CircularProgress>
 
-            <View style={styles.scoreBadgePill}>
-              <Text style={styles.scoreBadgeText}>Sangat Baik</Text>
+            {/* Professional typography - NO pastel green bubble! */}
+            <View style={styles.scoreMetaContainer}>
+              <Text style={styles.scoreHeadlineText}>Sangat Baik</Text>
+              <Text style={styles.scoreSubText}>30 hari terakhir</Text>
             </View>
           </View>
         </TouchableOpacity>
@@ -241,7 +242,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         >
           <View style={styles.halfCardHeader}>
             <View style={styles.halfCardHeaderLeft}>
-              <TrendingUp size={16} color={colors.primary} strokeWidth={2.2} />
+              <TrendingUp size={15} color={colors.primary} strokeWidth={2.2} />
               <Text style={styles.halfCardTitle}>Progress RTO</Text>
             </View>
             <ChevronRight size={14} color={colors.textDisabled} strokeWidth={2} />
@@ -249,7 +250,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
           <View style={styles.halfCardBody}>
             <CircularProgress
-              size={56}
+              size={54}
               strokeWidth={4.5}
               percentage={64.8}
               color={colors.primary}
@@ -258,9 +259,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               <Text style={styles.rtoPctText}>64,8%</Text>
             </CircularProgress>
 
-            <View style={styles.rtoTextContainer}>
-              <Text style={styles.rtoTenureText}>Bulan ke-23</Text>
-              <Text style={styles.rtoTenureSub}>dari 36</Text>
+            <View style={styles.rtoMetaContainer}>
+              <Text style={styles.rtoHeadlineText}>Bulan ke-23</Text>
+              <Text style={styles.rtoSubText}>dari 36 bulan</Text>
             </View>
           </View>
         </TouchableOpacity>
@@ -275,7 +276,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bg,
   },
   scrollContent: {
-    paddingBottom: 110, // Memberikan ruang aman untuk floating bottom bar
+    paddingBottom: 110,
   },
 
   /* TOP APP BAR */
@@ -285,21 +286,24 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 18,
     paddingTop: 8,
-    paddingBottom: 12,
+    paddingBottom: 10,
+    backgroundColor: colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
   logoRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   logoImage: {
-    width: 124,
-    height: 32,
+    width: 118,
+    height: 30,
   },
   bellButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.surface,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: colors.surface2,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
@@ -307,24 +311,31 @@ const styles = StyleSheet.create({
   },
   badgeDot: {
     position: 'absolute',
-    top: 9,
-    right: 9,
-    width: 7,
-    height: 7,
-    borderRadius: 3.5,
-    backgroundColor: colors.danger,
-    borderWidth: 1.5,
-    borderColor: colors.surface,
+    top: 8,
+    right: 8,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.dangerDark,
   },
 
-  /* HERO GREETING SECTION */
-  heroSection: {
+  /* DRIVER HERO CARD */
+  heroCard: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    marginBottom: 6,
+    backgroundColor: colors.surface,
+    marginHorizontal: 18,
+    marginTop: 14,
+    borderRadius: 16,
+    padding: 14,
+    borderWidth: 1,
+    borderColor: colors.border,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 1.5 },
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    elevation: 1,
   },
   heroLeft: {
     flexDirection: 'row',
@@ -332,32 +343,31 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   avatarWrapper: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     borderWidth: 1.5,
-    borderColor: colors.primary,
+    borderColor: colors.border,
     overflow: 'hidden',
-    backgroundColor: colors.surface,
+    backgroundColor: colors.surface2,
   },
   avatarImage: {
     width: '100%',
     height: '100%',
   },
   driverInfo: {
-    marginLeft: 10,
+    marginLeft: 12,
     flex: 1,
   },
   greetingText: {
     fontSize: 11,
     color: colors.textMuted,
-    fontWeight: '500',
   },
   driverName: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
     color: colors.text,
-    marginTop: 1,
+    letterSpacing: -0.2,
   },
   vehicleRow: {
     flexDirection: 'row',
@@ -365,79 +375,90 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   vehicleText: {
-    fontSize: 10.5,
-    color: colors.textMuted,
-    fontWeight: '500',
+    fontSize: 11,
+    color: colors.textSecondary,
     marginLeft: 4,
   },
-  heroRight: {
-    width: 110,
-    height: 65,
-    alignItems: 'flex-end',
-    justifyContent: 'center',
-  },
-  vanImage: {
-    width: '100%',
-    height: '100%',
-  },
-
-  /* CARD GENERAL STYLES */
-  card: {
-    backgroundColor: colors.surface,
-    borderRadius: 20,
+  heroStatusBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface2,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: colors.border,
+  },
+  liveDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.primary,
+    marginRight: 4,
+  },
+  heroStatusText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: colors.textSecondary,
+  },
+
+  /* CARD GENERIC */
+  card: {
+    backgroundColor: colors.surface,
+    marginHorizontal: 18,
+    marginTop: 14,
+    borderRadius: 16,
     padding: 16,
-    marginHorizontal: 16,
-    marginBottom: 12,
-    shadowColor: colors.text,
+    borderWidth: 1,
+    borderColor: colors.border,
+    shadowColor: '#0F172A',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.03,
-    shadowRadius: 8,
-    elevation: 2,
+    shadowRadius: 5,
+    elevation: 1,
   },
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginBottom: 12,
   },
   cardHeaderLeft: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   iconBoxBlue: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
+    width: 26,
+    height: 26,
+    borderRadius: 6,
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
   cardTitle: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '700',
     color: colors.text,
-    marginLeft: 10,
+    marginLeft: 8,
   },
   cardHeaderRight: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   activeTaskLink: {
-    fontSize: 11.5,
-    color: colors.primary,
+    fontSize: 11,
     fontWeight: '600',
+    color: colors.primary,
     marginRight: 2,
   },
 
   /* INNER TASK BOX */
   innerTaskBox: {
-    backgroundColor: colors.bg,
-    borderRadius: 14,
+    backgroundColor: '#F8FAFC',
+    borderRadius: 12,
+    padding: 12,
     borderWidth: 1,
-    borderColor: colors.borderLight,
-    padding: 14,
-    marginTop: 12,
+    borderColor: '#EDF2F7',
     marginBottom: 14,
   },
   tripCode: {
@@ -448,147 +469,161 @@ const styles = StyleSheet.create({
   tripRoute: {
     fontSize: 12,
     color: colors.textSecondary,
-    marginTop: 3,
-    fontWeight: '500',
+    marginTop: 2,
+    marginBottom: 10,
   },
   divider: {
     height: 1,
     backgroundColor: colors.border,
-    marginVertical: 10,
+    marginBottom: 10,
   },
   metricsRow: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
   },
   metricItem: {
-    alignItems: 'flex-start',
+    flex: 1,
   },
   metricIconRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 2,
   },
   metricValue: {
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: '700',
     color: colors.text,
     marginLeft: 4,
   },
   metricLabel: {
-    fontSize: 9.5,
-    color: colors.textDisabled,
-    fontWeight: '500',
-    marginTop: 2,
+    fontSize: 10,
+    color: colors.textMuted,
   },
 
-  /* BUTTON PRIMARY */
+  /* PRIMARY ACTION BUTTON */
   primaryActionButton: {
-    height: 46,
-    backgroundColor: colors.primary,
-    borderRadius: 12,
     flexDirection: 'row',
+    backgroundColor: colors.primary,
+    height: 46,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 4,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 2,
   },
   primaryActionText: {
-    color: colors.white,
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
+    color: colors.white,
   },
 
-  /* STATUS ARMADA */
-  statusPillGreen: {
-    backgroundColor: colors.successLight,
-    paddingHorizontal: 9,
-    paddingVertical: 4,
-    borderRadius: 16,
+  /* STATUS ARMADA (CLEAN ENTERPRISE) */
+  statusPillNeutral: {
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: colors.surface2,
+    paddingHorizontal: 8,
+    paddingVertical: 3.5,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
-  statusPillGreenText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: colors.success,
-    marginLeft: 4,
+  statusDotGreen: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#10B981',
+    marginRight: 5,
   },
+  statusPillNeutralText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: colors.textSecondary,
+  },
+
   armadaRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 14,
+    marginTop: 4,
+    gap: 12,
   },
   armadaCol: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: '#F8FAFC',
+    padding: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#EDF2F7',
   },
   iconCircleLightBlue: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: colors.primaryLight,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: colors.primaryMuted,
     alignItems: 'center',
     justifyContent: 'center',
+    marginRight: 10,
   },
   armadaColText: {
-    marginLeft: 10,
     flex: 1,
   },
   armadaLabel: {
-    fontSize: 10.5,
+    fontSize: 10,
     color: colors.textMuted,
-    fontWeight: '500',
   },
   armadaValue: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '700',
     color: colors.text,
     marginTop: 1,
   },
+  armadaSubLabel: {
+    fontSize: 9,
+    color: colors.textMuted,
+    marginTop: 1,
+  },
   progressBarBg: {
-    width: '85%',
-    height: 4.5,
-    backgroundColor: colors.border,
-    borderRadius: 3,
-    marginTop: 5,
+    height: 4,
+    backgroundColor: '#E2E8F0',
+    borderRadius: 2,
+    marginTop: 4,
     overflow: 'hidden',
   },
   progressBarFill: {
     height: '100%',
     backgroundColor: colors.primary,
-    borderRadius: 3,
+    borderRadius: 2,
   },
 
-  /* TWIN METRIC CARDS ROW */
+  /* TWIN CARDS */
   twinCardsRow: {
     flexDirection: 'row',
-    paddingHorizontal: 16,
-    marginBottom: 20,
+    marginHorizontal: 18,
+    marginTop: 14,
+    gap: 12,
   },
   halfCard: {
     flex: 1,
     backgroundColor: colors.surface,
-    borderRadius: 20,
+    borderRadius: 16,
+    padding: 14,
     borderWidth: 1,
     borderColor: colors.border,
-    padding: 14,
-    shadowColor: colors.text,
+    shadowColor: '#0F172A',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.03,
-    shadowRadius: 8,
-    elevation: 2,
-    marginHorizontal: 4,
+    shadowRadius: 4,
+    elevation: 1,
   },
   halfCardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   halfCardHeaderLeft: {
     flexDirection: 'row',
@@ -603,48 +638,49 @@ const styles = StyleSheet.create({
   halfCardBody: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
   },
   scoreTextMain: {
-    fontSize: 17,
+    fontSize: 13,
     fontWeight: '800',
-    color: colors.text,
+    color: colors.primary,
   },
   scoreTextSub: {
-    fontSize: 8.5,
-    color: colors.textDisabled,
+    fontSize: 8,
     fontWeight: '600',
+    color: colors.textMuted,
   },
-  scoreBadgePill: {
-    backgroundColor: colors.successLight,
-    paddingHorizontal: 7,
-    paddingVertical: 4,
-    borderRadius: 10,
-  },
-  scoreBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: colors.success,
-  },
-  rtoPctText: {
-    fontSize: 11.5,
-    fontWeight: '800',
-    color: colors.text,
-  },
-  rtoTextContainer: {
-    marginLeft: 8,
+  scoreMetaContainer: {
+    marginLeft: 10,
     flex: 1,
   },
-  rtoTenureText: {
-    fontSize: 11,
-    fontWeight: '600',
+  scoreHeadlineText: {
+    fontSize: 12,
+    fontWeight: '700',
     color: colors.text,
   },
-  rtoTenureSub: {
-    fontSize: 10,
+  scoreSubText: {
+    fontSize: 9.5,
     color: colors.textMuted,
-    fontWeight: '500',
-    marginTop: 1,
+    marginTop: 2,
+  },
+
+  rtoPctText: {
+    fontSize: 11,
+    fontWeight: '800',
+    color: colors.primary,
+  },
+  rtoMetaContainer: {
+    marginLeft: 10,
+    flex: 1,
+  },
+  rtoHeadlineText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: colors.text,
+  },
+  rtoSubText: {
+    fontSize: 9.5,
+    color: colors.textMuted,
+    marginTop: 2,
   },
 });
-
