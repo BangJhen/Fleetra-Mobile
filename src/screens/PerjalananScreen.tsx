@@ -296,30 +296,21 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = ({
                     </Text>
 
                     {isDone && (
-                      <View style={styles.badgeDoneNeutral}>
-                        <Text style={styles.badgeDoneNeutralText}>Selesai</Text>
-                        {stop.time && (
-                          <Text style={styles.badgeDoneNeutralTime}> • {stop.time}</Text>
-                        )}
-                      </View>
+                      <Text style={styles.statusDoneText}>
+                        Selesai{stop.time ? ` • ${stop.time}` : ''}
+                      </Text>
                     )}
 
                     {isCurrent && (
-                      <View style={styles.badgeCurrent}>
-                        <Text style={styles.badgeCurrentText}>Tujuan Saat Ini</Text>
-                      </View>
+                      <Text style={styles.statusCurrentText}>Tujuan Saat Ini</Text>
                     )}
 
                     {isNext && (
-                      <View style={styles.badgeNeutral}>
-                        <Text style={styles.badgeNeutralText}>Berikutnya</Text>
-                      </View>
+                      <Text style={styles.statusNextText}>Berikutnya</Text>
                     )}
 
                     {stop.status === 'menunggu' && (
-                      <View style={styles.badgeNeutral}>
-                        <Text style={styles.badgeNeutralText}>Menunggu</Text>
-                      </View>
+                      <Text style={styles.statusWaitingText}>Menunggu</Text>
                     )}
                   </View>
 
@@ -673,50 +664,25 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
   },
 
-  /* BADGES */
-  badgeDoneNeutral: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.surface2,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  badgeDoneNeutralText: {
-    fontSize: 9.5,
+  /* STOP STATUS (Clean typography without background containers) */
+  statusDoneText: {
+    fontSize: 11,
     fontWeight: '600',
-    color: colors.textSecondary,
-  },
-  badgeDoneNeutralTime: {
-    fontSize: 9,
     color: colors.textMuted,
   },
-  badgeCurrent: {
-    backgroundColor: colors.primaryMuted,
-    paddingHorizontal: 7,
-    paddingVertical: 2.5,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: '#BFDBFE',
-  },
-  badgeCurrentText: {
-    fontSize: 9.5,
+  statusCurrentText: {
+    fontSize: 11,
     fontWeight: '700',
     color: colors.primary,
   },
-  badgeNeutral: {
-    backgroundColor: colors.surface2,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  badgeNeutralText: {
-    fontSize: 9.5,
+  statusNextText: {
+    fontSize: 11,
     fontWeight: '500',
-    color: colors.textMuted,
+    color: colors.textSecondary,
+  },
+  statusWaitingText: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: colors.textDisabled,
   },
 });

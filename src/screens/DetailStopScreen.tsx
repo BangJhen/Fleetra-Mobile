@@ -66,12 +66,8 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = ({
             </View>
 
             <View style={styles.badgesCol}>
-              <View style={styles.currentPill}>
-                <Text style={styles.currentPillText}>Tujuan Saat Ini</Text>
-              </View>
-              <View style={styles.stopOrderPill}>
-                <Text style={styles.stopOrderPillText}>2 / 4 Stop</Text>
-              </View>
+              <Text style={styles.currentStatusText}>Tujuan Saat Ini</Text>
+              <Text style={styles.stopOrderText}>2 / 4 Stop</Text>
             </View>
           </View>
 
@@ -280,33 +276,18 @@ const styles = StyleSheet.create({
   },
   badgesCol: {
     alignItems: 'flex-end',
+    justifyContent: 'center',
   },
-  currentPill: {
-    backgroundColor: colors.primaryMuted,
-    paddingHorizontal: 7,
-    paddingVertical: 2.5,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: '#BFDBFE',
-    marginBottom: 4,
-  },
-  currentPillText: {
-    fontSize: 9.5,
+  currentStatusText: {
+    fontSize: 11,
     fontWeight: '700',
     color: colors.primary,
+    marginBottom: 2,
   },
-  stopOrderPill: {
-    backgroundColor: colors.surface2,
-    paddingHorizontal: 7,
-    paddingVertical: 2,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  stopOrderPillText: {
-    fontSize: 9.5,
+  stopOrderText: {
+    fontSize: 10.5,
     fontWeight: '600',
-    color: colors.textSecondary,
+    color: colors.textMuted,
   },
 
   /* QUICK ACTIONS ROW */
