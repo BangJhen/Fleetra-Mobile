@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Alert,
   Image,
   ScrollView,
   StyleSheet,
@@ -50,8 +51,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* 2. DRIVER PROFILE HERO CARD */}
-        <View style={styles.heroCard}>
+        {/* 2. DRIVER PROFILE HERO CARD (Interactive: Tap to view profile) */}
+        <TouchableOpacity
+          style={styles.heroCard}
+          onPress={onNavigateProfil}
+          activeOpacity={0.85}
+        >
           <View style={styles.heroLeft}>
             <View style={styles.avatarWrapper}>
               <Image
@@ -73,7 +78,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           <View style={styles.heroStatusBadge}>
             <Text style={styles.heroStatusText}>Aktif</Text>
           </View>
-        </View>
+        </TouchableOpacity>
 
         {/* 3. CARD: TUGAS HARI INI */}
         <View style={styles.card}>
@@ -142,8 +147,18 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           </TouchableOpacity>
         </View>
 
-        {/* 4. CARD: STATUS ARMADA */}
-        <View style={styles.card}>
+        {/* 4. CARD: STATUS ARMADA (Interactive: Tap for live diagnostics) */}
+        <TouchableOpacity
+          style={styles.card}
+          onPress={() =>
+            Alert.alert(
+              'Telemetri Armada (B 9821 KCE)',
+              '• Bahan Bakar: 74% (± 280 km jarak tempuh tersisa)\n• Odometer Hari Ini: 128 km (Ritase ke-2)\n• Tekanan Ban: 33 PSI (Normal)\n• Suhu Mesin: 88°C (Optimal)\n• Kondisi Keseluruhan: Siap Digunakan',
+              [{ text: 'Tutup' }]
+            )
+          }
+          activeOpacity={0.85}
+        >
           <View style={styles.cardHeader}>
             <View style={styles.cardHeaderLeft}>
               <Truck size={17} color={colors.primary} strokeWidth={2.2} />
@@ -182,7 +197,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               </View>
             </View>
           </View>
-        </View>
+        </TouchableOpacity>
 
         {/* 5. DUA KARTU METRIK: SAFETY SCORE & PROGRESS RTO */}
         <View style={styles.twinCardsRow}>

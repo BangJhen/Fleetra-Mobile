@@ -34,12 +34,69 @@ interface PerjalananScreenProps {
   completedStops: number[];
 }
 
+const PAST_TRIPS = [
+  {
+    id: 'TRIP-2026-088',
+    date: 'Kemarin • 31 Okt 2026',
+    route: 'Gudang Cimahi → Padalarang',
+    distance: '32,4 km',
+    duration: '1j 45m',
+    status: 'Selesai',
+    rtoContribution: 'Rp 45.000',
+    stops: 5,
+  },
+  {
+    id: 'TRIP-2026-087',
+    date: '28 Okt 2026',
+    route: 'Gudang Cimahi → Buah Batu',
+    distance: '24,8 km',
+    duration: '1j 20m',
+    status: 'Selesai',
+    rtoContribution: 'Rp 60.000',
+    stops: 6,
+  },
+  {
+    id: 'TRIP-2026-086',
+    date: '26 Okt 2026',
+    route: 'Gudang Cimahi → Cibiru & Ujungberung',
+    distance: '41,2 km',
+    duration: '2j 10m',
+    status: 'Selesai',
+    rtoContribution: 'Rp 75.000',
+    stops: 7,
+  },
+];
+
 export const PerjalananScreen: React.FC<PerjalananScreenProps> = ({
   onBackToHome,
   onOpenDetailStop,
   completedStops,
 }) => {
   const [activeSegmentTab, setActiveSegmentTab] = useState<'aktif' | 'riwayat'>('aktif');
+
+  const handleStopPress = (stop: StopItem) => {
+    if (stop.status === 'tujuan_saat_ini') {
+      onOpenDetailStop(stop.id);
+    } else if (stop.status === 'selesai') {
+      Alert.alert(
+        `${stop.name} (Selesai)`,
+        `Pengantaran kargo telah diselesaikan pukul ${stop.time || '08.15'} WIB. Seluruh dokumen e-POD dan foto bukti fisik telah diverifikasi oleh PIC toko.`,
+        [
+          {
+            text: 'Lihat e-POD',
+            onPress: () => onOpenDetailStop(stop.id),
+          },
+          { text: 'Tutup', style: 'cancel' },
+        ]
+      );
+    } else {
+      Alert.alert(
+        stop.name,
+        `• Status: ${stop.status === 'berikutnya' ? 'Stop Berikutnya' : 'Menunggu Antrean'}\n• Alamat: ${stop.address}\n• Estimasi Kargo: 8 paket logistik\n\nSelesaikan Stop 2 (Toko Sumber Rejeki) terlebih dahulu sebelum memulai proses di titik ini.`,
+        [{ text: 'Mengerti' }]
+      );
+    }
+  };
 
   // Stop list based on mockup
   const stops: StopItem[] = [
@@ -125,13 +182,7 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = ({
               styles.segmentButton,
               activeSegmentTab === 'riwayat' && styles.segmentButtonActive,
             ]}
-            onPress={() => {
-              setActiveSegmentTab('riwayat');
-              Alert.alert(
-                'Riwayat Perjalanan',
-                'Menampilkan 48 penugasan selesai bulan ini dengan total 1.840 km.'
-              );
-            }}
+            onPress={() => setActiveSegmentTab('riwayat')}
             activeOpacity={0.8}
           >
             <Text
@@ -145,182 +196,233 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = ({
           </TouchableOpacity>
         </View>
 
-        {/* 4. ACTIVE TRIP CARD */}
-        <View style={styles.tripCard}>
-          {/* Card Header */}
-          <View style={styles.tripHeaderRow}>
-            <Text style={styles.tripCode}>#TRIP-2026-089</Text>
+        {activeSegmentTab === 'aktif' ? (
+          <>
+            {/* 4. ACTIVE TRIP CARD */}
+            <View style={styles.tripCard}>
+              {/* Card Header */}
+              <View style={styles.tripHeaderRow}>
+                <Text style={styles.tripCode}>#TRIP-2026-089</Text>
 
-            <View style={styles.statusPillNeutral}>
-              <Text style={styles.statusPillNeutralText}>Dalam Perjalanan</Text>
-            </View>
-          </View>
-
-          <Text style={styles.tripRoute}>Gudang Cimahi → 4 Titik Bandung Kota</Text>
-
-          {/* 3-Column Metrics */}
-          <View style={styles.metricsBox}>
-            <View style={styles.metricCol}>
-              <View style={styles.metricIconRow}>
-                <Clock size={13} color={colors.primary} strokeWidth={2.2} />
-                <Text style={styles.metricValue}>08.00 WIB</Text>
+                <View style={styles.statusPillNeutral}>
+                  <Text style={styles.statusPillNeutralText}>Dalam Perjalanan</Text>
+                </View>
               </View>
-              <Text style={styles.metricLabel}>Waktu Mulai</Text>
-            </View>
 
-            <View style={styles.metricDivider} />
+              <Text style={styles.tripRoute}>Gudang Cimahi → 4 Titik Bandung Kota</Text>
 
-            <View style={styles.metricCol}>
-              <View style={styles.metricIconRow}>
-                <MapPin size={13} color={colors.primary} strokeWidth={2.2} />
-                <Text style={styles.metricValue}>4 Stop</Text>
+              {/* 3-Column Metrics */}
+              <View style={styles.metricsBox}>
+                <View style={styles.metricCol}>
+                  <View style={styles.metricIconRow}>
+                    <Clock size={13} color={colors.primary} strokeWidth={2.2} />
+                    <Text style={styles.metricValue}>08.00 WIB</Text>
+                  </View>
+                  <Text style={styles.metricLabel}>Waktu Mulai</Text>
+                </View>
+
+                <View style={styles.metricDivider} />
+
+                <View style={styles.metricCol}>
+                  <View style={styles.metricIconRow}>
+                    <MapPin size={13} color={colors.primary} strokeWidth={2.2} />
+                    <Text style={styles.metricValue}>4 Stop</Text>
+                  </View>
+                  <Text style={styles.metricLabel}>Tujuan</Text>
+                </View>
+
+                <View style={styles.metricDivider} />
+
+                <View style={styles.metricCol}>
+                  <View style={styles.metricIconRow}>
+                    <Milestone size={13} color={colors.primary} strokeWidth={2.2} />
+                    <Text style={styles.metricValue}>28,4 km</Text>
+                  </View>
+                  <Text style={styles.metricLabel}>Total Jarak</Text>
+                </View>
               </View>
-              <Text style={styles.metricLabel}>Tujuan</Text>
-            </View>
 
-            <View style={styles.metricDivider} />
-
-            <View style={styles.metricCol}>
-              <View style={styles.metricIconRow}>
-                <Milestone size={13} color={colors.primary} strokeWidth={2.2} />
-                <Text style={styles.metricValue}>28,4 km</Text>
+              {/* Horizontal Progress Bar */}
+              <View style={styles.progressContainer}>
+                <View style={styles.progressHeaderRow}>
+                  <Text style={styles.progressLabel}>
+                    {completedCount} / 4 stop selesai
+                  </Text>
+                  <Text style={styles.progressPctText}>{progressPercent}%</Text>
+                </View>
+                <View style={styles.progressBarBg}>
+                  <View
+                    style={[
+                      styles.progressBarFill,
+                      { width: `${Math.max(progressPercent, 12)}%` },
+                    ]}
+                  />
+                </View>
               </View>
-              <Text style={styles.metricLabel}>Total Jarak</Text>
-            </View>
-          </View>
 
-          {/* Horizontal Progress Bar */}
-          <View style={styles.progressContainer}>
-            <View style={styles.progressHeaderRow}>
-              <Text style={styles.progressLabel}>
-                {completedCount} / 4 stop selesai
-              </Text>
-              <Text style={styles.progressPctText}>{progressPercent}%</Text>
-            </View>
-            <View style={styles.progressBarBg}>
-              <View
-                style={[
-                  styles.progressBarFill,
-                  { width: `${Math.max(progressPercent, 12)}%` },
-                ]}
-              />
-            </View>
-          </View>
-
-          {/* Primary Action Button */}
-          <TouchableOpacity
-            style={styles.actionButton}
-            onPress={() => onOpenDetailStop(2)}
-            activeOpacity={0.85}
-          >
-            <Play size={14} color={colors.white} fill={colors.white} style={{ marginRight: 8 }} />
-            <Text style={styles.actionButtonText}>Lanjutkan Perjalanan</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* 5. SECTION: DETAIL RUTE */}
-        <View style={styles.sectionHeaderRow}>
-          <Text style={styles.sectionTitle}>Detail Rute</Text>
-          <TouchableOpacity
-            style={styles.sectionLinkRow}
-            onPress={() =>
-              Alert.alert(
-                'Peta Navigasi',
-                'Memuat koridor rute OSRM dari Cimahi menuju 4 titik pengantaran Bandung Kota.'
-              )
-            }
-            activeOpacity={0.7}
-          >
-            <Text style={styles.sectionLinkText}>Lihat Rute di Peta</Text>
-            <ChevronRight size={13} color={colors.primary} strokeWidth={2.2} />
-          </TouchableOpacity>
-        </View>
-
-        {/* 6. TIMELINE STOP LIST */}
-        <View style={styles.timelineCard}>
-          {stops.map((stop, index) => {
-            const isLast = index === stops.length - 1;
-            const isDone = stop.status === 'selesai';
-            const isCurrent = stop.status === 'tujuan_saat_ini';
-            const isNext = stop.status === 'berikutnya';
-
-            return (
+              {/* Primary Action Button */}
               <TouchableOpacity
-                key={stop.id}
-                style={[
-                  styles.stopRow,
-                  isLast && styles.stopRowLast,
-                  isCurrent && styles.stopRowCurrent,
-                ]}
-                onPress={() => onOpenDetailStop(stop.id)}
+                style={styles.actionButton}
+                onPress={() => onOpenDetailStop(2)}
+                activeOpacity={0.85}
+              >
+                <Play size={14} color={colors.white} fill={colors.white} style={{ marginRight: 8 }} />
+                <Text style={styles.actionButtonText}>Lanjutkan Perjalanan</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* 5. SECTION: DETAIL RUTE */}
+            <View style={styles.sectionHeaderRow}>
+              <Text style={styles.sectionTitle}>Detail Rute</Text>
+              <TouchableOpacity
+                style={styles.sectionLinkRow}
+                onPress={() =>
+                  Alert.alert(
+                    'Peta Navigasi',
+                    'Memuat koridor rute OSRM dari Cimahi menuju 4 titik pengantaran Bandung Kota.'
+                  )
+                }
+                activeOpacity={0.7}
+              >
+                <Text style={styles.sectionLinkText}>Lihat Rute di Peta</Text>
+                <ChevronRight size={13} color={colors.primary} strokeWidth={2.2} />
+              </TouchableOpacity>
+            </View>
+
+            {/* 6. TIMELINE STOP LIST */}
+            <View style={styles.timelineCard}>
+              {stops.map((stop, index) => {
+                const isLast = index === stops.length - 1;
+                const isDone = stop.status === 'selesai';
+                const isCurrent = stop.status === 'tujuan_saat_ini';
+                const isNext = stop.status === 'berikutnya';
+
+                return (
+                  <TouchableOpacity
+                    key={stop.id}
+                    style={[
+                      styles.stopRow,
+                      isLast && styles.stopRowLast,
+                      isCurrent && styles.stopRowCurrent,
+                    ]}
+                    onPress={() => handleStopPress(stop)}
+                    activeOpacity={0.8}
+                  >
+                    {/* Left Timeline Indicator */}
+                    <View style={styles.timelineIndicatorCol}>
+                      {isDone ? (
+                        <View style={styles.timelineIconDone}>
+                          <CheckCircle2 size={18} color={colors.primary} strokeWidth={2.5} />
+                        </View>
+                      ) : isCurrent ? (
+                        <View style={styles.timelineIconCurrent}>
+                          <View style={styles.timelineDotBlue} />
+                        </View>
+                      ) : (
+                        <View style={styles.timelineIconPending}>
+                          <Circle size={10} color={colors.textDisabled} strokeWidth={2} />
+                        </View>
+                      )}
+
+                      {!isLast && (
+                        <View
+                          style={[
+                            styles.timelineLine,
+                            isDone ? styles.timelineLineDone : styles.timelineLinePending,
+                          ]}
+                        />
+                      )}
+                    </View>
+
+                    {/* Stop Info */}
+                    <View style={styles.stopInfoCol}>
+                      <View style={styles.stopInfoHeaderRow}>
+                        <Text
+                          style={[
+                            styles.stopName,
+                            isCurrent && styles.stopNameCurrent,
+                          ]}
+                          numberOfLines={1}
+                        >
+                          {stop.name}
+                        </Text>
+
+                        {isDone && (
+                          <Text style={styles.statusDoneText}>
+                            Selesai{stop.time ? ` • ${stop.time}` : ''}
+                          </Text>
+                        )}
+
+                        {isCurrent && (
+                          <Text style={styles.statusCurrentText}>Tujuan Saat Ini</Text>
+                        )}
+
+                        {isNext && (
+                          <Text style={styles.statusNextText}>Berikutnya</Text>
+                        )}
+
+                        {stop.status === 'menunggu' && (
+                          <Text style={styles.statusWaitingText}>Menunggu</Text>
+                        )}
+                      </View>
+
+                      <Text style={styles.stopAddress} numberOfLines={1}>
+                        {stop.address}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </>
+        ) : (
+          /* RIWAYAT PENUGASAN SECTION */
+          <View style={styles.historyListSection}>
+            <View style={styles.historyHeaderRow}>
+              <Text style={styles.sectionTitle}>Riwayat Penugasan Selesai</Text>
+              <Text style={styles.historyCountText}>{PAST_TRIPS.length} Ritase</Text>
+            </View>
+
+            {PAST_TRIPS.map((trip) => (
+              <TouchableOpacity
+                key={trip.id}
+                style={styles.historyCard}
+                onPress={() =>
+                  Alert.alert(
+                    `Detail Ritase #${trip.id}`,
+                    `• Tanggal: ${trip.date}\n• Rute: ${trip.route}\n• Total Jarak: ${trip.distance}\n• Durasi: ${trip.duration}\n• Jumlah Stop: ${trip.stops} Titik (Selesai 100%)\n• Alokasi Setoran RTO: ${trip.rtoContribution}\n\nSeluruh data e-POD dan dokumen logistik telah terarsip di cloud konsol dispatcher.`,
+                    [{ text: 'Tutup' }]
+                  )
+                }
                 activeOpacity={0.8}
               >
-                {/* Left Timeline Indicator */}
-                <View style={styles.timelineIndicatorCol}>
-                  {isDone ? (
-                    <View style={styles.timelineIconDone}>
-                      <CheckCircle2 size={18} color={colors.primary} strokeWidth={2.5} />
-                    </View>
-                  ) : isCurrent ? (
-                    <View style={styles.timelineIconCurrent}>
-                      <View style={styles.timelineDotBlue} />
-                    </View>
-                  ) : (
-                    <View style={styles.timelineIconPending}>
-                      <Circle size={10} color={colors.textDisabled} strokeWidth={2} />
-                    </View>
-                  )}
-
-                  {!isLast && (
-                    <View
-                      style={[
-                        styles.timelineLine,
-                        isDone ? styles.timelineLineDone : styles.timelineLinePending,
-                      ]}
-                    />
-                  )}
+                <View style={styles.historyCardHeader}>
+                  <Text style={styles.historyTripCode}>#{trip.id}</Text>
+                  <Text style={styles.historyDateText}>{trip.date}</Text>
                 </View>
 
-                {/* Stop Info */}
-                <View style={styles.stopInfoCol}>
-                  <View style={styles.stopInfoHeaderRow}>
-                    <Text
-                      style={[
-                        styles.stopName,
-                        isCurrent && styles.stopNameCurrent,
-                      ]}
-                      numberOfLines={1}
-                    >
-                      {stop.name}
-                    </Text>
+                <Text style={styles.historyRouteText}>{trip.route}</Text>
 
-                    {isDone && (
-                      <Text style={styles.statusDoneText}>
-                        Selesai{stop.time ? ` • ${stop.time}` : ''}
-                      </Text>
-                    )}
+                <View style={styles.historyDivider} />
 
-                    {isCurrent && (
-                      <Text style={styles.statusCurrentText}>Tujuan Saat Ini</Text>
-                    )}
-
-                    {isNext && (
-                      <Text style={styles.statusNextText}>Berikutnya</Text>
-                    )}
-
-                    {stop.status === 'menunggu' && (
-                      <Text style={styles.statusWaitingText}>Menunggu</Text>
-                    )}
+                <View style={styles.historyMetaRow}>
+                  <View style={styles.historyMetaItem}>
+                    <Milestone size={12} color={colors.primary} strokeWidth={2} />
+                    <Text style={styles.historyMetaVal}>{trip.distance}</Text>
                   </View>
-
-                  <Text style={styles.stopAddress} numberOfLines={1}>
-                    {stop.address}
-                  </Text>
+                  <View style={styles.historyMetaItem}>
+                    <Clock size={12} color={colors.primary} strokeWidth={2} />
+                    <Text style={styles.historyMetaVal}>{trip.duration}</Text>
+                  </View>
+                  <View style={styles.historyMetaItem}>
+                    <CheckCircle2 size={12} color={colors.primary} strokeWidth={2} />
+                    <Text style={styles.historyMetaVal}>{trip.stops} Stop e-POD</Text>
+                  </View>
                 </View>
               </TouchableOpacity>
-            );
-          })}
-        </View>
+            ))}
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -674,5 +776,70 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '500',
     color: colors.textDisabled,
+  },
+
+  /* RIWAYAT PENUGASAN STYLES */
+  historyListSection: {
+    paddingHorizontal: 18,
+    marginTop: 14,
+  },
+  historyHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  historyCountText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.textSecondary,
+  },
+  historyCard: {
+    backgroundColor: colors.surface,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: 14,
+    marginBottom: 10,
+  },
+  historyCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  historyTripCode: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: colors.text,
+  },
+  historyDateText: {
+    fontSize: 11,
+    color: colors.textMuted,
+  },
+  historyRouteText: {
+    fontSize: 12.5,
+    color: colors.textSecondary,
+    marginBottom: 10,
+  },
+  historyDivider: {
+    height: 1,
+    backgroundColor: colors.borderLight,
+    marginBottom: 10,
+  },
+  historyMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  historyMetaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  historyMetaVal: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.textSecondary,
   },
 });

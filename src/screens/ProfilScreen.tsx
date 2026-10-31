@@ -72,7 +72,11 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = ({
           <TouchableOpacity
             style={styles.editProfileBtn}
             onPress={() =>
-              Alert.alert('Edit Profil', 'Fitur pembaruan data diri mitra pengemudi.')
+              Alert.alert(
+                'Profil Mitra Pengemudi',
+                '• Nama: Budi Santoso\n• ID Mitra: DRV-BDG-2024-042\n• SIM: B1 Umum (Berlaku s.d. 14 Nov 2028)\n• Kontak: +62 812-3456-7890\n• Armada: Daihatsu Gran Max Blind Van 1.3L\n• Nomor Polisi: B 9821 KCE',
+                [{ text: 'Tutup' }]
+              )
             }
             activeOpacity={0.75}
           >
@@ -82,8 +86,18 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = ({
 
         {/* 4. TWIN METRIC CARDS (SAFETY SCORE & KONDISI ARMADA) */}
         <View style={styles.twinCardsRow}>
-          {/* Left Card: Safety Score */}
-          <View style={styles.twinCard}>
+          {/* Left Card: Safety Score (Interactive breakdown) */}
+          <TouchableOpacity
+            style={styles.twinCard}
+            onPress={() =>
+              Alert.alert(
+                'Rincian Driver Safety Score (94/100)',
+                '• Pengereman Halus (Smooth Braking): 96/100\n• Kepatuhan Batas Kecepatan: 92/100\n• Akselerasi & Manuver Menikung: 95/100\n• Kebugaran Pengemudi (Fatigue Monitoring): 94/100\n\nKategori: Sangat Baik. Anda berhak atas insentif ritase prioritas bulan ini!',
+                [{ text: 'Tutup' }]
+              )
+            }
+            activeOpacity={0.85}
+          >
             <View style={styles.twinCardHeader}>
               <ShieldCheck size={15} color={colors.primary} strokeWidth={2.2} />
               <Text style={styles.twinCardTitle}>Safety Score</Text>
@@ -107,10 +121,20 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = ({
                 <Text style={styles.scoreSubMeta}>Zero-Incident</Text>
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
 
-          {/* Right Card: Kondisi Armada */}
-          <View style={styles.twinCard}>
+          {/* Right Card: Kondisi Armada (Interactive telemetry) */}
+          <TouchableOpacity
+            style={styles.twinCard}
+            onPress={() =>
+              Alert.alert(
+                'Diagnostik Armada (B 9821 KCE)',
+                '• Model: Gran Max Blind Van\n• Odometer: 128.430 km\n• Sistem Rem & ABS: Normal (Tebal Kampas 85%)\n• Tekanan Ban: 33 PSI rata 4 roda\n• Oli Mesin: 82% (Servis berkala 1.570 km lagi)\n• Tilang Elektronik (ETLE): Bersih (0 Pelanggaran)',
+                [{ text: 'Tutup' }]
+              )
+            }
+            activeOpacity={0.85}
+          >
             <View style={styles.twinCardHeader}>
               <Truck size={15} color={colors.primary} strokeWidth={2.2} />
               <Text style={styles.twinCardTitle}>Kondisi Armada</Text>
@@ -123,11 +147,21 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = ({
               <Text style={styles.armadaModelText}>Gran Max Blind Van</Text>
               <Text style={styles.armadaOdoText}>128.430 km</Text>
             </View>
-          </View>
+          </TouchableOpacity>
         </View>
 
-        {/* 5. PROGRESS RENT-TO-OWN (RTO) CARD */}
-        <View style={styles.rtoCard}>
+        {/* 5. PROGRESS RENT-TO-OWN (RTO) CARD (Interactive contract) */}
+        <TouchableOpacity
+          style={styles.rtoCard}
+          onPress={() =>
+            Alert.alert(
+              'Detail Skema Sewa-Beli (RTO)',
+              '• Total Nilai Armada: Rp 300.000.000\n• Tenor: 36 Bulan (Saat ini: Bulan ke-23)\n• Ekuitas Terkumpul: Rp 194.400.000 (64,8%)\n• Sisa Kewajiban: Rp 105.600.000 (13 bulan tersisa)\n• Model Pembayaran: Pay-per-trip otomatis dari setiap ritase logistik.\n\nArmada akan dialihkan kepemilikannya penuh (BPKB atas nama Budi Santoso) setelah bulan ke-36.',
+              [{ text: 'Tutup' }]
+            )
+          }
+          activeOpacity={0.85}
+        >
           <View style={styles.rtoCardHeader}>
             <View style={styles.rtoHeaderLeft}>
               <TrendingUp size={15} color={colors.primary} strokeWidth={2.2} />
@@ -165,7 +199,7 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = ({
               </View>
             </View>
           </View>
-        </View>
+        </TouchableOpacity>
 
         {/* 6. NAVIGATION MENU LIST */}
         <View style={styles.menuCard}>
@@ -187,8 +221,9 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = ({
             style={styles.menuItem}
             onPress={() =>
               Alert.alert(
-                'Riwayat Setoran RTO',
-                'Menampilkan rekam audit setoran otomatis pay-per-trip dari setiap ritase pengantaran yang diselesaikan.'
+                'Riwayat Setoran RTO Terakhir',
+                '• #TRIP-2026-089 (Hari Ini): Menunggu e-POD selesai\n• #TRIP-2026-088 (31 Okt): +Rp 45.000\n• #TRIP-2026-087 (28 Okt): +Rp 60.000\n• #TRIP-2026-086 (26 Okt): +Rp 75.000\n\nTotal alokasi ekuitas bulan ini: Rp 4.250.000 (Otomatis masuk ke cicilan armada).',
+                [{ text: 'Tutup' }]
               )
             }
             activeOpacity={0.7}
@@ -205,7 +240,11 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = ({
           <TouchableOpacity
             style={styles.menuItem}
             onPress={() =>
-              Alert.alert('Pengaturan Akun', 'Pengaturan notifikasi, bahasa, dan keamanan kata sandi.')
+              Alert.alert(
+                'Pengaturan Akun & Aplikasi',
+                '• Notifikasi Perjalanan: Aktif\n• Suara Navigasi OSRM: Aktif\n• Mode Streaming Telematika: Efisiensi Baterai (Tiap 5 Detik)\n• Bahasa: Bahasa Indonesia\n• Versi Aplikasi: FLEETRA Mobile v1.0.0-mvp (Build 2026.11)',
+                [{ text: 'Tutup' }]
+              )
             }
             activeOpacity={0.7}
           >

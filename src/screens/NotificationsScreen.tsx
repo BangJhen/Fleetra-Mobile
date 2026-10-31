@@ -95,6 +95,18 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onBack
     Alert.alert('Sukses', 'Semua notifikasi telah ditandai sebagai dibaca.');
   };
 
+  const handleNotificationPress = (item: NotificationItem) => {
+    setNotifications((prev) =>
+      prev.map((notif) => (notif.id === item.id ? { ...notif, isUnread: false } : notif))
+    );
+
+    Alert.alert(
+      item.title,
+      `${item.description}\n\nWaktu: ${item.time} WIB • Kategori: ${item.category.toUpperCase()}`,
+      [{ text: 'Tutup' }]
+    );
+  };
+
   const filteredItems = notifications.filter((item) => {
     if (activeFilter === 'semua') return true;
     return item.category === activeFilter;
@@ -209,7 +221,11 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onBack
                 const isLast = index === todayItems.length - 1;
                 return (
                   <View key={item.id}>
-                    <View style={styles.itemRow}>
+                    <TouchableOpacity
+                      style={styles.itemRow}
+                      onPress={() => handleNotificationPress(item)}
+                      activeOpacity={0.7}
+                    >
                       {renderIcon(item.iconType)}
                       <View style={styles.itemContent}>
                         <View style={styles.itemHeaderRow}>
@@ -221,7 +237,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onBack
                         </View>
                         <Text style={styles.itemDesc}>{item.description}</Text>
                       </View>
-                    </View>
+                    </TouchableOpacity>
                     {!isLast && <View style={styles.itemDivider} />}
                   </View>
                 );
@@ -242,7 +258,11 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onBack
                 const isLast = index === yesterdayItems.length - 1;
                 return (
                   <View key={item.id}>
-                    <View style={styles.itemRow}>
+                    <TouchableOpacity
+                      style={styles.itemRow}
+                      onPress={() => handleNotificationPress(item)}
+                      activeOpacity={0.7}
+                    >
                       {renderIcon(item.iconType)}
                       <View style={styles.itemContent}>
                         <View style={styles.itemHeaderRow}>
@@ -251,7 +271,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = ({ onBack
                         </View>
                         <Text style={styles.itemDesc}>{item.description}</Text>
                       </View>
-                    </View>
+                    </TouchableOpacity>
                     {!isLast && <View style={styles.itemDivider} />}
                   </View>
                 );

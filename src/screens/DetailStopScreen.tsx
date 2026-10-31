@@ -172,8 +172,18 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = ({
           </Text>
         </TouchableOpacity>
 
-        {/* 6. STOP BERIKUTNYA CARD */}
-        <View style={styles.nextStopCard}>
+        {/* 6. STOP BERIKUTNYA CARD (Interactive preview) */}
+        <TouchableOpacity
+          style={styles.nextStopCard}
+          onPress={() =>
+            Alert.alert(
+              'Pratinjau Stop 3: Minimarket Sejahtera',
+              '• Alamat: Jl. Flyover Pasirkoja, Bandung\n• Jarak dari titik ini: +6,8 km (± 18 menit)\n• Muatan: 8 Paket Logistik (ORD-2026-7742)\n• Kontak PIC: Ibu Ratna (+62 813-9876-5432)\n\nSelesaikan serah terima e-POD Toko Sumber Rejeki terlebih dahulu.',
+              [{ text: 'Tutup' }]
+            )
+          }
+          activeOpacity={0.8}
+        >
           <Text style={styles.nextStopTitle}>Stop Berikutnya</Text>
           <View style={styles.nextStopBody}>
             <View style={styles.nextStopLeft}>
@@ -187,7 +197,7 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = ({
               <Text style={styles.nextStopDistance}>+ 6,8 km</Text>
             </View>
           </View>
-        </View>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
