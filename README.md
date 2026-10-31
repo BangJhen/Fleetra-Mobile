@@ -68,3 +68,4 @@ npm run android
 ## 📄 Lisensi & Tim Pengembang
 Dikembangkan oleh **Tim FLEETRA** untuk **ADIKARA 2026** (Universitas Telkom).  
 Hak Cipta © 2026 FLEETRA.
+
