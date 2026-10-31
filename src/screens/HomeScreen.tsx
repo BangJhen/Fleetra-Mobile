@@ -71,7 +71,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           </View>
 
           <View style={styles.heroStatusBadge}>
-            <View style={styles.liveDot} />
             <Text style={styles.heroStatusText}>Aktif</Text>
           </View>
         </View>
@@ -152,7 +151,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             </View>
 
             <View style={styles.statusPillNeutral}>
-              <View style={styles.statusDotGreen} />
               <Text style={styles.statusPillNeutralText}>Siap Digunakan</Text>
             </View>
           </View>
@@ -336,21 +334,12 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
   heroStatusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: colors.surface2,
     paddingHorizontal: 8,
     paddingVertical: 4,
-    borderRadius: 12,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: colors.border,
-  },
-  liveDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: colors.primary,
-    marginRight: 4,
   },
   heroStatusText: {
     fontSize: 10,
@@ -478,21 +467,12 @@ const styles = StyleSheet.create({
 
   /* STATUS ARMADA */
   statusPillNeutral: {
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: colors.surface2,
     paddingHorizontal: 8,
     paddingVertical: 3.5,
-    borderRadius: 12,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: colors.border,
-  },
-  statusDotGreen: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#10B981',
-    marginRight: 5,
   },
   statusPillNeutralText: {
     fontSize: 10,

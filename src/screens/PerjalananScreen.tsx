@@ -152,7 +152,6 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = ({
             <Text style={styles.tripCode}>#TRIP-2026-089</Text>
 
             <View style={styles.statusPillNeutral}>
-              <View style={styles.statusDotBlue} />
               <Text style={styles.statusPillNeutralText}>Dalam Perjalanan</Text>
             </View>
           </View>
@@ -421,21 +420,12 @@ const styles = StyleSheet.create({
     letterSpacing: -0.2,
   },
   statusPillNeutral: {
-    flexDirection: 'row',
-    alignItems: 'center',
     backgroundColor: colors.surface2,
     paddingHorizontal: 8,
     paddingVertical: 3.5,
-    borderRadius: 12,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: colors.border,
-  },
-  statusDotBlue: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: colors.primary,
-    marginRight: 5,
   },
   statusPillNeutralText: {
     fontSize: 10,

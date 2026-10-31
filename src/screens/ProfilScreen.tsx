@@ -118,7 +118,6 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = ({
 
             <View style={styles.armadaCardBody}>
               <View style={styles.armadaStatusRow}>
-                <View style={styles.statusDotGreen} />
                 <Text style={styles.armadaStatusText}>Normal (Siap Pakai)</Text>
               </View>
               <Text style={styles.armadaModelText}>Gran Max Blind Van</Text>
@@ -416,16 +415,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   armadaStatusRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
     marginBottom: 3,
-  },
-  statusDotGreen: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#10B981',
-    marginRight: 5,
   },
   armadaStatusText: {
     fontSize: 10.5,

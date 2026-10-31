@@ -167,7 +167,6 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = ({
           onPress={onArriveAtLocation}
           activeOpacity={0.85}
         >
-          <View style={styles.btnDotWhite} />
           <Text style={styles.primaryActionText}>
             {isCompleted ? 'Lihat Bukti e-POD' : 'Tiba di Lokasi'}
           </Text>
@@ -353,7 +352,6 @@ const styles = StyleSheet.create({
 
   /* PRIMARY ACTION BUTTON */
   primaryActionButton: {
-    flexDirection: 'row',
     backgroundColor: colors.primary,
     marginHorizontal: 18,
     marginTop: 16,
@@ -366,13 +364,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 2,
-  },
-  btnDotWhite: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: colors.white,
-    marginRight: 8,
   },
   primaryActionText: {
     fontSize: 13.5,
