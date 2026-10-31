@@ -38,10 +38,12 @@ const generateMapHtml = (destinationName: string) => `
       background: #F8FAFC;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
-    .leaflet-control-attribution {
-      font-size: 8px !important;
-      background: rgba(255,255,255,0.7) !important;
-      padding: 1px 4px !important;
+    .leaflet-control-attribution,
+    .leaflet-control-container .leaflet-bottom,
+    .leaflet-control-container .leaflet-top {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
     }
     /* Van pulse marker */
     .vehicle-marker {
@@ -112,17 +114,17 @@ const generateMapHtml = (destinationName: string) => `
   <div id="map"></div>
 
   <script>
-    // 1. Initialize Map
+    // 1. Initialize Map with attributionControl & zoomControl disabled
     var map = L.map('map', {
       zoomControl: false,
-      attributionControl: true
+      attributionControl: false
     }).setView([-6.9100, 107.6000], 14);
 
-    // 2. Clean Light CartoDB Positron Layer (Free & Open-Source)
+    // 2. Clean Light CartoDB Positron Layer (Free, Open-Source & No Watermark)
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
       subdomains: 'abcd',
-      attribution: '&copy; OpenStreetMap &copy; CARTO'
+      attribution: ''
     }).addTo(map);
 
     // 3. Route Waypoints (Bandung Route Corridor: Pasteur -> Jl. Sudirman No. 45)

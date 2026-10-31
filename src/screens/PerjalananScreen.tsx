@@ -18,7 +18,6 @@ import {
   Play,
 } from 'lucide-react-native';
 import { colors } from '../theme/colors';
-import { TopBar } from '../components/TopBar';
 import { useApp } from '../context/AppContext';
 
 interface StopItem {
@@ -147,20 +146,12 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
 
   return (
     <View style={styles.container}>
-      {/* 1. MODULAR TOP BAR (FIXED, CONSISTENT HEIGHT) */}
-      <TopBar
-        variant="logo"
-        showNotificationBell
-        hasUnreadNotifications={hasUnreadNotifications}
-        onPressNotifications={() => navigateTo('notifikasi')}
-      />
-
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* 2. PAGE TITLE & SUBTITLE */}
+        {/* PAGE TITLE & SUBTITLE */}
         <View style={styles.pageHeader}>
           <Text style={styles.pageTitle}>Perjalanan</Text>
           <Text style={styles.pageSubtitle}>
@@ -458,7 +449,7 @@ const styles = StyleSheet.create({
   /* PAGE HEADER */
   pageHeader: {
     paddingHorizontal: 18,
-    marginTop: 14,
+    marginTop: 20,
     marginBottom: 12,
   },
   pageTitle: {
