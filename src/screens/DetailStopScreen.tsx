@@ -35,7 +35,13 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = (props) => {
     goBack,
   } = useApp();
 
-  const handleBack = props.onBack || goBack;
+  const handleBack = () => {
+    if (props.onBack) {
+      props.onBack();
+    } else {
+      navigateTo('perjalanan');
+    }
+  };
   const isCompleted =
     props.isCompleted !== undefined
       ? props.isCompleted

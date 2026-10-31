@@ -142,9 +142,10 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Navigation state
-  const [currentScreen, setCurrentScreen] = useState<ScreenState>('beranda');
-  const [prevScreen, setPrevScreen] = useState<ScreenState>('beranda');
+  // Navigation state (Stack-based navigation history)
+  const [history, setHistory] = useState<ScreenState[]>(['beranda']);
+  const currentScreen = history[history.length - 1] || 'beranda';
+  const prevScreen = history.length > 1 ? history[history.length - 2] : 'beranda';
 
   // Trip & e-POD state
   const [completedStops, setCompletedStops] = useState<number[]>([1]);
@@ -199,12 +200,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const navigateTo = (screen: ScreenState) => {
-    setPrevScreen(currentScreen);
-    setCurrentScreen(screen);
+    setHistory((prev) => {
+      // If navigating to a primary tab ('beranda', 'perjalanan', 'profil'), reset sub-screen history
+      if (screen === 'beranda' || screen === 'perjalanan' || screen === 'profil') {
+        return [screen];
+      }
+      // If target screen is already top of stack, don't duplicate
+      if (prev[prev.length - 1] === screen) {
+        return prev;
+      }
+      return [...prev, screen];
+    });
   };
 
   const goBack = () => {
-    setCurrentScreen(prevScreen || 'beranda');
+    setHistory((prev) => {
+      if (prev.length <= 1) {
+        return ['beranda'];
+      }
+      const next = [...prev];
+      next.pop(); // Pop current screen
+      return next.length > 0 ? next : ['beranda'];
+    });
   };
 
   const saveEpodRecord = (record: EpodRecord) => {

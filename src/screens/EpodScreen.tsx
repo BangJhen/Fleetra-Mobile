@@ -35,7 +35,13 @@ export const EpodScreen: React.FC<EpodScreenProps> = (props) => {
     goBack,
   } = useApp();
 
-  const handleBack = props.onBack || goBack;
+  const handleBack = () => {
+    if (props.onBack) {
+      props.onBack();
+    } else {
+      navigateTo('detail-stop');
+    }
+  };
   const existingRecord = epodRecords[selectedStopId];
 
   const stopTitle =

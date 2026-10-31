@@ -60,10 +60,20 @@ function MainAppContent() {
         {currentScreen === 'perjalanan' && <PerjalananScreen />}
 
         {/* 3. DETAIL STOP SCREEN */}
-        {currentScreen === 'detail-stop' && <DetailStopScreen />}
+        {currentScreen === 'detail-stop' && (
+          <DetailStopScreen
+            onBack={() => navigateTo('perjalanan')}
+            onArriveAtLocation={() => navigateTo('epod')}
+          />
+        )}
 
         {/* 4. e-POD SCREEN */}
-        {currentScreen === 'epod' && <EpodScreen />}
+        {currentScreen === 'epod' && (
+          <EpodScreen
+            onBack={() => navigateTo('detail-stop')}
+            onSubmitSuccess={() => navigateTo('perjalanan')}
+          />
+        )}
 
         {/* 5. PROFIL SCREEN */}
         {currentScreen === 'profil' && <ProfilScreen />}
