@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import {
   CheckCircle2,
+  ChevronDown,
   ChevronRight,
   Circle,
   Clock,
@@ -330,12 +331,21 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
                       )}
 
                       {!isLast && (
-                        <View
-                          style={[
-                            styles.timelineLine,
-                            isDone ? styles.timelineLineDone : styles.timelineLinePending,
-                          ]}
-                        />
+                        <View style={styles.timelineConnector}>
+                          <View
+                            style={[
+                              styles.timelineLine,
+                              isDone ? styles.timelineLineDone : styles.timelineLinePending,
+                            ]}
+                          />
+                          <View style={styles.timelineArrowBox}>
+                            <ChevronDown
+                              size={12}
+                              color={isDone ? colors.primary : '#94A3B8'}
+                              strokeWidth={2.5}
+                            />
+                          </View>
+                        </View>
                       )}
                     </View>
 
@@ -664,7 +674,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     marginHorizontal: 18,
     borderRadius: 16,
-    paddingVertical: 6,
+    paddingTop: 8,
+    paddingBottom: 8,
     paddingHorizontal: 14,
     borderWidth: 1,
     borderColor: colors.border,
@@ -676,7 +687,7 @@ const styles = StyleSheet.create({
   },
   stopRow: {
     flexDirection: 'row',
-    paddingVertical: 12,
+    paddingVertical: 8,
     alignItems: 'flex-start',
   },
   stopRowLast: {
@@ -692,8 +703,8 @@ const styles = StyleSheet.create({
   /* TIMELINE INDICATOR */
   timelineIndicatorCol: {
     alignItems: 'center',
-    width: 24,
-    marginRight: 10,
+    width: 22,
+    marginRight: 12,
   },
   timelineIconDone: {
     width: 20,
@@ -723,16 +734,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  timelineConnector: {
+    alignItems: 'center',
+    width: 20,
+    height: 38,
+    marginTop: 2,
+    marginBottom: -8,
+  },
   timelineLine: {
-    width: 1.5,
-    height: 36,
-    marginTop: 4,
+    width: 2,
+    flex: 1,
   },
   timelineLineDone: {
     backgroundColor: colors.primary,
   },
   timelineLinePending: {
-    backgroundColor: '#E2E8F0',
+    backgroundColor: '#CBD5E1',
+  },
+  timelineArrowBox: {
+    marginTop: -3,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 
   /* STOP INFO */
