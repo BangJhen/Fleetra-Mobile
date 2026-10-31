@@ -45,6 +45,9 @@ const generateMapHtml = (destinationName: string) => `
       visibility: hidden !important;
       opacity: 0 !important;
     }
+    .leaflet-tile {
+      filter: saturate(0.92) contrast(1.02);
+    }
     /* Van pulse marker */
     .vehicle-marker {
       position: relative;
@@ -120,12 +123,18 @@ const generateMapHtml = (destinationName: string) => `
       attributionControl: false
     }).setView([-6.9100, 107.6000], 14);
 
-    // 2. Clean Light CartoDB Positron Layer (Free, Open-Source & No Watermark)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    // 2. OpenStreetMap Standard Layer (100% Free, Open-Source & No API Key Required)
+    var primaryTiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
-      subdomains: 'abcd',
       attribution: ''
     }).addTo(map);
+
+    // Fallback to ArcGIS World Street Map if any tile encounters an issue
+    primaryTiles.on('tileerror', function(error, tile) {
+      if (error && error.coords) {
+        tile.src = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/' + error.coords.z + '/' + error.coords.y + '/' + error.coords.x;
+      }
+    });
 
     // 3. Route Waypoints (Bandung Route Corridor: Pasteur -> Jl. Sudirman No. 45)
     var routeCoords = [
