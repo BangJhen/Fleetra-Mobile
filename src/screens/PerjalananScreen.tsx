@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Alert,
   ScrollView,
@@ -74,6 +74,8 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
     activeTripTab,
     setActiveTripTab,
     setSelectedStopId,
+    isTripCompleted,
+    completeEntireTrip,
     navigateTo,
     hasUnreadNotifications,
   } = useApp();
@@ -91,13 +93,18 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
 
   const activeSegmentTab = activeTripTab;
 
+  const completedCount = completedStops.length;
+  const progressPercent = Math.min(Math.round((completedCount / 4) * 100), 100);
+  const isAllCompleted = completedCount >= 4 || isTripCompleted;
+  const nextActiveStopId = [1, 2, 3, 4].find((id) => !completedStops.includes(id)) || 4;
+
   const handleStopPress = (stop: StopItem) => {
     if (stop.status === 'tujuan_saat_ini' || stop.status === 'selesai') {
       onOpenDetailStop(stop.id);
     } else {
       Alert.alert(
         stop.name,
-        `• Status: ${stop.status === 'berikutnya' ? 'Stop Berikutnya' : 'Menunggu Antrean'}\n• Alamat: ${stop.address}\n• Estimasi Kargo: 8 paket logistik\n\nSelesaikan Stop 2 (Toko Sumber Rejeki) terlebih dahulu sebelum memulai proses di titik ini.`,
+        `• Status: ${stop.status === 'berikutnya' ? 'Stop Berikutnya' : 'Menunggu Antrean'}\n• Alamat: ${stop.address}\n\nSelesaikan stop sebelumnya terlebih dahulu sebelum membuka titik ini.`,
         [{ text: 'Mengerti' }]
       );
     }
@@ -132,17 +139,39 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
         : completedStops.includes(2)
         ? 'tujuan_saat_ini'
         : 'berikutnya',
+      time: completedStops.includes(3) ? '10.30' : undefined,
     },
     {
       id: 4,
       name: 'Toko Makmur Jaya',
       address: 'Jl. Peta No. 88, Bandung',
-      status: completedStops.includes(4) ? 'selesai' : 'menunggu',
+      status: completedStops.includes(4)
+        ? 'selesai'
+        : completedStops.includes(3)
+        ? 'tujuan_saat_ini'
+        : 'menunggu',
+      time: completedStops.includes(4) ? '11.45' : undefined,
     },
   ];
 
-  const completedCount = completedStops.length;
-  const progressPercent = (completedCount / 4) * 100;
+  const pastTripsList = useMemo(() => {
+    if (isTripCompleted || completedCount >= 4) {
+      return [
+        {
+          id: 'TRIP-2026-089',
+          date: 'Hari ini • 01 Nov 2026',
+          route: 'Gudang Cimahi → 4 Titik Bandung Kota',
+          distance: '28,4 km',
+          duration: '1j 15m',
+          status: 'Selesai',
+          rtoContribution: 'Rp 50.000',
+          stops: 4,
+        },
+        ...PAST_TRIPS,
+      ];
+    }
+    return PAST_TRIPS;
+  }, [isTripCompleted, completedCount]);
 
   return (
     <View style={styles.container}>
@@ -207,7 +236,9 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
                 <Text style={styles.tripCode}>#TRIP-2026-089</Text>
 
                 <View style={styles.statusPillNeutral}>
-                  <Text style={styles.statusPillNeutralText}>Dalam Perjalanan</Text>
+                  <Text style={styles.statusPillNeutralText}>
+                    {isAllCompleted ? 'Ritase Selesai' : 'Dalam Perjalanan'}
+                  </Text>
                 </View>
               </View>
 
@@ -263,14 +294,30 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
               </View>
 
               {/* Primary Action Button */}
-              <TouchableOpacity
-                style={styles.actionButton}
-                onPress={() => onOpenDetailStop(2)}
-                activeOpacity={0.85}
-              >
-                <Play size={14} color={colors.white} fill={colors.white} style={{ marginRight: 8 }} />
-                <Text style={styles.actionButtonText}>Lanjutkan Perjalanan</Text>
-              </TouchableOpacity>
+              {isAllCompleted ? (
+                <TouchableOpacity
+                  style={styles.actionButtonDone}
+                  onPress={() => {
+                    completeEntireTrip();
+                    setActiveTripTab('riwayat');
+                  }}
+                  activeOpacity={0.85}
+                >
+                  <CheckCircle2 size={15} color={colors.white} strokeWidth={2.4} style={{ marginRight: 8 }} />
+                  <Text style={styles.actionButtonText}>Ritase Selesai • Selesaikan Pesanan</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={() => onOpenDetailStop(nextActiveStopId)}
+                  activeOpacity={0.85}
+                >
+                  <Play size={14} color={colors.white} fill={colors.white} style={{ marginRight: 8 }} />
+                  <Text style={styles.actionButtonText}>
+                    Lanjutkan ke Stop {nextActiveStopId}
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
 
             {/* 5. SECTION: DETAIL RUTE */}
@@ -278,7 +325,7 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
               <Text style={styles.sectionTitle}>Detail Rute</Text>
               <TouchableOpacity
                 style={styles.sectionLinkRow}
-                onPress={() => onOpenDetailStop(2)}
+                onPress={() => onOpenDetailStop(nextActiveStopId)}
                 activeOpacity={0.7}
               >
                 <Text style={styles.sectionLinkText}>Lihat Rute di Peta</Text>
@@ -398,10 +445,10 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
           <View style={styles.historyListSection}>
             <View style={styles.historyHeaderRow}>
               <Text style={styles.sectionTitle}>Riwayat Penugasan Selesai</Text>
-              <Text style={styles.historyCountText}>{PAST_TRIPS.length} Ritase</Text>
+              <Text style={styles.historyCountText}>{pastTripsList.length} Ritase</Text>
             </View>
 
-            {PAST_TRIPS.map((trip) => (
+            {pastTripsList.map((trip) => (
               <TouchableOpacity
                 key={trip.id}
                 style={styles.historyCard}
@@ -639,6 +686,19 @@ const styles = StyleSheet.create({
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 2,
+  },
+  actionButtonDone: {
+    flexDirection: 'row',
+    backgroundColor: '#0F172A',
+    height: 46,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
     shadowRadius: 5,
     elevation: 2,
   },

@@ -175,7 +175,11 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           >
             <Play size={14} color={colors.white} fill={colors.white} style={{ marginRight: 8 }} />
             <Text style={styles.primaryActionText}>
-              {completedStops.length > 1 ? 'Lanjutkan Perjalanan' : 'Mulai Perjalanan'}
+              {completedStops.length >= 4
+                ? 'Ritase Selesai • Lihat Riwayat'
+                : completedStops.length > 1
+                ? 'Lanjutkan Perjalanan'
+                : 'Mulai Perjalanan'}
             </Text>
           </TouchableOpacity>
         </View>

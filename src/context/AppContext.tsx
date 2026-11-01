@@ -112,6 +112,9 @@ interface AppContextType {
   setActiveTripTab: (tab: 'aktif' | 'riwayat') => void;
   epodRecords: Record<number, EpodRecord>;
   saveEpodRecord: (record: EpodRecord) => void;
+  isTripCompleted: boolean;
+  completeEntireTrip: () => void;
+  resetTripDemo: () => void;
 
   // SOS Emergency State
   isSosActive: boolean;
@@ -151,6 +154,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [completedStops, setCompletedStops] = useState<number[]>([1]);
   const [selectedStopId, setSelectedStopId] = useState<number>(2);
   const [activeTripTab, setActiveTripTab] = useState<'aktif' | 'riwayat'>('aktif');
+  const [isTripCompleted, setIsTripCompleted] = useState<boolean>(false);
   const [epodRecords, setEpodRecords] = useState<Record<number, EpodRecord>>({
     1: {
       stopId: 1,
@@ -226,7 +230,54 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const saveEpodRecord = (record: EpodRecord) => {
     setEpodRecords((prev) => ({ ...prev, [record.stopId]: record }));
-    setCompletedStops((prev) => (prev.includes(record.stopId) ? prev : [...prev, record.stopId]));
+    setCompletedStops((prev) => {
+      const nextCompleted = prev.includes(record.stopId) ? prev : [...prev, record.stopId];
+      if (nextCompleted.length >= 4) {
+        setIsTripCompleted(true);
+      }
+      return nextCompleted;
+    });
+
+    const stopNames: Record<number, string> = {
+      1: 'Gudang Pusat Cimahi',
+      2: 'Toko Sumber Rejeki',
+      3: 'Minimarket Sejahtera',
+      4: 'Toko Makmur Jaya',
+    };
+
+    const newNotif: NotificationItem = {
+      id: `epod-${record.stopId}-${Date.now()}`,
+      title: `e-POD Terverifikasi • Stop ${record.stopId}/4`,
+      description: `Kargo di ${stopNames[record.stopId] || 'titik singgah'} telah diterima oleh ${record.recipientName}. Bukti foto & tanda tangan telah terverifikasi.`,
+      time: 'Baru saja',
+      category: 'perjalanan',
+      isUnread: true,
+      iconType: 'trip',
+    };
+    setNotifications((prev) => [newNotif, ...prev]);
+  };
+
+  const completeEntireTrip = () => {
+    setIsTripCompleted(true);
+    setCompletedStops([1, 2, 3, 4]);
+    setActiveTripTab('riwayat');
+    const newNotif: NotificationItem = {
+      id: `trip-done-${Date.now()}`,
+      title: '🎉 Ritase #TRIP-2026-089 Selesai!',
+      description: 'Seluruh 4 titik pengantaran telah tuntas. Setoran RTO Rp 50.000 dialokasikan ke ekuitas kepemilikan armada.',
+      time: 'Baru saja',
+      category: 'sistem',
+      isUnread: true,
+      iconType: 'rto',
+    };
+    setNotifications((prev) => [newNotif, ...prev]);
+  };
+
+  const resetTripDemo = () => {
+    setIsTripCompleted(false);
+    setCompletedStops([1]);
+    setSelectedStopId(2);
+    setActiveTripTab('aktif');
   };
 
   const activateSos = (category?: string) => {
@@ -274,6 +325,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setActiveTripTab,
     epodRecords,
     saveEpodRecord,
+    isTripCompleted,
+    completeEntireTrip,
+    resetTripDemo,
 
     isSosActive,
     sosCategory,

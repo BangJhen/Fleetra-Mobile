@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  Modal,
   ScrollView,
   StyleSheet,
   Text,
@@ -12,6 +13,7 @@ import {
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import {
+  ArrowRight,
   Camera,
   CheckCircle2,
   ChevronRight,
@@ -49,8 +51,10 @@ const DEFAULT_PHOTOS: PhotoItem[] = [
 export const EpodScreen: React.FC<EpodScreenProps> = (props) => {
   const {
     selectedStopId,
+    setSelectedStopId,
     epodRecords,
     saveEpodRecord,
+    completeEntireTrip,
     driverProfile,
     navigateTo,
   } = useApp();
@@ -103,8 +107,9 @@ export const EpodScreen: React.FC<EpodScreenProps> = (props) => {
   );
   const [signatureVariant, setSignatureVariant] = useState<number>(0);
 
-  // 4. Submitting State
+  // 4. Submitting & Success Modal State
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   // Quick recipient suggestions
   const recipientSuggestions = [
@@ -201,51 +206,24 @@ export const EpodScreen: React.FC<EpodScreenProps> = (props) => {
       return;
     }
 
-    Alert.alert(
-      'Konfirmasi Serah Terima e-POD',
-      `• Titik Singgah: ${stopTitle} (Stop ${selectedStopId}/4)\n• Nama Penerima: ${recipientName.trim()}\n• Dokumentasi: ${photos.length} Foto Terverifikasi\n• Tanda Tangan: Tervalidasi Digital\n\nPastikan kargo telah diserahkan dengan benar dan lengkap sesuai pesanan.`,
-      [
-        { text: 'Periksa Kembali', style: 'cancel' },
-        {
-          text: 'Ya, Konfirmasi & Unggah',
-          onPress: () => {
-            setIsSubmitting(true);
-            setTimeout(() => {
-              setIsSubmitting(false);
-              const now = new Date();
-              const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(
-                now.getMinutes()
-              ).padStart(2, '0')} WIB`;
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setIsSubmitting(false);
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(
+        now.getMinutes()
+      ).padStart(2, '0')} WIB`;
 
-              saveEpodRecord({
-                stopId: selectedStopId,
-                recipientName: recipientName.trim(),
-                hasPhoto: true,
-                hasSignature: true,
-                submittedAt: timeStr,
-              });
+      saveEpodRecord({
+        stopId: selectedStopId,
+        recipientName: recipientName.trim(),
+        hasPhoto: true,
+        hasSignature: true,
+        submittedAt: timeStr,
+      });
 
-              Alert.alert(
-                'e-POD Terverifikasi & Tersimpan',
-                `Bukti serah terima untuk ${stopTitle} (Stop ${selectedStopId}/4) telah tersimpan ke sistem in-memory dan disinkronkan ke Web Dispatcher FLEETRA.`,
-                [
-                  {
-                    text: 'Selesai & Ke Perjalanan',
-                    onPress: () => {
-                      if (props.onSubmitSuccess) {
-                        props.onSubmitSuccess();
-                      } else {
-                        navigateTo('perjalanan');
-                      }
-                    },
-                  },
-                ]
-              );
-            }, 600);
-          },
-        },
-      ]
-    );
+      setShowSuccessModal(true);
+    }, 500);
   };
 
   return (
@@ -521,6 +499,94 @@ export const EpodScreen: React.FC<EpodScreenProps> = (props) => {
           )}
         </TouchableOpacity>
       </ScrollView>
+
+      {/* 8. IN-APP SUCCESS MODAL */}
+      <Modal
+        visible={showSuccessModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowSuccessModal(false)}
+      >
+        <View style={styles.modalBackdrop}>
+          <View style={styles.modalCard}>
+            {/* Top Icon Circle */}
+            <View style={styles.modalIconBox}>
+              <CheckCircle2 size={32} color={colors.primary} strokeWidth={2.4} />
+            </View>
+
+            <Text style={styles.modalTitle}>
+              {selectedStopId >= 4 ? 'Ritase #TRIP-2026-089 Selesai!' : 'Serah Terima Berhasil!'}
+            </Text>
+            <Text style={styles.modalSubtitle}>
+              {selectedStopId >= 4
+                ? 'Seluruh 4 titik pengantaran telah sukses diselesaikan dengan verifikasi e-POD.'
+                : `${stopTitle} (Stop ${selectedStopId}/4) telah terverifikasi secara digital.`}
+            </Text>
+
+            {/* Receipt Summary Card */}
+            <View style={styles.modalReceiptCard}>
+              <View style={styles.receiptRow}>
+                <Text style={styles.receiptLabel}>Penerima</Text>
+                <Text style={styles.receiptValueBold}>{recipientName.trim()}</Text>
+              </View>
+              <View style={styles.receiptDivider} />
+              <View style={styles.receiptRow}>
+                <Text style={styles.receiptLabel}>Dokumen e-POD</Text>
+                <Text style={styles.receiptValue}>{photos.length} Foto + TTD Digital</Text>
+              </View>
+              <View style={styles.receiptDivider} />
+              <View style={styles.receiptRow}>
+                <Text style={styles.receiptLabel}>Setoran Ekuitas (RTO)</Text>
+                <Text style={styles.receiptValueGreen}>+Rp 50.000 (Masuk)</Text>
+              </View>
+            </View>
+
+            {/* Action Buttons */}
+            {selectedStopId < 4 ? (
+              <TouchableOpacity
+                style={styles.modalPrimaryBtn}
+                onPress={() => {
+                  setShowSuccessModal(false);
+                  setSelectedStopId(selectedStopId + 1);
+                  navigateTo('detail-stop');
+                }}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.modalPrimaryBtnText}>
+                  Lanjut ke Stop Berikutnya (Stop {selectedStopId + 1})
+                </Text>
+                <ArrowRight size={15} color={colors.white} strokeWidth={2.2} />
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={styles.modalPrimaryBtn}
+                onPress={() => {
+                  setShowSuccessModal(false);
+                  completeEntireTrip();
+                  navigateTo('perjalanan');
+                }}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.modalPrimaryBtnText}>
+                  Selesaikan Seluruh Pesanan
+                </Text>
+                <CheckCircle2 size={15} color={colors.white} strokeWidth={2.2} />
+              </TouchableOpacity>
+            )}
+
+            <TouchableOpacity
+              style={styles.modalSecondaryBtn}
+              onPress={() => {
+                setShowSuccessModal(false);
+                navigateTo('perjalanan');
+              }}
+              activeOpacity={0.75}
+            >
+              <Text style={styles.modalSecondaryBtnText}>Kembali ke Daftar Perjalanan</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -895,5 +961,125 @@ const styles = StyleSheet.create({
     fontSize: 13.5,
     fontWeight: '700',
     color: colors.white,
+  },
+
+  /* SUCCESS MODAL */
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(15, 23, 42, 0.65)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  modalCard: {
+    width: '100%',
+    maxWidth: 380,
+    backgroundColor: colors.surface,
+    borderRadius: 20,
+    padding: 22,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  modalIconBox: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#EFF6FF',
+    borderWidth: 2,
+    borderColor: '#BFDBFE',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 14,
+  },
+  modalTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: colors.text,
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+  modalSubtitle: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 17,
+    marginBottom: 16,
+  },
+  modalReceiptCard: {
+    width: '100%',
+    backgroundColor: '#F8FAFC',
+    borderRadius: 14,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    marginBottom: 18,
+    gap: 8,
+  },
+  receiptRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  receiptLabel: {
+    fontSize: 11,
+    color: colors.textMuted,
+  },
+  receiptValue: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  receiptValueBold: {
+    fontSize: 11.5,
+    fontWeight: '700',
+    color: colors.text,
+  },
+  receiptValueGreen: {
+    fontSize: 11.5,
+    fontWeight: '700',
+    color: colors.primary,
+  },
+  receiptDivider: {
+    height: 1,
+    backgroundColor: '#EDF2F7',
+  },
+  modalPrimaryBtn: {
+    width: '100%',
+    height: 46,
+    backgroundColor: colors.primary,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginBottom: 8,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  modalPrimaryBtnText: {
+    fontSize: 12.5,
+    fontWeight: '700',
+    color: colors.white,
+  },
+  modalSecondaryBtn: {
+    width: '100%',
+    height: 42,
+    backgroundColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalSecondaryBtnText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.textSecondary,
   },
 });

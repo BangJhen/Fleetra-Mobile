@@ -27,7 +27,9 @@ interface DetailStopScreenProps {
 export const DetailStopScreen: React.FC<DetailStopScreenProps> = (props) => {
   const {
     selectedStopId,
+    setSelectedStopId,
     completedStops,
+    completeEntireTrip,
     epodRecords,
     navigateTo,
     goBack,
@@ -220,43 +222,93 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = (props) => {
           </View>
         </View>
 
-        {/* 6. PRIMARY CTA BUTTON: TIBA DI LOKASI / LIHAT e-POD */}
-        <TouchableOpacity
-          style={styles.primaryActionButton}
-          onPress={handleArrive}
-          activeOpacity={0.85}
-        >
-          <Text style={styles.primaryActionText}>
-            {isCompleted ? 'Lihat Bukti e-POD' : 'Tiba di Lokasi'}
-          </Text>
-        </TouchableOpacity>
+        {/* 6. PRIMARY & SECONDARY CTA BUTTONS */}
+        {isCompleted ? (
+          <View style={styles.completedActionsContainer}>
+            {selectedStopId < 4 ? (
+              <TouchableOpacity
+                style={styles.primaryActionButton}
+                onPress={() => setSelectedStopId(selectedStopId + 1)}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.primaryActionText}>
+                  Lanjut ke Stop Berikutnya (Stop {selectedStopId + 1})
+                </Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={styles.primaryActionButton}
+                onPress={() => {
+                  completeEntireTrip();
+                  navigateTo('perjalanan');
+                }}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.primaryActionText}>
+                  Selesaikan Seluruh Pesanan Ritase
+                </Text>
+              </TouchableOpacity>
+            )}
 
-        {/* 6. STOP BERIKUTNYA CARD (Interactive preview) */}
-        <TouchableOpacity
-          style={styles.nextStopCard}
-          onPress={() =>
-            Alert.alert(
-              'Pratinjau Stop 3: Minimarket Sejahtera',
-              '• Alamat: Jl. Flyover Pasirkoja, Bandung\n• Jarak dari titik ini: +6,8 km (± 18 menit)\n• Muatan: 8 Paket Logistik (ORD-2026-7742)\n• Kontak PIC: Ibu Ratna (+62 813-9876-5432)\n\nSelesaikan serah terima e-POD Toko Sumber Rejeki terlebih dahulu.',
-              [{ text: 'Tutup' }]
-            )
-          }
-          activeOpacity={0.8}
-        >
-          <Text style={styles.nextStopTitle}>Stop Berikutnya</Text>
-          <View style={styles.nextStopBody}>
-            <View style={styles.nextStopLeft}>
-              <Text style={styles.nextStopName}>Minimarket Sejahtera</Text>
-              <Text style={styles.nextStopAddress}>
-                Jl. Flyover Pasirkoja, Bandung
-              </Text>
-            </View>
-
-            <View style={styles.nextStopRight}>
-              <Text style={styles.nextStopDistance}>+ 6,8 km</Text>
-            </View>
+            <TouchableOpacity
+              style={styles.secondaryActionButton}
+              onPress={handleArrive}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.secondaryActionText}>Lihat Bukti e-POD</Text>
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={styles.primaryActionButton}
+            onPress={handleArrive}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.primaryActionText}>Tiba di Lokasi & Buka e-POD</Text>
+          </TouchableOpacity>
+        )}
+
+        {/* 7. STOP BERIKUTNYA CARD */}
+        {selectedStopId < 4 && (
+          <TouchableOpacity
+            style={styles.nextStopCard}
+            onPress={() => setSelectedStopId(selectedStopId + 1)}
+            activeOpacity={0.8}
+          >
+            <View style={styles.nextStopHeaderRow}>
+              <Text style={styles.nextStopTitle}>Stop Berikutnya</Text>
+              <Text style={styles.nextStopHint}>Ketuk untuk buka</Text>
+            </View>
+            <View style={styles.nextStopBody}>
+              <View style={styles.nextStopLeft}>
+                <Text style={styles.nextStopName}>
+                  {selectedStopId === 1
+                    ? 'Toko Sumber Rejeki'
+                    : selectedStopId === 2
+                    ? 'Minimarket Sejahtera'
+                    : 'Toko Makmur Jaya'}
+                </Text>
+                <Text style={styles.nextStopAddress}>
+                  {selectedStopId === 1
+                    ? 'Jl. Sudirman No. 45, Bandung'
+                    : selectedStopId === 2
+                    ? 'Jl. Flyover Pasirkoja, Bandung'
+                    : 'Jl. Peta No. 88, Bandung'}
+                </Text>
+              </View>
+
+              <View style={styles.nextStopRight}>
+                <Text style={styles.nextStopDistance}>
+                  {selectedStopId === 1
+                    ? '+ 4,2 km'
+                    : selectedStopId === 2
+                    ? '+ 6,8 km'
+                    : '+ 11,2 km'}
+                </Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        )}
       </ScrollView>
     </View>
   );
@@ -389,11 +441,14 @@ const styles = StyleSheet.create({
     backgroundColor: colors.borderLight,
   },
 
-  /* PRIMARY ACTION BUTTON */
+  /* PRIMARY & SECONDARY ACTION BUTTONS */
+  completedActionsContainer: {
+    gap: 8,
+    marginTop: 16,
+  },
   primaryActionButton: {
     backgroundColor: colors.primary,
     marginHorizontal: 18,
-    marginTop: 16,
     height: 48,
     borderRadius: 12,
     alignItems: 'center',
@@ -409,6 +464,21 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.white,
   },
+  secondaryActionButton: {
+    backgroundColor: colors.surface,
+    marginHorizontal: 18,
+    height: 44,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  secondaryActionText: {
+    fontSize: 12.5,
+    fontWeight: '600',
+    color: colors.textSecondary,
+  },
 
   /* NEXT STOP CARD */
   nextStopCard: {
@@ -420,13 +490,23 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
+  nextStopHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
   nextStopTitle: {
     fontSize: 10.5,
     fontWeight: '700',
     color: colors.textMuted,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
-    marginBottom: 6,
+  },
+  nextStopHint: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: colors.primary,
   },
   nextStopBody: {
     flexDirection: 'row',
