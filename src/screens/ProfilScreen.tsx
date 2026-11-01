@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Alert,
   Image,
@@ -21,6 +21,7 @@ import {
 } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 import { CircularProgress } from '../components/CircularProgress';
+import { LogoutModal } from '../components/LogoutModal';
 import { useApp } from '../context/AppContext';
 
 interface ProfilScreenProps {
@@ -38,6 +39,8 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = (props) => {
     hasUnreadNotifications,
     driverProfile,
   } = useApp();
+
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const handleBackHome = props.onBackToHome || (() => navigateTo('beranda'));
   const handlePerjalanan = props.onNavigatePerjalanan || (() => navigateTo('perjalanan'));
@@ -257,22 +260,24 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = (props) => {
         {/* 7. DANGER ACTION BUTTON: KELUAR AKUN */}
         <TouchableOpacity
           style={styles.logoutButton}
-          onPress={() =>
-            Alert.alert(
-              'Keluar Akun',
-              'Apakah Anda yakin ingin keluar dari akun mitra pengemudi FLEETRA?',
-              [
-                { text: 'Batal', style: 'cancel' },
-                { text: 'Keluar', style: 'destructive', onPress: logout },
-              ]
-            )
-          }
+          onPress={() => setShowLogoutModal(true)}
           activeOpacity={0.8}
+          accessibilityLabel="Keluar dari Akun Mitra"
         >
           <LogOut size={15} color={colors.dangerDark} strokeWidth={2} style={{ marginRight: 6 }} />
           <Text style={styles.logoutButtonText}>Keluar Akun</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      {/* CONFIRMATION LOGOUT MODAL */}
+      <LogoutModal
+        visible={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={() => {
+          setShowLogoutModal(false);
+          logout();
+        }}
+      />
     </View>
   );
 };

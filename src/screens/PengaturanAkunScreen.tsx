@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Alert,
   ScrollView,
@@ -26,10 +26,12 @@ import {
 } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 import { TopBar } from '../components/TopBar';
+import { LogoutModal } from '../components/LogoutModal';
 import { useApp } from '../context/AppContext';
 
 export const PengaturanAkunScreen: React.FC = () => {
   const { goBack, settings, toggleSetting, logout, navigateTo } = useApp();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const handleClearCache = () => {
     Alert.alert(
@@ -299,22 +301,24 @@ export const PengaturanAkunScreen: React.FC = () => {
         {/* LOGOUT BUTTON */}
         <TouchableOpacity
           style={styles.logoutBtn}
-          onPress={() =>
-            Alert.alert(
-              'Keluar Akun',
-              'Apakah Anda yakin ingin keluar dari akun mitra pengemudi FLEETRA?',
-              [
-                { text: 'Batal', style: 'cancel' },
-                { text: 'Keluar', style: 'destructive', onPress: logout },
-              ]
-            )
-          }
+          onPress={() => setShowLogoutModal(true)}
           activeOpacity={0.8}
+          accessibilityLabel="Keluar dari Akun Mitra"
         >
           <LogOut size={15} color={colors.dangerDark} strokeWidth={2} style={{ marginRight: 6 }} />
           <Text style={styles.logoutBtnText}>Keluar dari Akun Mitra</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      {/* LOGOUT CONFIRMATION MODAL */}
+      <LogoutModal
+        visible={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={() => {
+          setShowLogoutModal(false);
+          logout();
+        }}
+      />
     </View>
   );
 };

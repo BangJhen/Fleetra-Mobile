@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -39,6 +39,10 @@ interface AuthScreenProps {
 export const AuthScreen: React.FC<AuthScreenProps> = ({ initialMode = 'login' }) => {
   const { login, register, navigateTo } = useApp();
   const [mode, setMode] = useState<'login' | 'register'>(initialMode);
+
+  useEffect(() => {
+    setMode(initialMode);
+  }, [initialMode]);
 
   // Login Form State
   const [loginIdentifier, setLoginIdentifier] = useState('budi.santoso@fleetra.id');
