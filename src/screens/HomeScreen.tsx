@@ -17,6 +17,7 @@ import {
   MapPin,
   Milestone,
   Play,
+  Power,
   ShieldCheck,
   TrendingUp,
   Truck,
@@ -89,7 +90,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               <View style={styles.vehicleRow}>
                 <Truck size={12} color={colors.textSecondary} strokeWidth={2} />
                 <Text style={styles.vehicleText} numberOfLines={1}>
-                  Gran Max • B 9821 KCE
+                  Gran Max - B 9821 KCE
                 </Text>
               </View>
             </View>
@@ -107,49 +108,24 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               ]}
               onPress={toggleDriverStatus}
               activeOpacity={0.8}
-              accessibilityRole="switch"
-              accessibilityState={{ checked: driverStatus === 'Aktif' }}
-              accessibilityLabel={`Status kerja ${driverStatus}. Ketuk untuk mengalihkan mode ON/OFF.`}
+              accessibilityRole="button"
+              accessibilityLabel={`Status kerja ${driverStatus}. Ketuk untuk mengalihkan mode.`}
             >
-              <View style={styles.dutyStatusLeft}>
-                <View
-                  style={[
-                    styles.statusIndicatorDot,
-                    driverStatus === 'Aktif'
-                      ? styles.statusDotActive
-                      : styles.statusDotInactive,
-                  ]}
-                />
-                <Text
-                  style={[
-                    styles.dutyToggleStatusText,
-                    driverStatus === 'Aktif'
-                      ? styles.dutyToggleStatusTextActive
-                      : styles.dutyToggleStatusTextInactive,
-                  ]}
-                >
-                  {driverStatus === 'Aktif' ? 'ON' : 'OFF'}
-                </Text>
-              </View>
-
-              {/* Physical Switch Track & Thumb */}
-              <View
+              <Power
+                size={13}
+                color={driverStatus === 'Aktif' ? '#065F46' : '#64748B'}
+                strokeWidth={2.4}
+              />
+              <Text
                 style={[
-                  styles.switchTrack,
+                  styles.dutyToggleStatusText,
                   driverStatus === 'Aktif'
-                    ? styles.switchTrackActive
-                    : styles.switchTrackInactive,
+                    ? styles.dutyToggleStatusTextActive
+                    : styles.dutyToggleStatusTextInactive,
                 ]}
               >
-                <View
-                  style={[
-                    styles.switchThumb,
-                    driverStatus === 'Aktif'
-                      ? styles.switchThumbActive
-                      : styles.switchThumbInactive,
-                  ]}
-                />
-              </View>
+                {driverStatus === 'Aktif' ? 'ON' : 'OFF'}
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -223,7 +199,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
             <Play size={14} color={colors.white} fill={colors.white} style={{ marginRight: 8 }} />
             <Text style={styles.primaryActionText}>
               {completedStops.length >= 4
-                ? 'Ritase Selesai • Lihat Riwayat'
+                ? 'Ritase Selesai - Lihat Riwayat'
                 : completedStops.length > 1
                 ? 'Lanjutkan Perjalanan'
                 : 'Mulai Perjalanan'}
@@ -237,7 +213,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           onPress={() =>
             Alert.alert(
               'Telemetri Armada (B 9821 KCE)',
-              '• Bahan Bakar: 74% (± 280 km jarak tempuh tersisa)\n• Odometer Hari Ini: 128 km (Ritase ke-2)\n• Tekanan Ban: 33 PSI (Normal)\n• Suhu Mesin: 88°C (Optimal)\n• Kondisi Keseluruhan: Siap Digunakan',
+              '- Bahan Bakar: 74% (± 280 km jarak tempuh tersisa)\n- Odometer Hari Ini: 128 km (Ritase ke-2)\n- Tekanan Ban: 33 PSI (Normal)\n- Suhu Mesin: 88°C (Optimal)\n- Kondisi Keseluruhan: Siap Digunakan',
               [{ text: 'Tutup' }]
             )
           }
@@ -432,7 +408,7 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginLeft: 5,
   },
-  /* DUTY ON / OFF SWITCH */
+  /* DUTY ON / OFF BUTTON */
   dutySwitchCol: {
     alignItems: 'flex-end',
     justifyContent: 'center',
@@ -448,11 +424,13 @@ const styles = StyleSheet.create({
   dutyToggleBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 4.5,
-    paddingHorizontal: 8,
-    borderRadius: 20,
+    justifyContent: 'center',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 14,
     borderWidth: 1.5,
-    gap: 6,
+    gap: 5,
+    minWidth: 58,
   },
   dutyToggleBtnActive: {
     backgroundColor: '#F0FDF4',
@@ -462,62 +440,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8FAFC',
     borderColor: '#CBD5E1',
   },
-  dutyStatusLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  statusIndicatorDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-  },
-  statusDotActive: {
-    backgroundColor: '#10B981',
-  },
-  statusDotInactive: {
-    backgroundColor: '#94A3B8',
-  },
   dutyToggleStatusText: {
-    fontSize: 10.5,
+    fontSize: 11,
     fontWeight: '800',
-    letterSpacing: 0.2,
+    letterSpacing: 0.4,
   },
   dutyToggleStatusTextActive: {
     color: '#065F46',
   },
   dutyToggleStatusTextInactive: {
     color: '#64748B',
-  },
-  switchTrack: {
-    width: 26,
-    height: 15,
-    borderRadius: 8,
-    padding: 1.5,
-    justifyContent: 'center',
-  },
-  switchTrackActive: {
-    backgroundColor: '#10B981',
-  },
-  switchTrackInactive: {
-    backgroundColor: '#CBD5E1',
-  },
-  switchThumb: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.15,
-    shadowRadius: 1,
-    elevation: 1,
-  },
-  switchThumbActive: {
-    alignSelf: 'flex-end',
-  },
-  switchThumbInactive: {
-    alignSelf: 'flex-start',
   },
 
   /* CARD GENERIC */
