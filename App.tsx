@@ -7,7 +7,8 @@ import { AlertCircle } from 'lucide-react-native';
 import { colors } from './src/theme/colors';
 import { AppProvider, useApp } from './src/context/AppContext';
 import { OnboardingScreen } from './src/screens/OnboardingScreen';
-import { AuthScreen } from './src/screens/AuthScreen';
+import { LoginScreen } from './src/screens/LoginScreen';
+import { RegisterScreen } from './src/screens/RegisterScreen';
 import { HomeScreen } from './src/screens/HomeScreen';
 import { PerjalananScreen } from './src/screens/PerjalananScreen';
 import { DetailStopScreen } from './src/screens/DetailStopScreen';
@@ -63,10 +64,9 @@ function MainAppContent() {
         {/* 0. ONBOARDING SCREEN */}
         {currentScreen === 'onboarding' && <OnboardingScreen />}
 
-        {/* 0. AUTH SCREEN (LOGIN & REGISTER) */}
-        {isAuthOrOnboarding && currentScreen !== 'onboarding' && (
-          <AuthScreen initialMode={currentScreen} />
-        )}
+        {/* 0. AUTH SCREENS (SEPARATE SCREENS) */}
+        {currentScreen === 'login' && <LoginScreen />}
+        {currentScreen === 'register' && <RegisterScreen />}
 
         {/* 1. BERANDA (HOME) SCREEN */}
         {currentScreen === 'beranda' && <HomeScreen />}
