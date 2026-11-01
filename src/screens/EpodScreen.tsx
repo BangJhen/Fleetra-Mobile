@@ -260,7 +260,7 @@ export const EpodScreen: React.FC<EpodScreenProps> = (props) => {
         {/* 3. FOTO BUKTI BARANG CARD */}
         <View style={styles.card}>
           <View style={styles.cardHeaderRow}>
-            <View>
+            <View style={styles.cardHeaderLeftCol}>
               <Text style={styles.cardTitle}>Foto Bukti Kargo</Text>
               <Text style={styles.cardSubtitle}>
                 {photos.length}/3 Foto Terlampir (Min. 1 foto wajib)
@@ -370,26 +370,26 @@ export const EpodScreen: React.FC<EpodScreenProps> = (props) => {
         {/* 5. TANDA TANGAN PENERIMA CARD */}
         <View style={styles.card}>
           <View style={styles.cardHeaderRow}>
-            <View>
+            <View style={styles.cardHeaderLeftCol}>
               <Text style={styles.cardTitle}>Tanda Tangan Penerima</Text>
-              <Text style={styles.cardSubtitle}>
-                Bubuhkan tanda tangan digital di atas kanvas
+              <Text style={styles.cardSubtitle} numberOfLines={1}>
+                Bubuhkan tanda tangan di kanvas
               </Text>
             </View>
 
             {hasSignature ? (
               <View style={styles.signActionsRow}>
                 <TouchableOpacity
-                  style={styles.signActionBtn}
+                  style={styles.signActionBtnSecondary}
                   onPress={handleToggleSignatureStyle}
                   activeOpacity={0.7}
                 >
                   <RotateCcw size={11} color={colors.primary} strokeWidth={2.2} />
-                  <Text style={styles.signActionTextPrimary}>Ganti Gaya</Text>
+                  <Text style={styles.signActionTextPrimary}>Ganti</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={styles.signActionBtn}
+                  style={styles.signActionBtnDanger}
                   onPress={handleClearSignature}
                   activeOpacity={0.7}
                 >
@@ -399,7 +399,7 @@ export const EpodScreen: React.FC<EpodScreenProps> = (props) => {
               </View>
             ) : (
               <TouchableOpacity
-                style={styles.signActionBtn}
+                style={styles.signActionBtnSecondary}
                 onPress={handleSignCanvas}
                 activeOpacity={0.7}
               >
@@ -670,8 +670,12 @@ const styles = StyleSheet.create({
   cardHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     marginBottom: 12,
+  },
+  cardHeaderLeftCol: {
+    flex: 1,
+    marginRight: 8,
   },
   cardTitle: {
     fontSize: 13.5,
@@ -828,21 +832,40 @@ const styles = StyleSheet.create({
   /* SIGNATURE SECTION */
   signActionsRow: {
     flexDirection: 'row',
-    gap: 10,
+    alignItems: 'center',
+    gap: 6,
+    flexShrink: 0,
   },
-  signActionBtn: {
+  signActionBtnSecondary: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 3.5,
+    backgroundColor: '#EFF6FF',
+    paddingHorizontal: 8,
+    paddingVertical: 4.5,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
+  },
+  signActionBtnDanger: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3.5,
+    backgroundColor: '#FEF2F2',
+    paddingHorizontal: 8,
+    paddingVertical: 4.5,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#FECACA',
   },
   signActionTextPrimary: {
-    fontSize: 11,
-    fontWeight: '600',
+    fontSize: 10.5,
+    fontWeight: '700',
     color: colors.primary,
   },
   signActionTextDanger: {
-    fontSize: 11,
-    fontWeight: '600',
+    fontSize: 10.5,
+    fontWeight: '700',
     color: colors.dangerDark,
   },
   signatureBox: {
