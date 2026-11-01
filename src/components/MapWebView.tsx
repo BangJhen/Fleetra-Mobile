@@ -123,16 +123,16 @@ const generateMapHtml = (destinationName: string) => `
       attributionControl: false
     }).setView([-6.9100, 107.6000], 14);
 
-    // 2. OpenStreetMap Standard Layer (100% Free, Open-Source & No API Key Required)
-    var primaryTiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    // 2. High-Definition World Street Map (100% Free, Clean, Fast & Zero Watermark)
+    var primaryTiles = L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
       maxZoom: 19,
       attribution: ''
     }).addTo(map);
 
-    // Fallback to ArcGIS World Street Map if any tile encounters an issue
+    // Fallback to OSM tile if any tile encounters an issue
     primaryTiles.on('tileerror', function(error, tile) {
       if (error && error.coords) {
-        tile.src = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/' + error.coords.z + '/' + error.coords.y + '/' + error.coords.x;
+        tile.src = 'https://tile.openstreetmap.org/' + error.coords.z + '/' + error.coords.x + '/' + error.coords.y + '.png';
       }
     });
 

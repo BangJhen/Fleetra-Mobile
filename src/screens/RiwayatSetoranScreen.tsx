@@ -9,15 +9,9 @@ import {
 } from 'react-native';
 import {
   ArrowDownLeft,
-  Calendar,
-  CheckCircle2,
-  ChevronRight,
   Clock,
   Download,
-  FileText,
   HelpCircle,
-  ShieldCheck,
-  TrendingUp,
   Truck,
 } from 'lucide-react-native';
 import { colors } from '../theme/colors';
@@ -41,19 +35,19 @@ const DEPOSIT_HISTORY: DepositTransaction[] = [
   {
     id: 'tx-089',
     tripCode: '#TRIP-2026-089',
-    route: 'Gudang Cimahi → 4 Titik Bandung Kota',
+    route: '4 Titik Pengantaran',
     date: 'Hari ini',
     time: '08:15 WIB',
     group: 'hari-ini',
     stopsCount: 4,
     amount: 50000,
     status: 'proses',
-    notes: 'Estimasi setoran ritase aktif (Menunggu verifikasi e-POD)',
+    notes: 'Estimasi setoran ritase aktif hari ini',
   },
   {
     id: 'tx-088',
     tripCode: '#TRIP-2026-088',
-    route: 'Gudang Cimahi → Padalarang',
+    route: 'Padalarang (4 Stop)',
     date: '31 Okt 2026',
     time: '17:40 WIB',
     group: 'bulan-ini',
@@ -65,7 +59,7 @@ const DEPOSIT_HISTORY: DepositTransaction[] = [
   {
     id: 'tx-087',
     tripCode: '#TRIP-2026-087',
-    route: 'Gudang Cimahi → Buah Batu',
+    route: 'Buah Batu (6 Stop)',
     date: '28 Okt 2026',
     time: '16:15 WIB',
     group: 'bulan-ini',
@@ -77,7 +71,7 @@ const DEPOSIT_HISTORY: DepositTransaction[] = [
   {
     id: 'tx-086',
     tripCode: '#TRIP-2026-086',
-    route: 'Gudang Cimahi → Cibiru & Ujungberung',
+    route: 'Cibiru & Ujungberung (7 Stop)',
     date: '26 Okt 2026',
     time: '18:00 WIB',
     group: 'bulan-ini',
@@ -89,7 +83,7 @@ const DEPOSIT_HISTORY: DepositTransaction[] = [
   {
     id: 'tx-085',
     tripCode: '#TRIP-2026-085',
-    route: 'Gudang Cimahi → Pasirkaliki',
+    route: 'Pasirkaliki (5 Stop)',
     date: '24 Okt 2026',
     time: '15:30 WIB',
     group: 'bulan-ini',
@@ -101,7 +95,7 @@ const DEPOSIT_HISTORY: DepositTransaction[] = [
   {
     id: 'tx-084',
     tripCode: '#TRIP-2026-084',
-    route: 'Gudang Cimahi → Dago & Cihampelas',
+    route: 'Dago & Cihampelas (6 Stop)',
     date: '22 Okt 2026',
     time: '17:10 WIB',
     group: 'bulan-ini',
@@ -129,16 +123,16 @@ export const RiwayatSetoranScreen: React.FC = () => {
   const handleDownloadReport = () => {
     Alert.alert(
       'Unduh Rekap Mutasi RTO',
-      'Laporan mutasi setoran sewa-beli armada pay-per-trip (Oktober 2026) berhasil diproses.\n\nFile: FLEETRA_RTO_Statement_B9821KCE_202610.pdf telah dikirim ke email terdaftar pengemudi.',
+      'Laporan mutasi setoran sewa-beli armada (Oktober 2026) berhasil diproses dan dikirim ke email terdaftar pengemudi.',
       [{ text: 'Tutup' }]
     );
   };
 
   const handleTxDetail = (tx: DepositTransaction) => {
     Alert.alert(
-      `Rincian Setoran ${tx.tripCode}`,
-      `• Rute Pengantaran: ${tx.route}\n• Waktu: ${tx.date} (${tx.time})\n• Total Stop: ${tx.stopsCount} Titik Singgah\n• Nilai Ekuitas: Rp ${tx.amount.toLocaleString('id-ID')}\n• Status: ${
-        tx.status === 'selesai' ? 'Terverifikasi (Masuk Ekuitas Kepemilikan)' : 'Diproses (Menunggu Verifikasi e-POD)'
+      `Rincian ${tx.tripCode}`,
+      `• Pengantaran: ${tx.route}\n• Waktu: ${tx.date} (${tx.time})\n• Nilai Ekuitas: Rp ${tx.amount.toLocaleString('id-ID')}\n• Status: ${
+        tx.status === 'selesai' ? 'Selesai (Masuk Ekuitas)' : 'Diproses (Menunggu e-POD)'
       }\n• Catatan: ${tx.notes}`,
       [{ text: 'Tutup' }]
     );
@@ -146,8 +140,8 @@ export const RiwayatSetoranScreen: React.FC = () => {
 
   const handleRtoInfo = () => {
     Alert.alert(
-      'Skema Sewa-Beli (Rent-to-Own) FLEETRA',
-      'Skema RTO memungkinkan mitra pengemudi mengumpulkan ekuitas kepemilikan armada secara bertahap melalui pemotongan wajar otomatis per-ritase kargo (Pay-per-Trip).\n\nSetelah masa tenor 36 bulan (3 tahun) terpenuhi 100%, hak kepemilikan armada (BPKB & STNK) dialihkan sepenuhnya atas nama mitra.',
+      'Tentang Skema RTO FLEETRA',
+      'Sistem Rent-to-Own mengalokasikan pemotongan otomatis per-ritase kargo (Pay-per-Trip) untuk kepemilikan armada.\n\nSetelah 36 bulan (3 tahun), kepemilikan armada (BPKB & STNK) dialihkan sepenuhnya ke mitra pengemudi.',
       [{ text: 'Mengerti' }]
     );
   };
@@ -167,103 +161,70 @@ export const RiwayatSetoranScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* 2. HERO FINANCIAL ASSET CARD */}
+        {/* 2. CALM & SPACIOUS HERO CARD */}
         <View style={styles.heroCard}>
-          {/* Header Row */}
           <View style={styles.heroHeaderRow}>
-            <View style={styles.programBadge}>
-              <ShieldCheck size={12} color={colors.primary} strokeWidth={2.2} />
-              <Text style={styles.programBadgeText}>PROGRAM SEWA-BELI (RTO)</Text>
-            </View>
-
+            <Text style={styles.assetLabel}>Ekuitas Terkumpul</Text>
             <TouchableOpacity
               style={styles.tenorPill}
               onPress={handleRtoInfo}
               activeOpacity={0.7}
             >
-              <Text style={styles.tenorPillText}>Bulan 23 / 36</Text>
+              <Text style={styles.tenorPillText}>Tenor Bln 23/36</Text>
               <HelpCircle size={13} color={colors.textMuted} strokeWidth={2} style={{ marginLeft: 3 }} />
             </TouchableOpacity>
           </View>
 
-          {/* Large Financial Headline */}
-          <Text style={styles.assetLabel}>Total Ekuitas Terkumpul</Text>
+          {/* Large Clean Balance */}
           <View style={styles.assetAmountRow}>
-            <Text style={styles.assetCurrency}>Rp</Text>
-            <Text style={styles.assetAmountBold}>194.400.000</Text>
-            <View style={styles.pctBadge}>
-              <Text style={styles.pctBadgeText}>64,8%</Text>
-            </View>
+            <Text style={styles.assetAmountBold}>Rp 194.400.000</Text>
+            <Text style={styles.pctText}>({rtoPercent.toString().replace('.', ',')}%)</Text>
           </View>
 
-          {/* Sleek Milestone Progress Bar */}
+          {/* Minimalist Progress Bar */}
           <View style={styles.progressTrack}>
             <View style={[styles.progressFill, { width: `${rtoPercent}%` }]} />
           </View>
 
-          {/* Milestone Details */}
+          {/* Clean Sub-details */}
           <View style={styles.milestoneRow}>
-            <View style={styles.milestoneLeft}>
-              <Text style={styles.milestoneSub}>Target Nilai Armada</Text>
-              <Text style={styles.milestoneVal}>Rp 300.000.000</Text>
-            </View>
-            <View style={styles.milestoneDivider} />
-            <View style={styles.milestoneRight}>
-              <Text style={styles.milestoneSub}>Sisa Kewajiban (13 Bln)</Text>
-              <Text style={styles.milestoneValDark}>Rp 105.600.000</Text>
-            </View>
+            <Text style={styles.milestoneText}>
+              Target: <Text style={styles.milestoneBold}>Rp 300.000.000</Text>
+            </Text>
+            <Text style={styles.milestoneText}>
+              Sisa: <Text style={styles.milestoneBold}>Rp 105.600.000</Text> (13 Bln)
+            </Text>
           </View>
 
           {/* Vehicle Strip */}
           <View style={styles.vehicleStrip}>
-            <View style={styles.vehicleIconBox}>
-              <Truck size={14} color={colors.primary} strokeWidth={2.2} />
-            </View>
-            <View style={styles.vehicleInfoCol}>
-              <Text style={styles.vehicleModelText} numberOfLines={1}>
-                {driverProfile.vehicleModel}
-              </Text>
-              <Text style={styles.vehiclePlateText}>
-                {driverProfile.vehiclePlate} • Kontrak #RTO-BDG-089
-              </Text>
-            </View>
+            <Truck size={14} color={colors.textSecondary} strokeWidth={2} />
+            <Text style={styles.vehicleText} numberOfLines={1}>
+              {driverProfile.vehicleModel} • {driverProfile.vehiclePlate}
+            </Text>
           </View>
         </View>
 
-        {/* 3. TWIN MONTHLY STATS CARDS */}
+        {/* 3. CALM TWIN STATS CARDS (NO LOUD COLORS) */}
         <View style={styles.twinStatsRow}>
-          {/* Card Left: Akumulasi Bulan Ini */}
           <View style={styles.statCard}>
-            <View style={styles.statCardHeader}>
-              <View style={styles.statIconGreen}>
-                <TrendingUp size={15} color={colors.success} strokeWidth={2.2} />
-              </View>
-              <Text style={styles.statCardLabel}>Bulan Ini (Okt)</Text>
-            </View>
-            <Text style={styles.statValueGreen}>Rp 4.250.000</Text>
-            <Text style={styles.statSubText}>+12% vs bulan September</Text>
+            <Text style={styles.statLabel}>Bulan Ini (Okt)</Text>
+            <Text style={styles.statValue}>Rp 4.250.000</Text>
           </View>
 
-          {/* Card Right: Ritase Berkontribusi */}
           <View style={styles.statCard}>
-            <View style={styles.statCardHeader}>
-              <View style={styles.statIconBlue}>
-                <CheckCircle2 size={15} color={colors.primary} strokeWidth={2.2} />
-              </View>
-              <Text style={styles.statCardLabel}>Ritase Logistik</Text>
-            </View>
-            <Text style={styles.statValueDark}>18 Ritase</Text>
-            <Text style={styles.statSubText}>Rata-rata Rp 52.500/trip</Text>
+            <Text style={styles.statLabel}>Ritase Logistik</Text>
+            <Text style={styles.statValue}>18 Trip</Text>
           </View>
         </View>
 
-        {/* 4. MODERN SEGMENTED FILTER CONTROL */}
+        {/* 4. CLEAN NEUTRAL SEGMENTED FILTER */}
         <View style={styles.segmentContainer}>
           {(
             [
-              { id: 'semua', label: 'Semua', count: DEPOSIT_HISTORY.length },
-              { id: 'bulan-ini', label: 'Bulan Ini', count: 5 },
-              { id: 'bulan-lalu', label: 'Bulan Lalu', count: 1 },
+              { id: 'semua', label: 'Semua' },
+              { id: 'bulan-ini', label: 'Bulan Ini' },
+              { id: 'bulan-lalu', label: 'Bulan Lalu' },
             ] as const
           ).map((tab) => {
             const isActive = filterPeriod === tab.id;
@@ -282,28 +243,12 @@ export const RiwayatSetoranScreen: React.FC = () => {
                 >
                   {tab.label}
                 </Text>
-                <View
-                  style={[
-                    styles.segmentCountBadge,
-                    isActive && styles.segmentCountBadgeActive,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.segmentCountText,
-                      isActive && styles.segmentCountTextActive,
-                    ]}
-                  >
-                    {tab.count}
-                  </Text>
-                </View>
               </TouchableOpacity>
             );
           })}
         </View>
 
-        {/* 5. GROUPED TRANSACTION LIST (Per DESIGN.md Section 4.4) */}
-        {/* GROUP 1: HARI INI */}
+        {/* 5. SPACIOUS & MONOCHROME TRANSACTION LIST (NO GREEN/YELLOW/LOUD BACKGROUNDS) */}
         {todayTx.length > 0 && (
           <View style={styles.txGroupSection}>
             <Text style={styles.groupHeaderTitle}>HARI INI</Text>
@@ -318,29 +263,26 @@ export const RiwayatSetoranScreen: React.FC = () => {
                   onPress={() => handleTxDetail(tx)}
                   activeOpacity={0.7}
                 >
-                  <View style={styles.txIconAmber}>
-                    <Clock size={16} color={colors.warning} strokeWidth={2.2} />
+                  {/* Clean Neutral Icon */}
+                  <View style={styles.txNeutralIconBox}>
+                    <Clock size={16} color={colors.textSecondary} strokeWidth={2} />
                   </View>
 
                   <View style={styles.txMainCol}>
-                    <View style={styles.txTitleRow}>
-                      <Text style={styles.txTitleText}>{tx.tripCode}</Text>
-                      <Text style={styles.txAmountAmber}>
+                    {/* Line 1: Code & Amount */}
+                    <View style={styles.txLineRow}>
+                      <Text style={styles.txCodeText}>{tx.tripCode}</Text>
+                      <Text style={styles.txAmountText}>
                         +Rp {tx.amount.toLocaleString('id-ID')}
                       </Text>
                     </View>
 
-                    <Text style={styles.txRouteText} numberOfLines={1}>
-                      {tx.route}
-                    </Text>
-
-                    <View style={styles.txFooterRow}>
-                      <Text style={styles.txTimeText}>
-                        {tx.time} • Estimasi Ritase Aktif
+                    {/* Line 2: Route, Time, Clean Text Status (NO BACKGROUND PILL) */}
+                    <View style={styles.txLineRow}>
+                      <Text style={styles.txDetailText}>
+                        {tx.route} • {tx.time}
                       </Text>
-                      <View style={styles.badgeAmber}>
-                        <Text style={styles.badgeTextAmber}>Diproses</Text>
-                      </View>
+                      <Text style={styles.txStatusTextPending}>Diproses</Text>
                     </View>
                   </View>
                 </TouchableOpacity>
@@ -349,7 +291,6 @@ export const RiwayatSetoranScreen: React.FC = () => {
           </View>
         )}
 
-        {/* GROUP 2: OKTOBER 2026 */}
         {pastTx.length > 0 && (
           <View style={styles.txGroupSection}>
             <Text style={styles.groupHeaderTitle}>OKTOBER 2026</Text>
@@ -366,29 +307,26 @@ export const RiwayatSetoranScreen: React.FC = () => {
                     onPress={() => handleTxDetail(tx)}
                     activeOpacity={0.7}
                   >
-                    <View style={styles.txIconGreen}>
-                      <ArrowDownLeft size={16} color={colors.success} strokeWidth={2.2} />
+                    {/* Clean Neutral Icon */}
+                    <View style={styles.txNeutralIconBox}>
+                      <ArrowDownLeft size={16} color={colors.textSecondary} strokeWidth={2} />
                     </View>
 
                     <View style={styles.txMainCol}>
-                      <View style={styles.txTitleRow}>
-                        <Text style={styles.txTitleText}>{tx.tripCode}</Text>
-                        <Text style={styles.txAmountGreen}>
+                      {/* Line 1: Code & Amount */}
+                      <View style={styles.txLineRow}>
+                        <Text style={styles.txCodeText}>{tx.tripCode}</Text>
+                        <Text style={styles.txAmountText}>
                           +Rp {tx.amount.toLocaleString('id-ID')}
                         </Text>
                       </View>
 
-                      <Text style={styles.txRouteText} numberOfLines={1}>
-                        {tx.route}
-                      </Text>
-
-                      <View style={styles.txFooterRow}>
-                        <Text style={styles.txTimeText}>
-                          {tx.date} • {tx.time}
+                      {/* Line 2: Route, Time, Clean Text Status (NO BACKGROUND PILL) */}
+                      <View style={styles.txLineRow}>
+                        <Text style={styles.txDetailText}>
+                          {tx.route} • {tx.time}
                         </Text>
-                        <View style={styles.badgeGreen}>
-                          <Text style={styles.badgeTextGreen}>Masuk Ekuitas</Text>
-                        </View>
+                        <Text style={styles.txStatusTextDone}>Selesai</Text>
                       </View>
                     </View>
                   </TouchableOpacity>
@@ -398,19 +336,15 @@ export const RiwayatSetoranScreen: React.FC = () => {
           </View>
         )}
 
-        {/* 6. DOWNLOAD PDF REPORT BUTTON */}
+        {/* 6. CLEAN DOWNLOAD BUTTON */}
         <TouchableOpacity
           style={styles.downloadButton}
           onPress={handleDownloadReport}
           activeOpacity={0.8}
         >
-          <FileText size={16} color={colors.primary} strokeWidth={2.2} />
+          <Download size={15} color={colors.textSecondary} strokeWidth={2} />
           <Text style={styles.downloadButtonText}>Unduh Rekap Mutasi RTO (PDF)</Text>
         </TouchableOpacity>
-
-        <Text style={styles.footerAuditText}>
-          Dokumen mutasi ekuitas dienkripsi dan tervalidasi via Smart Contract FLEETRA Ledger.
-        </Text>
       </ScrollView>
     </View>
   );
@@ -428,41 +362,31 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
 
-  /* HERO FINANCIAL ASSET CARD */
+  /* 2. HERO FINANCIAL CARD */
   heroCard: {
     backgroundColor: colors.surface,
     marginHorizontal: 18,
     marginTop: 14,
-    borderRadius: 20,
+    borderRadius: 18,
     padding: 18,
     borderWidth: 1,
     borderColor: colors.border,
     shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.03,
+    shadowRadius: 5,
+    elevation: 1,
   },
   heroHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 8,
   },
-  programBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.primaryLight,
-    paddingHorizontal: 8,
-    paddingVertical: 3.5,
-    borderRadius: 8,
-    gap: 4,
-  },
-  programBadgeText: {
-    fontSize: 9.5,
-    fontWeight: '700',
-    color: colors.primary,
-    letterSpacing: 0.4,
+  assetLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.textMuted,
   },
   tenorPill: {
     flexDirection: 'row',
@@ -475,97 +399,56 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   tenorPillText: {
-    fontSize: 10,
-    fontWeight: '700',
+    fontSize: 10.5,
+    fontWeight: '600',
     color: colors.textSecondary,
-  },
-
-  assetLabel: {
-    fontSize: 11.5,
-    fontWeight: '500',
-    color: colors.textMuted,
-    marginBottom: 4,
   },
   assetAmountRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    marginBottom: 14,
-  },
-  assetCurrency: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.primary,
-    marginRight: 4,
+    gap: 8,
+    marginBottom: 12,
   },
   assetAmountBold: {
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: '800',
     color: colors.text,
-    letterSpacing: -0.6,
+    letterSpacing: -0.4,
   },
-  pctBadge: {
-    backgroundColor: colors.primaryLight,
-    paddingHorizontal: 7,
-    paddingVertical: 2,
-    borderRadius: 6,
-    marginLeft: 10,
-    borderWidth: 1,
-    borderColor: '#BFDBFE',
-  },
-  pctBadgeText: {
-    fontSize: 11,
-    fontWeight: '800',
+  pctText: {
+    fontSize: 13,
+    fontWeight: '700',
     color: colors.primary,
   },
 
   /* Progress Bar */
   progressTrack: {
-    height: 7,
+    height: 6,
     backgroundColor: '#E2E8F0',
-    borderRadius: 3.5,
+    borderRadius: 3,
     overflow: 'hidden',
     marginBottom: 10,
   },
   progressFill: {
     height: '100%',
     backgroundColor: colors.primary,
-    borderRadius: 3.5,
+    borderRadius: 3,
   },
 
-  /* Milestone Details */
+  /* Milestones */
   milestoneRow: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 6,
-    marginBottom: 12,
+    marginBottom: 14,
   },
-  milestoneLeft: {
-    flex: 1,
-  },
-  milestoneRight: {
-    flex: 1,
-    alignItems: 'flex-end',
-  },
-  milestoneSub: {
-    fontSize: 10,
+  milestoneText: {
+    fontSize: 11,
     color: colors.textMuted,
-    marginBottom: 2,
   },
-  milestoneVal: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: colors.primary,
-  },
-  milestoneValDark: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  milestoneDivider: {
-    width: 1,
-    height: 24,
-    backgroundColor: colors.borderLight,
-    marginHorizontal: 10,
+  milestoneBold: {
+    fontWeight: '600',
+    color: colors.textSecondary,
   },
 
   /* Vehicle Strip */
@@ -573,166 +456,99 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.surface2,
-    borderRadius: 12,
-    padding: 10,
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
     borderWidth: 1,
     borderColor: colors.border,
-    gap: 10,
+    gap: 8,
   },
-  vehicleIconBox: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: colors.white,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  vehicleInfoCol: {
+  vehicleText: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: colors.textSecondary,
     flex: 1,
   },
-  vehicleModelText: {
-    fontSize: 11.5,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  vehiclePlateText: {
-    fontSize: 10,
-    color: colors.textMuted,
-    marginTop: 1,
-  },
 
-  /* TWIN STATS CARDS */
+  /* 3. TWIN STATS CARDS */
   twinStatsRow: {
     flexDirection: 'row',
     marginHorizontal: 18,
     marginTop: 12,
-    gap: 10,
+    gap: 12,
   },
   statCard: {
     flex: 1,
     backgroundColor: colors.surface,
-    borderRadius: 16,
+    borderRadius: 14,
     padding: 14,
     borderWidth: 1,
     borderColor: colors.border,
     shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.03,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 1.5 },
+    shadowOpacity: 0.02,
+    shadowRadius: 3,
     elevation: 1,
   },
-  statCardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginBottom: 6,
+  statLabel: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: colors.textMuted,
+    marginBottom: 4,
   },
-  statIconGreen: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: '#ECFDF5',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  statIconBlue: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    backgroundColor: colors.primaryLight,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  statCardLabel: {
-    fontSize: 10.5,
-    fontWeight: '600',
-    color: colors.textSecondary,
-  },
-  statValueGreen: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: colors.success,
-    letterSpacing: -0.3,
-  },
-  statValueDark: {
-    fontSize: 15,
-    fontWeight: '800',
+  statValue: {
+    fontSize: 16,
+    fontWeight: '700',
     color: colors.text,
     letterSpacing: -0.3,
   },
-  statSubText: {
-    fontSize: 9.5,
-    color: colors.textMuted,
-    marginTop: 2,
-  },
 
-  /* SEGMENTED CONTROL BAR */
+  /* 4. SEGMENTED FILTER */
   segmentContainer: {
     flexDirection: 'row',
     backgroundColor: '#EEF2F6',
     marginHorizontal: 18,
     marginTop: 16,
-    borderRadius: 12,
+    borderRadius: 10,
     padding: 3,
     gap: 4,
   },
   segmentBtn: {
     flex: 1,
-    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 7,
-    borderRadius: 9,
-    gap: 5,
+    borderRadius: 8,
   },
   segmentBtnActive: {
     backgroundColor: colors.white,
     shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 1.5 },
-    shadowOpacity: 0.06,
-    shadowRadius: 3,
-    elevation: 1.5,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   segmentBtnText: {
-    fontSize: 11,
-    fontWeight: '600',
+    fontSize: 11.5,
+    fontWeight: '500',
     color: colors.textMuted,
   },
   segmentBtnTextActive: {
     color: colors.text,
     fontWeight: '700',
   },
-  segmentCountBadge: {
-    backgroundColor: 'transparent',
-    paddingHorizontal: 4,
-    borderRadius: 6,
-  },
-  segmentCountBadgeActive: {
-    backgroundColor: colors.primaryLight,
-  },
-  segmentCountText: {
-    fontSize: 9.5,
-    fontWeight: '600',
-    color: colors.textDisabled,
-  },
-  segmentCountTextActive: {
-    color: colors.primary,
-    fontWeight: '700',
-  },
 
-  /* TRANSACTION GROUPS */
+  /* 5. TRANSACTION LIST (SPACIOUS, NO LOUD COLORS) */
   txGroupSection: {
     marginHorizontal: 18,
-    marginTop: 14,
+    marginTop: 16,
   },
   groupHeaderTitle: {
     fontSize: 11,
     fontWeight: '700',
     color: colors.textMuted,
     letterSpacing: 0.5,
-    marginBottom: 6,
+    marginBottom: 8,
     marginLeft: 2,
   },
   txGroupCard: {
@@ -740,142 +556,87 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
     borderColor: colors.border,
-    paddingHorizontal: 14,
+    paddingHorizontal: 16,
     shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.03,
+    shadowOffset: { width: 0, height: 1.5 },
+    shadowOpacity: 0.02,
     shadowRadius: 4,
     elevation: 1,
   },
   txItemRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingVertical: 13,
+    alignItems: 'center',
+    paddingVertical: 16, // Spacious breathing room!
     gap: 12,
   },
   txItemBorderBottom: {
     borderBottomWidth: 1,
     borderBottomColor: colors.borderLight,
   },
-  txIconGreen: {
+  /* Neutral Icon Box (NO green, NO yellow) */
+  txNeutralIconBox: {
     width: 34,
     height: 34,
     borderRadius: 17,
-    backgroundColor: '#ECFDF5',
+    backgroundColor: colors.surface2,
+    borderWidth: 1,
+    borderColor: colors.border,
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 2,
-    borderWidth: 1,
-    borderColor: '#D1FAE5',
-  },
-  txIconAmber: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    backgroundColor: '#FFFBEB',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 2,
-    borderWidth: 1,
-    borderColor: '#FEF3C7',
   },
   txMainCol: {
     flex: 1,
+    gap: 4,
   },
-  txTitleRow: {
+  txLineRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 2,
   },
-  txTitleText: {
-    fontSize: 12.5,
+  txCodeText: {
+    fontSize: 13,
     fontWeight: '700',
     color: colors.text,
   },
-  txAmountGreen: {
+  txAmountText: {
     fontSize: 13,
-    fontWeight: '800',
-    color: colors.success,
+    fontWeight: '700',
+    color: colors.text, // Neutral dark text!
   },
-  txAmountAmber: {
-    fontSize: 13,
-    fontWeight: '800',
-    color: colors.warning,
-  },
-  txRouteText: {
+  txDetailText: {
     fontSize: 11,
-    color: colors.textSecondary,
-    marginBottom: 5,
-  },
-  txFooterRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  txTimeText: {
-    fontSize: 10,
     color: colors.textMuted,
   },
-
-  /* BADGES */
-  badgeGreen: {
-    backgroundColor: '#ECFDF5',
-    paddingHorizontal: 7,
-    paddingVertical: 2,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: '#D1FAE5',
+  /* Clean Plain Text Status (NO BACKGROUND PILL) */
+  txStatusTextPending: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.textMuted, // Plain clean text, no yellow box!
   },
-  badgeTextGreen: {
-    fontSize: 9.5,
-    fontWeight: '700',
-    color: colors.success,
-  },
-  badgeAmber: {
-    backgroundColor: '#FFFBEB',
-    paddingHorizontal: 7,
-    paddingVertical: 2,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: '#FEF3C7',
-  },
-  badgeTextAmber: {
-    fontSize: 9.5,
-    fontWeight: '700',
-    color: colors.warning,
+  txStatusTextDone: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.textMuted, // Plain clean text, no green box!
   },
 
-  /* DOWNLOAD BUTTON */
+  /* 6. DOWNLOAD BUTTON */
   downloadButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.surface,
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: colors.border,
     marginHorizontal: 18,
     marginTop: 18,
-    height: 46,
-    borderRadius: 14,
+    marginBottom: 20,
+    height: 44,
+    borderRadius: 12,
     gap: 8,
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 1.5 },
-    shadowOpacity: 0.03,
-    shadowRadius: 3,
-    elevation: 1,
   },
   downloadButtonText: {
-    fontSize: 12.5,
-    fontWeight: '700',
-    color: colors.text,
-  },
-  footerAuditText: {
-    fontSize: 10,
-    color: colors.textMuted,
-    textAlign: 'center',
-    marginTop: 10,
-    marginHorizontal: 24,
-    lineHeight: 14,
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.textSecondary,
   },
 });

@@ -307,46 +307,39 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
                     activeOpacity={0.8}
                   >
                     {/* Left Timeline Indicator */}
-                    <View style={styles.timelineIndicatorCol}>
-                      {/* Top connector from previous stop */}
-                      {!isFirst ? (
-                        <View
-                          style={[
-                            styles.timelineTopLine,
-                            isDone || isCurrent
-                              ? styles.timelineLineDone
-                              : styles.timelineLinePending,
-                          ]}
-                        />
-                      ) : (
-                        <View style={styles.timelineTopSpacer} />
-                      )}
+                    <View style={styles.timelineCol}>
+                      {/* Node Icon Box */}
+                      <View style={styles.nodeIconBox}>
+                        {isDone ? (
+                          <View style={styles.iconCircleDone}>
+                            <CheckCircle2 size={18} color={colors.primary} strokeWidth={2.4} />
+                          </View>
+                        ) : isCurrent ? (
+                          <View style={styles.iconCircleCurrent}>
+                            <View style={styles.dotCurrent} />
+                          </View>
+                        ) : (
+                          <View style={styles.iconCirclePending}>
+                            <Circle size={10} color="#94A3B8" strokeWidth={2.2} />
+                          </View>
+                        )}
+                      </View>
 
-                      {/* Node Icon */}
-                      {isDone ? (
-                        <View style={styles.timelineIconDone}>
-                          <CheckCircle2 size={18} color={colors.primary} strokeWidth={2.5} />
-                        </View>
-                      ) : isCurrent ? (
-                        <View style={styles.timelineIconCurrent}>
-                          <View style={styles.timelineDotBlue} />
-                        </View>
-                      ) : (
-                        <View style={styles.timelineIconPending}>
-                          <Circle size={10} color={colors.textDisabled} strokeWidth={2} />
-                        </View>
-                      )}
-
-                      {/* Bottom connector to next stop with direction arrow */}
+                      {/* Continuous Connecting Track with Centered Direction Arrow */}
                       {!isLast && (
-                        <View style={styles.timelineBottomCol}>
+                        <View style={styles.trackContainer} pointerEvents="none">
                           <View
                             style={[
-                              styles.timelineBottomLine,
-                              isDone ? styles.timelineLineDone : styles.timelineLinePending,
+                              styles.trackLine,
+                              isDone ? styles.trackLineDone : styles.trackLinePending,
                             ]}
                           />
-                          <View style={styles.timelineArrowBox}>
+                          <View
+                            style={[
+                              styles.arrowBadge,
+                              isDone ? styles.arrowBadgeDone : styles.arrowBadgePending,
+                            ]}
+                          >
                             <ChevronDown
                               size={11}
                               color={isDone ? colors.primary : '#94A3B8'}
@@ -377,7 +370,9 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
                         )}
 
                         {isCurrent && (
-                          <Text style={styles.statusCurrentText}>Tujuan Saat Ini</Text>
+                          <View style={styles.currentBadge}>
+                            <Text style={styles.currentBadgeText}>Stop Aktif</Text>
+                          </View>
                         )}
 
                         {isNext && (
@@ -682,9 +677,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     marginHorizontal: 18,
     borderRadius: 16,
-    paddingTop: 8,
-    paddingBottom: 8,
-    paddingHorizontal: 14,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
     borderWidth: 1,
     borderColor: colors.border,
     shadowColor: '#0F172A',
@@ -695,86 +689,113 @@ const styles = StyleSheet.create({
   },
   stopRow: {
     flexDirection: 'row',
-    alignItems: 'stretch',
-    minHeight: 54,
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    position: 'relative',
+    borderRadius: 12,
   },
   stopRowLast: {
     borderBottomWidth: 0,
   },
   stopRowCurrent: {
-    backgroundColor: 'transparent',
+    backgroundColor: 'rgba(36, 99, 216, 0.04)',
   },
 
   /* TIMELINE INDICATOR */
-  timelineIndicatorCol: {
+  timelineCol: {
+    width: 24,
     alignItems: 'center',
-    width: 22,
     marginRight: 12,
+    position: 'relative',
+    alignSelf: 'stretch',
+    justifyContent: 'flex-start',
   },
-  timelineTopSpacer: {
-    height: 6,
-  },
-  timelineTopLine: {
-    width: 2,
-    height: 6,
-  },
-  timelineIconDone: {
-    width: 20,
-    height: 20,
+  nodeIconBox: {
+    width: 24,
+    height: 24,
     alignItems: 'center',
     justifyContent: 'center',
+    zIndex: 3,
+    backgroundColor: 'transparent',
   },
-  timelineIconCurrent: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+  iconCircleDone: {
+    width: 22,
+    height: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: 11,
+  },
+  iconCircleCurrent: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
     borderWidth: 2,
     borderColor: colors.primary,
-    backgroundColor: colors.primaryLight,
+    backgroundColor: '#EFF6FF',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  timelineDotBlue: {
+  dotCurrent: {
     width: 8,
     height: 8,
     borderRadius: 4,
     backgroundColor: colors.primary,
   },
-  timelineIconPending: {
-    width: 20,
-    height: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  timelineBottomCol: {
-    flex: 1,
-    alignItems: 'center',
+  iconCirclePending: {
     width: 22,
-    position: 'relative',
-  },
-  timelineBottomLine: {
-    width: 2,
-    flex: 1,
-  },
-  timelineLineDone: {
-    backgroundColor: colors.primary,
-  },
-  timelineLinePending: {
-    backgroundColor: '#CBD5E1',
-  },
-  timelineArrowBox: {
-    position: 'absolute',
-    top: '32%',
+    height: 22,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: colors.surface,
-    paddingVertical: 1,
+    borderRadius: 11,
+  },
+
+  /* CONTINUOUS CONNECTING TRACK */
+  trackContainer: {
+    position: 'absolute',
+    top: 22,
+    bottom: -14, // seamlessly passes behind the next stop's icon
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1,
+  },
+  trackLine: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    width: 2,
+  },
+  trackLineDone: {
+    backgroundColor: colors.primary,
+  },
+  trackLinePending: {
+    backgroundColor: '#CBD5E1',
+  },
+  arrowBadge: {
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 2,
+  },
+  arrowBadgeDone: {
+    backgroundColor: '#EFF6FF',
+    borderColor: '#BFDBFE',
+  },
+  arrowBadgePending: {
+    backgroundColor: colors.surface,
+    borderColor: '#E2E8F0',
   },
 
   /* STOP INFO */
   stopInfoCol: {
     flex: 1,
-    paddingVertical: 6,
     justifyContent: 'center',
   },
   stopInfoHeaderRow: {
@@ -799,11 +820,24 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
   },
 
-  /* STOP STATUS (Clean typography without background containers) */
+  /* STOP STATUS */
   statusDoneText: {
     fontSize: 11,
     fontWeight: '600',
     color: colors.textMuted,
+  },
+  currentBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6,
+    backgroundColor: '#EFF6FF',
+    borderWidth: 1,
+    borderColor: '#BFDBFE',
+  },
+  currentBadgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: colors.primary,
   },
   statusCurrentText: {
     fontSize: 11,
