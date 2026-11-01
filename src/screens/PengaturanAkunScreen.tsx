@@ -169,7 +169,7 @@ export const PengaturanAkunScreen: React.FC = () => {
               onPress={() =>
                 Alert.alert(
                   'Status Perangkat OBD-II',
-                  '• Model: FLEETRA Telematics Dongle v2.1\n• Protokol: CAN-Bus ISO 15765-4\n• Koneksi: BLE 5.0 (Aktif • Terhubung)\n• Sinyal Satelit GPS: 14 Satelit (Akurasi 2,1m)\n• Status Sensor Gyro: Terkalibrasi',
+                  'Model: FLEETRA Telematics Dongle v2.1\nProtokol: CAN-Bus ISO 15765-4\nKoneksi: BLE 5.0 (Aktif & Terhubung)\nSinyal Satelit GPS: 14 Satelit (Akurasi 2,1m)\nStatus Sensor Gyro: Terkalibrasi',
                   [{ text: 'Tutup' }]
                 )
               }
@@ -181,7 +181,7 @@ export const PengaturanAkunScreen: React.FC = () => {
               <View style={styles.settingTextGroup}>
                 <Text style={styles.settingTitle}>Dongle OBD-II Terhubung</Text>
                 <Text style={styles.settingSubtitle}>
-                  ID: #BDG-OBD-092 • Sinyal Kuat (Terhubung)
+                  ID: #BDG-OBD-092 - Sinyal Kuat (Terhubung)
                 </Text>
               </View>
               <ChevronRight size={16} color={colors.textDisabled} strokeWidth={2} />
@@ -291,7 +291,7 @@ export const PengaturanAkunScreen: React.FC = () => {
               <View style={styles.settingTextGroup}>
                 <Text style={styles.settingTitle}>FLEETRA Mobile</Text>
                 <Text style={styles.settingSubtitle}>
-                  Versi 1.0.0-mvp • Build 2026.11 (ADIKARA Finalist Edition)
+                  Versi 1.0.0-mvp (Build 2026.11 ADIKARA Finalist Edition)
                 </Text>
               </View>
             </View>

@@ -38,7 +38,7 @@ interface PerjalananScreenProps {
 const PAST_TRIPS = [
   {
     id: 'TRIP-2026-088',
-    date: 'Kemarin • 31 Okt 2026',
+    date: 'Kemarin, 31 Okt 2026',
     route: 'Gudang Cimahi → Padalarang',
     distance: '32,4 km',
     duration: '1j 45m',
@@ -104,7 +104,7 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
     } else {
       Alert.alert(
         stop.name,
-        `• Status: ${stop.status === 'berikutnya' ? 'Stop Berikutnya' : 'Menunggu Antrean'}\n• Alamat: ${stop.address}\n\nSelesaikan stop sebelumnya terlebih dahulu sebelum membuka titik ini.`,
+        `Status: ${stop.status === 'berikutnya' ? 'Stop Berikutnya' : 'Menunggu Antrean'}\nAlamat: ${stop.address}\n\nSelesaikan stop sebelumnya terlebih dahulu sebelum membuka titik ini.`,
         [{ text: 'Mengerti' }]
       );
     }
@@ -159,7 +159,7 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
       return [
         {
           id: 'TRIP-2026-089',
-          date: 'Hari ini • 01 Nov 2026',
+          date: 'Hari ini, 01 Nov 2026',
           route: 'Gudang Cimahi → 4 Titik Bandung Kota',
           distance: '28,4 km',
           duration: '1j 15m',
@@ -304,7 +304,7 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
                   activeOpacity={0.85}
                 >
                   <CheckCircle2 size={15} color={colors.white} strokeWidth={2.4} style={{ marginRight: 8 }} />
-                  <Text style={styles.actionButtonText}>Ritase Selesai • Selesaikan Pesanan</Text>
+                  <Text style={styles.actionButtonText}>Ritase Selesai - Selesaikan Pesanan</Text>
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity
@@ -413,7 +413,7 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
 
                         {isDone && (
                           <Text style={styles.statusDoneText}>
-                            Selesai{stop.time ? ` • ${stop.time}` : ''}
+                            Selesai{stop.time ? ` (${stop.time})` : ''}
                           </Text>
                         )}
 
@@ -456,7 +456,7 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
                 onPress={() =>
                   Alert.alert(
                     `Detail Ritase #${trip.id}`,
-                    `• Tanggal: ${trip.date}\n• Rute: ${trip.route}\n• Total Jarak: ${trip.distance}\n• Durasi: ${trip.duration}\n• Jumlah Stop: ${trip.stops} Titik (Selesai 100%)\n• Alokasi Setoran RTO: ${trip.rtoContribution}\n\nSeluruh data e-POD dan dokumen logistik telah terarsip di cloud konsol dispatcher.`,
+                    `Tanggal: ${trip.date}\nRute: ${trip.route}\nTotal Jarak: ${trip.distance}\nDurasi: ${trip.duration}\nJumlah Stop: ${trip.stops} Titik (Selesai 100%)\nAlokasi Setoran RTO: ${trip.rtoContribution}\n\nSeluruh data e-POD dan dokumen logistik telah terarsip di cloud konsol dispatcher.`,
                     [{ text: 'Tutup' }]
                   )
                 }

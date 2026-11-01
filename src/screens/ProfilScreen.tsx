@@ -97,7 +97,7 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = (props) => {
             onPress={() =>
               Alert.alert(
                 'Rincian Driver Safety Score (94/100)',
-                '• Pengereman Halus (Smooth Braking): 96/100\n• Kepatuhan Batas Kecepatan: 92/100\n• Akselerasi & Manuver Menikung: 95/100\n• Kebugaran Pengemudi (Fatigue Monitoring): 94/100\n\nKategori: Sangat Baik. Anda berhak atas insentif ritase prioritas bulan ini!',
+                'Pengereman Halus (Smooth Braking): 96/100\nKepatuhan Batas Kecepatan: 92/100\nAkselerasi & Manuver Menikung: 95/100\nKebugaran Pengemudi (Fatigue Monitoring): 94/100\n\nKategori: Sangat Baik. Anda berhak atas insentif ritase prioritas bulan ini!',
                 [{ text: 'Tutup' }]
               )
             }
@@ -134,7 +134,7 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = (props) => {
             onPress={() =>
               Alert.alert(
                 'Diagnostik Armada (B 9821 KCE)',
-                '• Model: Gran Max Blind Van\n• Odometer: 128.430 km\n• Sistem Rem & ABS: Normal (Tebal Kampas 85%)\n• Tekanan Ban: 33 PSI rata 4 roda\n• Oli Mesin: 82% (Servis berkala 1.570 km lagi)\n• Tilang Elektronik (ETLE): Bersih (0 Pelanggaran)',
+                'Model: Gran Max Blind Van\nOdometer: 128.430 km\nSistem Rem & ABS: Normal (Tebal Kampas 85%)\nTekanan Ban: 33 PSI rata 4 roda\nOli Mesin: 82% (Servis berkala 1.570 km lagi)\nTilang Elektronik (ETLE): Bersih (0 Pelanggaran)',
                 [{ text: 'Tutup' }]
               )
             }

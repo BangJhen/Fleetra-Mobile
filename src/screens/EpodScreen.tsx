@@ -44,7 +44,7 @@ const DEFAULT_PHOTOS: PhotoItem[] = [
   {
     id: 'photo-1',
     title: 'Fisik Kargo Diterima',
-    time: '09:12 WIB • B 9821 KCE',
+    time: '09:12 WIB [B 9821 KCE]',
   },
 ];
 
@@ -135,7 +135,7 @@ export const EpodScreen: React.FC<EpodScreenProps> = (props) => {
             const now = new Date();
             const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(
               now.getMinutes()
-            ).padStart(2, '0')} WIB • ${driverProfile.vehiclePlate}`;
+            ).padStart(2, '0')} WIB [${driverProfile.vehiclePlate}]`;
             const newPhoto: PhotoItem = {
               id: `photo-${Date.now()}`,
               title: `Fisik Kargo #${photos.length + 1}`,
@@ -151,7 +151,7 @@ export const EpodScreen: React.FC<EpodScreenProps> = (props) => {
             const now = new Date();
             const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(
               now.getMinutes()
-            ).padStart(2, '0')} WIB • ${driverProfile.vehiclePlate}`;
+            ).padStart(2, '0')} WIB [${driverProfile.vehiclePlate}]`;
             const newPhoto: PhotoItem = {
               id: `photo-${Date.now()}`,
               title: 'Dokumen Surat Jalan',
@@ -232,7 +232,7 @@ export const EpodScreen: React.FC<EpodScreenProps> = (props) => {
       <TopBar
         variant="back"
         title="Bukti Pengantaran (e-POD)"
-        subtitle={`Trip #TRIP-2026-089 • Stop ${selectedStopId}/4`}
+        subtitle={`Trip #TRIP-2026-089 - Stop ${selectedStopId}/4`}
         onBack={handleBack}
       />
 
@@ -451,7 +451,7 @@ export const EpodScreen: React.FC<EpodScreenProps> = (props) => {
                 <View style={styles.signatureSignerTag}>
                   <CheckCircle2 size={11} color={colors.primary} strokeWidth={2.2} />
                   <Text style={styles.signatureSignerText}>
-                    {recipientName.trim() || 'Penerima Kargo'} • Tervalidasi Digital
+                    {recipientName.trim() || 'Penerima Kargo'} - Tervalidasi Digital
                   </Text>
                 </View>
               </View>

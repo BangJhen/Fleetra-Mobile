@@ -9,7 +9,6 @@ import {
   View,
 } from 'react-native';
 import {
-  BarChart2,
   ChevronRight,
   ClipboardList,
   Clock,
@@ -19,6 +18,7 @@ import {
   Play,
   Power,
   ShieldCheck,
+  Timer,
   TrendingUp,
   Truck,
 } from 'lucide-react-native';
@@ -182,7 +182,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               {/* Metric 3 */}
               <View style={styles.metricItem}>
                 <View style={styles.metricIconRow}>
-                  <BarChart2 size={13} color={colors.primary} strokeWidth={2.2} />
+                  <Timer size={13} color={colors.primary} strokeWidth={2.2} />
                   <Text style={styles.metricValue}>± 1j 15m</Text>
                 </View>
                 <Text style={styles.metricLabel}>Estimasi</Text>

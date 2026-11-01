@@ -81,7 +81,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = (props) =
 
     Alert.alert(
       item.title,
-      `${item.description}\n\nWaktu: ${item.time} • Kategori: ${item.category.toUpperCase()}`,
+      `${item.description}\n\nWaktu: ${item.time} (${item.category.toUpperCase()})`,
       [{ text: 'Tutup' }]
     );
   };

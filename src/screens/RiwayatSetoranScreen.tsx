@@ -131,9 +131,9 @@ export const RiwayatSetoranScreen: React.FC = () => {
   const handleTxDetail = (tx: DepositTransaction) => {
     Alert.alert(
       `Rincian ${tx.tripCode}`,
-      `• Pengantaran: ${tx.route}\n• Waktu: ${tx.date} (${tx.time})\n• Nilai Ekuitas: Rp ${tx.amount.toLocaleString('id-ID')}\n• Status: ${
+      `Pengantaran: ${tx.route}\nWaktu: ${tx.date} (${tx.time})\nNilai Ekuitas: Rp ${tx.amount.toLocaleString('id-ID')}\nStatus: ${
         tx.status === 'selesai' ? 'Selesai (Masuk Ekuitas)' : 'Diproses (Menunggu e-POD)'
-      }\n• Catatan: ${tx.notes}`,
+      }\nCatatan: ${tx.notes}`,
       [{ text: 'Tutup' }]
     );
   };
@@ -200,7 +200,7 @@ export const RiwayatSetoranScreen: React.FC = () => {
           <View style={styles.vehicleStrip}>
             <Truck size={14} color={colors.textSecondary} strokeWidth={2} />
             <Text style={styles.vehicleText} numberOfLines={1}>
-              {driverProfile.vehicleModel} • {driverProfile.vehiclePlate}
+              {driverProfile.vehicleModel} - {driverProfile.vehiclePlate}
             </Text>
           </View>
         </View>
@@ -280,7 +280,7 @@ export const RiwayatSetoranScreen: React.FC = () => {
                     {/* Line 2: Route, Time, Clean Text Status (NO BACKGROUND PILL) */}
                     <View style={styles.txLineRow}>
                       <Text style={styles.txDetailText}>
-                        {tx.route} • {tx.time}
+                        {tx.route} ({tx.time})
                       </Text>
                       <Text style={styles.txStatusTextPending}>Diproses</Text>
                     </View>
@@ -324,7 +324,7 @@ export const RiwayatSetoranScreen: React.FC = () => {
                       {/* Line 2: Route, Time, Clean Text Status (NO BACKGROUND PILL) */}
                       <View style={styles.txLineRow}>
                         <Text style={styles.txDetailText}>
-                          {tx.route} • {tx.time}
+                          {tx.route} ({tx.time})
                         </Text>
                         <Text style={styles.txStatusTextDone}>Selesai</Text>
                       </View>

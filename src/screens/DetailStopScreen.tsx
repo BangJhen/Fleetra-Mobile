@@ -99,7 +99,7 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = (props) => {
       <TopBar
         variant="back"
         title="Detail Stop"
-        subtitle={`Trip #TRIP-2026-089 • Stop ${selectedStopId}/4`}
+        subtitle={`Trip #TRIP-2026-089 - Stop ${selectedStopId}/4`}
         onBack={handleBack}
       />
 

@@ -173,7 +173,7 @@ const generateMapHtml = (destinationName: string) => `
       iconAnchor: [16, 16]
     });
     var vehicleMarker = L.marker([-6.8992, 107.5954], { icon: vehicleIcon }).addTo(map);
-    vehicleMarker.bindPopup('<div class="popup-title">Armada B 9821 KCE</div><div class="popup-desc">Gran Max Blind Van • Kecepatan: 38 km/jam</div>');
+    vehicleMarker.bindPopup('<div class="popup-title">Armada B 9821 KCE</div><div class="popup-desc">Gran Max Blind Van - Kecepatan: 38 km/jam</div>');
 
     // 6. Destination Marker (Toko Sumber Rejeki)
     var destSvg = '<svg class="dest-pin-svg" width="28" height="34" viewBox="0 0 28 34" fill="none"><path d="M14 0C6.268 0 0 6.268 0 14c0 10.5 14 20 14 20s14-9.5 14-20C28 6.268 21.732 0 14 0z" fill="#EF4444"/><circle cx="14" cy="14" r="5.5" fill="#FFFFFF"/></svg>';
@@ -185,7 +185,7 @@ const generateMapHtml = (destinationName: string) => `
       popupAnchor: [0, -32]
     });
     var destMarker = L.marker([-6.9214, 107.6046], { icon: destIcon }).addTo(map);
-    destMarker.bindPopup('<div class="popup-title">${destinationName}</div><div class="popup-desc">Stop 2 • Jl. Sudirman No. 45<br>Estimasi tiba: 12 menit</div>');
+    destMarker.bindPopup('<div class="popup-title">${destinationName}</div><div class="popup-desc">Stop 2 - Jl. Sudirman No. 45<br>Estimasi tiba: 12 menit</div>');
 
     // 7. Auto fit bounds with gentle padding
     map.fitBounds(routeLine.getBounds(), { padding: [30, 30] });

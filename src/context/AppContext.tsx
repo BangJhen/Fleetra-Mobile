@@ -281,7 +281,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     const newNotif: NotificationItem = {
       id: `epod-${record.stopId}-${Date.now()}`,
-      title: `e-POD Terverifikasi • Stop ${record.stopId}/4`,
+      title: `e-POD Terverifikasi - Stop ${record.stopId}/4`,
       description: `Kargo di ${stopNames[record.stopId] || 'titik singgah'} telah diterima oleh ${record.recipientName}. Bukti foto & tanda tangan telah terverifikasi.`,
       time: 'Baru saja',
       category: 'perjalanan',
