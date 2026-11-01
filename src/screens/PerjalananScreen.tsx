@@ -372,27 +372,28 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
                         )}
                       </View>
 
-                      {/* Continuous Connecting Track with Centered Direction Arrow */}
+                      {/* Continuous Connecting Track with Integrated Direction Arrow */}
                       {!isLast && (
                         <View style={styles.trackContainer} pointerEvents="none">
                           <View
                             style={[
-                              styles.trackLine,
+                              styles.trackLineSegment,
                               isDone ? styles.trackLineDone : styles.trackLinePending,
                             ]}
                           />
-                          <View
-                            style={[
-                              styles.arrowBadge,
-                              isDone ? styles.arrowBadgeDone : styles.arrowBadgePending,
-                            ]}
-                          >
+                          <View style={styles.arrowIndicator}>
                             <ChevronDown
                               size={11}
                               color={isDone ? colors.primary : '#94A3B8'}
-                              strokeWidth={2.5}
+                              strokeWidth={2.6}
                             />
                           </View>
+                          <View
+                            style={[
+                              styles.trackLineSegment,
+                              isDone ? styles.trackLineDone : styles.trackLinePending,
+                            ]}
+                          />
                         </View>
                       )}
                     </View>
@@ -815,19 +816,18 @@ const styles = StyleSheet.create({
   /* CONTINUOUS CONNECTING TRACK */
   trackContainer: {
     position: 'absolute',
-    top: 22,
-    bottom: -14, // seamlessly passes behind the next stop's icon
+    top: 24,
+    bottom: -12,
     left: 0,
     right: 0,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 1,
   },
-  trackLine: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
+  trackLineSegment: {
+    flex: 1,
     width: 2,
+    borderRadius: 1,
   },
   trackLineDone: {
     backgroundColor: colors.primary,
@@ -835,22 +835,11 @@ const styles = StyleSheet.create({
   trackLinePending: {
     backgroundColor: '#CBD5E1',
   },
-  arrowBadge: {
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    borderWidth: 1,
+  arrowIndicator: {
     alignItems: 'center',
     justifyContent: 'center',
+    marginVertical: -2,
     zIndex: 2,
-  },
-  arrowBadgeDone: {
-    backgroundColor: '#EFF6FF',
-    borderColor: '#BFDBFE',
-  },
-  arrowBadgePending: {
-    backgroundColor: colors.surface,
-    borderColor: '#E2E8F0',
   },
 
   /* STOP INFO */
