@@ -136,24 +136,13 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ initialMode = 'login' })
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* 1. TOP HEADER WITH LOGO & BACK TO ONBOARDING */}
+        {/* 1. TOP HEADER WITH LOGO */}
         <View style={styles.topHeader}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigateTo('onboarding')}
-            activeOpacity={0.7}
-          >
-            <ChevronLeft size={16} color={colors.textSecondary} strokeWidth={2.2} />
-            <Text style={styles.backText}>Kembali</Text>
-          </TouchableOpacity>
-
-          <View style={styles.brandRow}>
-            <Image
-              source={require('../../assets/Fleetra Blue Ribbon Logo.png')}
-              style={styles.brandLogo}
-              resizeMode="contain"
-            />
-          </View>
+          <Image
+            source={require('../../assets/Fleetra Blue Ribbon Logo.png')}
+            style={styles.brandLogo}
+            resizeMode="contain"
+          />
         </View>
 
         {/* 2. AUTH CARD */}
@@ -483,34 +472,14 @@ const styles = StyleSheet.create({
 
   /* TOP HEADER */
   topHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
-  backButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 6,
-    paddingHorizontal: 8,
-    borderRadius: 8,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    gap: 3,
-  },
-  backText: {
-    fontSize: 11.5,
-    fontWeight: '600',
-    color: colors.textSecondary,
-  },
-  brandRow: {
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: 20,
+    marginTop: 6,
   },
   brandLogo: {
-    width: 110,
-    height: 28,
+    width: 140,
+    height: 36,
   },
 
   /* AUTH CARD */
