@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
+  Animated,
   Dimensions,
+  Easing,
   Image,
   StyleSheet,
   Text,
@@ -9,221 +11,264 @@ import {
 } from 'react-native';
 import {
   ArrowRight,
-  Camera,
   CheckCircle2,
   ChevronRight,
-  Compass,
   FileCheck2,
-  Fuel,
-  KeyRound,
   Navigation,
   ShieldCheck,
   TrendingUp,
-  Truck,
 } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 import { useApp } from '../context/AppContext';
 
-interface SlideItem {
-  id: number;
-  badge: string;
-  title: string;
-  subtitle: string;
-  iconType: 'telematics' | 'epod' | 'rto';
-  pills: string[];
-}
-
-const SLIDES: SlideItem[] = [
-  {
-    id: 1,
-    badge: 'TELEMATIKA & IoT ARMADA',
-    title: 'Navigasi Presisi & Telematika IoT',
-    subtitle:
-      'Optimasi rute cerdas OSRM belokan demi belokan, monitoring bahan bakar armada, dan status lalu lintas real-time di seluruh koridor logistik.',
-    iconType: 'telematics',
-    pills: ['Rute Dinamis OSRM', 'Sensor Bahan Bakar Real-time', 'Telemetri IoT'],
-  },
-  {
-    id: 2,
-    badge: 'VERIFIKASI DIGITAL KABIN',
-    title: 'Serah Terima e-POD Bebas Kertas',
-    subtitle:
-      'Konfirmasi pengantaran kargo instan dengan dokumentasi foto ber-watermark GPS dan kanvas tanda tangan digital penerima tanpa manifes manual.',
-    iconType: 'epod',
-    pills: ['Foto Berstempel Waktu', 'Kanvas TTD Digital', '100% Paperless'],
-  },
-  {
-    id: 3,
-    badge: 'SEWA-BELI (RENT-TO-OWN)',
-    title: 'Miliki Armada dari Setiap Ritase',
-    subtitle:
-      'Skema kepemilikan berkeadilan. Setiap ritase logistik yang Anda selesaikan otomatis dialokasikan menjadi ekuitas kepemilikan kendaraan blind van.',
-    iconType: 'rto',
-    pills: ['Pay-per-Trip', 'Akumulasi Ekuitas', 'Rekonsiliasi ETLE'],
-  },
-];
+const { width } = Dimensions.get('window');
 
 export const OnboardingScreen: React.FC = () => {
   const { navigateTo } = useApp();
-  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
 
-  const activeSlide = SLIDES[currentSlideIndex];
-  const isLastSlide = currentSlideIndex === SLIDES.length - 1;
+  // Animation values
+  const logoScale = useRef(new Animated.Value(0.85)).current;
+  const logoOpacity = useRef(new Animated.Value(0)).current;
+  const contentFade = useRef(new Animated.Value(0)).current;
+  const contentTranslateY = useRef(new Animated.Value(24)).current;
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const progressBar = useRef(new Animated.Value(0)).current;
 
-  const handleNext = () => {
-    if (isLastSlide) {
-      navigateTo('login');
-    } else {
-      setCurrentSlideIndex((prev) => prev + 1);
+  const timerRef = useRef<any>(null);
+
+  const handleProceed = (target: 'login' | 'register' = 'login') => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
     }
+    navigateTo(target);
   };
 
-  const handleSkip = () => {
-    navigateTo('login');
-  };
+  useEffect(() => {
+    // 1. Entrance animation sequence
+    Animated.sequence([
+      // Logo scale & fade in
+      Animated.parallel([
+        Animated.timing(logoOpacity, {
+          toValue: 1,
+          duration: 650,
+          useNativeDriver: true,
+          easing: Easing.out(Easing.cubic),
+        }),
+        Animated.spring(logoScale, {
+          toValue: 1,
+          friction: 6,
+          tension: 40,
+          useNativeDriver: true,
+        }),
+      ]),
+      // Content slide & fade
+      Animated.parallel([
+        Animated.timing(contentFade, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+          easing: Easing.out(Easing.quad),
+        }),
+        Animated.timing(contentTranslateY, {
+          toValue: 0,
+          duration: 500,
+          useNativeDriver: true,
+          easing: Easing.out(Easing.quad),
+        }),
+      ]),
+    ]).start();
+
+    // 2. Subtle ambient pulse for the glow ring
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.08,
+          duration: 1400,
+          easing: Easing.inOut(Easing.quad),
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 1400,
+          easing: Easing.inOut(Easing.quad),
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+
+    // 3. Progress bar animation (completes in 2.6s)
+    Animated.timing(progressBar, {
+      toValue: 1,
+      duration: 2600,
+      easing: Easing.inOut(Easing.quad),
+      useNativeDriver: false,
+    }).start();
+
+    // 4. Auto redirect to login after smooth entrance animation
+    timerRef.current = setTimeout(() => {
+      handleProceed('login');
+    }, 2800);
+
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
+
+  const progressWidth = progressBar.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0%', '100%'],
+  });
 
   return (
     <View style={styles.container}>
-      {/* 1. TOP BAR: LOGO & SKIP BUTTON */}
+      {/* TOP SKIP ACTION */}
       <View style={styles.topBar}>
-        <View style={styles.logoRow}>
-          <Image
-            source={require('../../assets/Fleetra Blue Ribbon Logo.png')}
-            style={styles.logoImage}
-            resizeMode="contain"
-          />
-          <View style={styles.logoTextCol}>
-            <Text style={styles.brandTitle}>FLEETRA</Text>
-            <Text style={styles.brandSubtitle}>Intelligent Driver App</Text>
-          </View>
+        <View style={styles.topPill}>
+          <ShieldCheck size={14} color={colors.primary} strokeWidth={2.2} />
+          <Text style={styles.topPillText}>ADIKARA 2026 Softdev</Text>
         </View>
 
         <TouchableOpacity
           style={styles.skipButton}
-          onPress={handleSkip}
+          onPress={() => handleProceed('login')}
           activeOpacity={0.7}
+          accessibilityLabel="Lewati ke Halaman Masuk"
         >
           <Text style={styles.skipText}>Lewati</Text>
-          <ChevronRight size={13} color={colors.textSecondary} strokeWidth={2} />
+          <ChevronRight size={14} color={colors.textSecondary} strokeWidth={2} />
         </TouchableOpacity>
       </View>
 
-      {/* 2. MAIN SLIDE CONTENT */}
-      <View style={styles.slideContainer}>
-        {/* Dynamic Graphic Hero Box */}
-        <View style={styles.heroGraphicBox}>
-          {activeSlide.iconType === 'telematics' && (
-            <View style={styles.iconCircleCluster}>
-              <View style={styles.heroOuterRing}>
-                <View style={styles.heroCenterIcon}>
-                  <Navigation size={42} color={colors.primary} strokeWidth={2.2} />
-                </View>
-              </View>
-              <View style={[styles.floatingMiniBadge, { top: 12, right: 18 }]}>
-                <Fuel size={14} color={colors.primary} strokeWidth={2.2} />
-                <Text style={styles.floatingMiniBadgeText}>BBM 74%</Text>
-              </View>
-              <View style={[styles.floatingMiniBadge, { bottom: 16, left: 14 }]}>
-                <Truck size={14} color={colors.primary} strokeWidth={2.2} />
-                <Text style={styles.floatingMiniBadgeText}>B 9821 KCE</Text>
-              </View>
-            </View>
-          )}
+      {/* CENTER ANIMATED BRAND & SPLASH HERO */}
+      <View style={styles.centerContainer}>
+        {/* Ambient Glowing Background Circle */}
+        <Animated.View
+          style={[
+            styles.glowRing,
+            {
+              transform: [{ scale: pulseAnim }],
+            },
+          ]}
+        />
 
-          {activeSlide.iconType === 'epod' && (
-            <View style={styles.iconCircleCluster}>
-              <View style={styles.heroOuterRing}>
-                <View style={styles.heroCenterIcon}>
-                  <FileCheck2 size={42} color={colors.primary} strokeWidth={2.2} />
-                </View>
-              </View>
-              <View style={[styles.floatingMiniBadge, { top: 12, right: 18 }]}>
-                <Camera size={14} color={colors.primary} strokeWidth={2.2} />
-                <Text style={styles.floatingMiniBadgeText}>GPS Foto</Text>
-              </View>
-              <View style={[styles.floatingMiniBadge, { bottom: 16, left: 14 }]}>
-                <CheckCircle2 size={14} color={colors.primary} strokeWidth={2.2} />
-                <Text style={styles.floatingMiniBadgeText}>TTD Digital</Text>
-              </View>
-            </View>
-          )}
-
-          {activeSlide.iconType === 'rto' && (
-            <View style={styles.iconCircleCluster}>
-              <View style={styles.heroOuterRing}>
-                <View style={styles.heroCenterIcon}>
-                  <KeyRound size={42} color={colors.primary} strokeWidth={2.2} />
-                </View>
-              </View>
-              <View style={[styles.floatingMiniBadge, { top: 12, right: 18 }]}>
-                <TrendingUp size={14} color={colors.primary} strokeWidth={2.2} />
-                <Text style={styles.floatingMiniBadgeText}>Ekuitas 64,8%</Text>
-              </View>
-              <View style={[styles.floatingMiniBadge, { bottom: 16, left: 14 }]}>
-                <ShieldCheck size={14} color={colors.primary} strokeWidth={2.2} />
-                <Text style={styles.floatingMiniBadgeText}>Pay-per-Trip</Text>
-              </View>
-            </View>
-          )}
-        </View>
-
-        {/* Badge Pill */}
-        <View style={styles.slideBadgePill}>
-          <Text style={styles.slideBadgeText}>{activeSlide.badge}</Text>
-        </View>
-
-        {/* Title & Subtitle */}
-        <Text style={styles.slideTitle}>{activeSlide.title}</Text>
-        <Text style={styles.slideSubtitle}>{activeSlide.subtitle}</Text>
-
-        {/* Feature Check Pills */}
-        <View style={styles.pillsRow}>
-          {activeSlide.pills.map((pill, idx) => (
-            <View key={idx} style={styles.featurePill}>
-              <CheckCircle2 size={11} color={colors.primary} strokeWidth={2.4} />
-              <Text style={styles.featurePillText}>{pill}</Text>
-            </View>
-          ))}
-        </View>
-      </View>
-
-      {/* 3. BOTTOM CONTROLS & PAGINATION */}
-      <View style={styles.bottomSection}>
-        {/* Pagination Dots */}
-        <View style={styles.paginationRow}>
-          {SLIDES.map((_, idx) => (
-            <TouchableOpacity
-              key={idx}
-              onPress={() => setCurrentSlideIndex(idx)}
-              style={[
-                styles.dot,
-                idx === currentSlideIndex && styles.dotActive,
-              ]}
-              activeOpacity={0.8}
-            />
-          ))}
-        </View>
-
-        {/* Primary Action Button */}
-        <TouchableOpacity
-          style={styles.primaryBtn}
-          onPress={handleNext}
-          activeOpacity={0.85}
+        {/* Brand Logo (Official Asset contains Wordmark - No hardcoded text) */}
+        <Animated.View
+          style={[
+            styles.logoWrapper,
+            {
+              opacity: logoOpacity,
+              transform: [{ scale: logoScale }],
+            },
+          ]}
         >
-          <Text style={styles.primaryBtnText}>
-            {isLastSlide ? 'Mulai Sekarang' : 'Lanjutkan'}
+          <Image
+            source={require('../../assets/Fleetra Blue Ribbon Logo.png')}
+            style={styles.brandLogo}
+            resizeMode="contain"
+          />
+        </Animated.View>
+
+        {/* Animated Tagline & System Info */}
+        <Animated.View
+          style={[
+            styles.taglineSection,
+            {
+              opacity: contentFade,
+              transform: [{ translateY: contentTranslateY }],
+            },
+          ]}
+        >
+          <View style={styles.badgePill}>
+            <Text style={styles.badgeText}>INTELLIGENT FLEET & RTO</Text>
+          </View>
+
+          <Text style={styles.heroHeadline}>
+            Ekosistem Telematika Cerdas & Kepemilikan Armada
           </Text>
-          <ArrowRight size={16} color={colors.white} strokeWidth={2.4} />
+
+          <Text style={styles.heroSubheadline}>
+            Optimasi rute logistik OSRM, verifikasi digital serah terima e-POD, dan akumulasi ekuitas sewa-beli (Rent-to-Own) dalam satu genggaman kabin.
+          </Text>
+
+          {/* Value Proposition Micro Cards */}
+          <View style={styles.featureGrid}>
+            <View style={styles.featureCard}>
+              <View style={[styles.featureIconBox, { backgroundColor: '#EFF6FF' }]}>
+                <Navigation size={16} color={colors.primary} strokeWidth={2.2} />
+              </View>
+              <Text style={styles.featureLabel}>Rute Dinamis</Text>
+            </View>
+
+            <View style={styles.featureCard}>
+              <View style={[styles.featureIconBox, { backgroundColor: '#F0FDF4' }]}>
+                <FileCheck2 size={16} color={colors.success} strokeWidth={2.2} />
+              </View>
+              <Text style={styles.featureLabel}>e-POD Paperless</Text>
+            </View>
+
+            <View style={styles.featureCard}>
+              <View style={[styles.featureIconBox, { backgroundColor: '#F8FAFC' }]}>
+                <TrendingUp size={16} color="#0284C7" strokeWidth={2.2} />
+              </View>
+              <Text style={styles.featureLabel}>Sewa-Beli RTO</Text>
+            </View>
+          </View>
+        </Animated.View>
+      </View>
+
+      {/* BOTTOM CONTROLS & INITIALIZATION PROGRESS */}
+      <Animated.View
+        style={[
+          styles.bottomSection,
+          {
+            opacity: contentFade,
+          },
+        ]}
+      >
+        {/* Loading Progress Bar */}
+        <View style={styles.progressContainer}>
+          <View style={styles.progressBarTrack}>
+            <Animated.View
+              style={[styles.progressBarFill, { width: progressWidth }]}
+            />
+          </View>
+          <View style={styles.progressMetaRow}>
+            <Text style={styles.progressText}>
+              Menginisialisasi telematika kabin...
+            </Text>
+            <View style={styles.onlineBadge}>
+              <CheckCircle2 size={11} color={colors.success} strokeWidth={2.5} />
+              <Text style={styles.onlineBadgeText}>Sistem Siap</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Primary Action: Go to Login */}
+        <TouchableOpacity
+          style={styles.primaryButton}
+          onPress={() => handleProceed('login')}
+          activeOpacity={0.85}
+          accessibilityLabel="Masuk ke Akun Driver"
+        >
+          <Text style={styles.primaryButtonText}>Masuk ke Akun Mitra</Text>
+          <ArrowRight size={18} color="#FFFFFF" strokeWidth={2.2} />
         </TouchableOpacity>
 
-        {/* Secondary Login / Register Switcher */}
-        <View style={styles.footerLinkRow}>
-          <Text style={styles.footerLinkMuted}>Sudah memiliki akun mitra? </Text>
-          <TouchableOpacity onPress={() => navigateTo('login')} activeOpacity={0.7}>
-            <Text style={styles.footerLinkBold}>Masuk ke Akun</Text>
+        {/* Secondary Register Link */}
+        <View style={styles.footerRow}>
+          <Text style={styles.footerTextMuted}>Belum terdaftar sebagai mitra?</Text>
+          <TouchableOpacity
+            onPress={() => handleProceed('register')}
+            activeOpacity={0.7}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+          >
+            <Text style={styles.footerLinkBold}> Daftar Pengemudi</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </Animated.View>
     </View>
   );
 };
@@ -231,206 +276,210 @@ export const OnboardingScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.surface,
+    backgroundColor: colors.bg, // Light mode #F8FAFC
     justifyContent: 'space-between',
+    paddingBottom: 24,
   },
+
+  /* TOP BAR */
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 10,
+    paddingTop: 12,
+    paddingBottom: 8,
   },
-  logoRow: {
+  topPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 6,
+    backgroundColor: '#EFF6FF',
+    borderWidth: 1,
+    borderColor: '#DBEAFE',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 20,
   },
-  logoImage: {
-    width: 38,
-    height: 38,
-  },
-  logoTextCol: {
-    justifyContent: 'center',
-  },
-  brandTitle: {
-    fontSize: 16,
-    fontWeight: '800',
+  topPillText: {
+    fontSize: 11,
+    fontWeight: '700',
     color: colors.primary,
-    letterSpacing: 0.5,
-  },
-  brandSubtitle: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: colors.textMuted,
   },
   skipButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 2,
     paddingVertical: 6,
     paddingHorizontal: 10,
     borderRadius: 8,
-    backgroundColor: colors.surface2,
+    backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
-    gap: 3,
   },
   skipText: {
-    fontSize: 11.5,
+    fontSize: 12,
     fontWeight: '600',
     color: colors.textSecondary,
   },
 
-  /* SLIDE MAIN CONTENT */
-  slideContainer: {
+  /* CENTER HERO SECTION */
+  centerContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingHorizontal: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-  },
-  heroGraphicBox: {
-    width: '100%',
-    height: 220,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
     position: 'relative',
   },
-  iconCircleCluster: {
-    width: 200,
-    height: 200,
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-  },
-  heroOuterRing: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    backgroundColor: '#EFF6FF',
-    borderWidth: 2,
-    borderColor: '#DBEAFE',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  heroCenterIcon: {
-    width: 88,
-    height: 88,
-    borderRadius: 44,
-    backgroundColor: colors.surface,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
-    shadowRadius: 10,
-    elevation: 4,
-  },
-  floatingMiniBadge: {
+  glowRing: {
     position: 'absolute',
-    flexDirection: 'row',
+    width: width * 0.78,
+    height: width * 0.78,
+    borderRadius: (width * 0.78) / 2,
+    backgroundColor: '#EFF6FF',
+    borderWidth: 1.5,
+    borderColor: '#DBEAFE',
+    opacity: 0.65,
+  },
+  logoWrapper: {
+    marginBottom: 24,
     alignItems: 'center',
-    gap: 5,
+    justifyContent: 'center',
     backgroundColor: colors.surface,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 14,
+    paddingVertical: 14,
+    paddingHorizontal: 28,
+    borderRadius: 24,
     borderWidth: 1,
     borderColor: colors.border,
-    shadowColor: '#0F172A',
-    shadowOffset: { width: 0, height: 2 },
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
-    shadowRadius: 4,
+    shadowRadius: 12,
     elevation: 3,
   },
-  floatingMiniBadgeText: {
-    fontSize: 10.5,
-    fontWeight: '700',
-    color: colors.text,
+  brandLogo: {
+    width: 190,
+    height: 48,
   },
 
-  slideBadgePill: {
-    backgroundColor: '#EFF6FF',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
+  /* TAGLINE & HEADLINES */
+  taglineSection: {
+    alignItems: 'center',
+    marginTop: 4,
+  },
+  badgePill: {
+    backgroundColor: '#EEF2FF',
     borderWidth: 1,
-    borderColor: '#BFDBFE',
-    marginBottom: 10,
+    borderColor: '#E0E7FF',
+    paddingHorizontal: 12,
+    paddingVertical: 4.5,
+    borderRadius: 20,
+    marginBottom: 12,
   },
-  slideBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
+  badgeText: {
+    fontSize: 10.5,
+    fontWeight: '800',
     color: colors.primary,
-    letterSpacing: 0.5,
+    letterSpacing: 0.8,
   },
-  slideTitle: {
-    fontSize: 21,
+  heroHeadline: {
+    fontSize: 20,
     fontWeight: '800',
     color: colors.text,
     textAlign: 'center',
-    marginBottom: 8,
+    lineHeight: 26,
     letterSpacing: -0.3,
+    marginBottom: 8,
   },
-  slideSubtitle: {
+  heroSubheadline: {
     fontSize: 12.5,
+    fontWeight: '400',
     color: colors.textSecondary,
     textAlign: 'center',
     lineHeight: 18,
-    marginBottom: 16,
     paddingHorizontal: 10,
+    marginBottom: 20,
   },
 
-  pillsRow: {
+  /* FEATURE VALUE PROPOSITION GRID */
+  featureGrid: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     justifyContent: 'center',
-    gap: 6,
-  },
-  featurePill: {
-    flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.surface2,
+    gap: 8,
+    width: '100%',
+  },
+  featureCard: {
+    flex: 1,
+    alignItems: 'center',
+    backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
-    paddingHorizontal: 9,
-    paddingVertical: 4.5,
-    borderRadius: 12,
-    gap: 5,
+    borderRadius: 14,
+    paddingVertical: 10,
+    paddingHorizontal: 6,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    elevation: 1,
   },
-  featurePillText: {
-    fontSize: 10.5,
-    fontWeight: '600',
-    color: colors.textSecondary,
+  featureIconBox: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 6,
+  },
+  featureLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: colors.text,
+    textAlign: 'center',
   },
 
-  /* BOTTOM CONTROLS */
+  /* BOTTOM PROGRESS & ACTION CONTROLS */
   bottomSection: {
     paddingHorizontal: 20,
-    paddingBottom: 28,
-    paddingTop: 10,
+    paddingTop: 8,
   },
-  paginationRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 6,
-    marginBottom: 18,
+  progressContainer: {
+    marginBottom: 16,
   },
-  dot: {
-    width: 7,
-    height: 7,
-    borderRadius: 3.5,
-    backgroundColor: '#CBD5E1',
+  progressBarTrack: {
+    height: 4,
+    backgroundColor: '#E2E8F0',
+    borderRadius: 2,
+    overflow: 'hidden',
+    marginBottom: 6,
   },
-  dotActive: {
-    width: 22,
-    height: 7,
-    borderRadius: 3.5,
+  progressBarFill: {
+    height: '100%',
     backgroundColor: colors.primary,
+    borderRadius: 2,
   },
-  primaryBtn: {
+  progressMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  progressText: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: colors.textMuted,
+  },
+  onlineBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  onlineBadgeText: {
+    fontSize: 10.5,
+    fontWeight: '700',
+    color: colors.success,
+  },
+
+  primaryButton: {
     backgroundColor: colors.primary,
     height: 48,
     borderRadius: 14,
@@ -440,27 +489,29 @@ const styles = StyleSheet.create({
     gap: 8,
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.25,
+    shadowOpacity: 0.22,
     shadowRadius: 6,
     elevation: 3,
-    marginBottom: 14,
+    marginBottom: 12,
   },
-  primaryBtnText: {
-    fontSize: 13.5,
+  primaryButtonText: {
+    fontSize: 14,
     fontWeight: '700',
     color: colors.white,
+    letterSpacing: -0.2,
   },
-  footerLinkRow: {
+
+  footerRow: {
     flexDirection: 'row',
-    justifyContent: 'center',
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  footerLinkMuted: {
-    fontSize: 11.5,
-    color: colors.textMuted,
+  footerTextMuted: {
+    fontSize: 12,
+    color: colors.textSecondary,
   },
   footerLinkBold: {
-    fontSize: 11.5,
+    fontSize: 12,
     fontWeight: '700',
     color: colors.primary,
   },

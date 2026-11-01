@@ -140,7 +140,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ initialMode = 'login' })
             activeOpacity={0.7}
           >
             <ChevronLeft size={16} color={colors.textSecondary} strokeWidth={2.2} />
-            <Text style={styles.backText}>Onboarding</Text>
+            <Text style={styles.backText}>Kembali</Text>
           </TouchableOpacity>
 
           <View style={styles.brandRow}>
@@ -149,7 +149,6 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ initialMode = 'login' })
               style={styles.brandLogo}
               resizeMode="contain"
             />
-            <Text style={styles.brandName}>FLEETRA</Text>
           </View>
         </View>
 
@@ -298,7 +297,7 @@ export const AuthScreen: React.FC<AuthScreenProps> = ({ initialMode = 'login' })
                   <ActivityIndicator size="small" color={colors.white} />
                 ) : (
                   <>
-                    <Text style={styles.submitButtonText}>Masuk ke FLEETRA</Text>
+                    <Text style={styles.submitButtonText}>Masuk ke Akun</Text>
                     <ArrowRight size={15} color={colors.white} strokeWidth={2.4} />
                   </>
                 )}
@@ -502,19 +501,12 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   brandRow: {
-    flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    justifyContent: 'center',
   },
   brandLogo: {
-    width: 26,
-    height: 26,
-  },
-  brandName: {
-    fontSize: 14,
-    fontWeight: '800',
-    color: colors.primary,
-    letterSpacing: 0.5,
+    width: 110,
+    height: 28,
   },
 
   /* AUTH CARD */
@@ -765,3 +757,4 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
   },
 });
+
