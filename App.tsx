@@ -6,6 +6,8 @@ import { AlertCircle } from 'lucide-react-native';
 
 import { colors } from './src/theme/colors';
 import { AppProvider, useApp } from './src/context/AppContext';
+import { OnboardingScreen } from './src/screens/OnboardingScreen';
+import { AuthScreen } from './src/screens/AuthScreen';
 import { HomeScreen } from './src/screens/HomeScreen';
 import { PerjalananScreen } from './src/screens/PerjalananScreen';
 import { DetailStopScreen } from './src/screens/DetailStopScreen';
@@ -33,12 +35,17 @@ function MainAppContent() {
     currentScreen === 'perjalanan' ||
     currentScreen === 'profil';
 
+  const isAuthOrOnboarding =
+    currentScreen === 'onboarding' ||
+    currentScreen === 'login' ||
+    currentScreen === 'register';
+
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <StatusBar style="dark" />
 
-      {/* GLOBAL PERSISTENT SOS ACTIVE BANNER (In-memory persistent status) */}
-      {isSosActive && (
+      {/* GLOBAL PERSISTENT SOS ACTIVE BANNER */}
+      {isSosActive && !isAuthOrOnboarding && (
         <TouchableOpacity
           style={styles.sosGlobalBanner}
           onPress={() => navigateTo('sos')}
@@ -53,6 +60,14 @@ function MainAppContent() {
       )}
 
       <View style={styles.content}>
+        {/* 0. ONBOARDING SCREEN */}
+        {currentScreen === 'onboarding' && <OnboardingScreen />}
+
+        {/* 0. AUTH SCREEN (LOGIN & REGISTER) */}
+        {isAuthOrOnboarding && currentScreen !== 'onboarding' && (
+          <AuthScreen initialMode={currentScreen} />
+        )}
+
         {/* 1. BERANDA (HOME) SCREEN */}
         {currentScreen === 'beranda' && <HomeScreen />}
 

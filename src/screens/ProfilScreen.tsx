@@ -15,6 +15,7 @@ import {
   LogOut,
   Settings,
   ShieldCheck,
+  Sparkles,
   TrendingUp,
   Truck,
 } from 'lucide-react-native';
@@ -30,6 +31,7 @@ interface ProfilScreenProps {
 export const ProfilScreen: React.FC<ProfilScreenProps> = (props) => {
   const {
     navigateTo,
+    logout,
     safetyScore,
     rtoPercent,
     driverStatus,
@@ -236,6 +238,20 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = (props) => {
             </View>
             <ChevronRight size={15} color={colors.textDisabled} strokeWidth={2} />
           </TouchableOpacity>
+
+          <View style={styles.menuDivider} />
+
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => navigateTo('onboarding')}
+            activeOpacity={0.7}
+          >
+            <View style={styles.menuItemLeft}>
+              <Sparkles size={16} color={colors.primary} strokeWidth={2} />
+              <Text style={styles.menuItemTitle}>Panduan & Onboarding Aplikasi</Text>
+            </View>
+            <ChevronRight size={15} color={colors.textDisabled} strokeWidth={2} />
+          </TouchableOpacity>
         </View>
 
         {/* 7. DANGER ACTION BUTTON: KELUAR AKUN */}
@@ -247,7 +263,7 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = (props) => {
               'Apakah Anda yakin ingin keluar dari akun mitra pengemudi FLEETRA?',
               [
                 { text: 'Batal', style: 'cancel' },
-                { text: 'Keluar', style: 'destructive', onPress: handleBackHome },
+                { text: 'Keluar', style: 'destructive', onPress: logout },
               ]
             )
           }

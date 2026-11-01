@@ -15,10 +15,12 @@ import {
   FileText,
   Info,
   Lock,
+  LogOut,
   Moon,
   Radio,
   RotateCcw,
   Shield,
+  Sparkles,
   Volume2,
   Vibrate,
 } from 'lucide-react-native';
@@ -27,7 +29,7 @@ import { TopBar } from '../components/TopBar';
 import { useApp } from '../context/AppContext';
 
 export const PengaturanAkunScreen: React.FC = () => {
-  const { goBack, settings, toggleSetting } = useApp();
+  const { goBack, settings, toggleSetting, logout, navigateTo } = useApp();
 
   const handleClearCache = () => {
     Alert.alert(
@@ -259,6 +261,26 @@ export const PengaturanAkunScreen: React.FC = () => {
 
             <View style={styles.divider} />
 
+            {/* Onboarding walkthrough */}
+            <TouchableOpacity
+              style={styles.settingActionRow}
+              onPress={() => navigateTo('onboarding')}
+              activeOpacity={0.7}
+            >
+              <View style={styles.iconCircle}>
+                <Sparkles size={16} color={colors.primary} strokeWidth={2.2} />
+              </View>
+              <View style={styles.settingTextGroup}>
+                <Text style={styles.settingTitle}>Buka Panduan Onboarding</Text>
+                <Text style={styles.settingSubtitle}>
+                  Pelajari kembali fitur telematika, e-POD, dan Sewa-Beli RTO.
+                </Text>
+              </View>
+              <ChevronRight size={16} color={colors.textDisabled} strokeWidth={2} />
+            </TouchableOpacity>
+
+            <View style={styles.divider} />
+
             {/* App Info */}
             <View style={styles.settingRow}>
               <View style={styles.iconCircle}>
@@ -273,6 +295,25 @@ export const PengaturanAkunScreen: React.FC = () => {
             </View>
           </View>
         </View>
+
+        {/* LOGOUT BUTTON */}
+        <TouchableOpacity
+          style={styles.logoutBtn}
+          onPress={() =>
+            Alert.alert(
+              'Keluar Akun',
+              'Apakah Anda yakin ingin keluar dari akun mitra pengemudi FLEETRA?',
+              [
+                { text: 'Batal', style: 'cancel' },
+                { text: 'Keluar', style: 'destructive', onPress: logout },
+              ]
+            )
+          }
+          activeOpacity={0.8}
+        >
+          <LogOut size={15} color={colors.dangerDark} strokeWidth={2} style={{ marginRight: 6 }} />
+          <Text style={styles.logoutBtnText}>Keluar dari Akun Mitra</Text>
+        </TouchableOpacity>
       </ScrollView>
     </View>
   );
@@ -351,6 +392,24 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: colors.borderLight,
     marginLeft: 46,
+  },
+  logoutBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: '#FECACA',
+    marginHorizontal: 18,
+    marginTop: 18,
+    marginBottom: 30,
+    height: 46,
+    borderRadius: 12,
+  },
+  logoutBtnText: {
+    fontSize: 12.5,
+    fontWeight: '700',
+    color: colors.dangerDark,
   },
 });
 

@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useMemo, useState } from 'react';
 
 export type ScreenState =
+  | 'onboarding'
+  | 'login'
+  | 'register'
   | 'beranda'
   | 'perjalanan'
   | 'detail-stop'
@@ -98,11 +101,15 @@ const INITIAL_NOTIFICATIONS: NotificationItem[] = [
 ];
 
 interface AppContextType {
-  // Navigation
+  // Navigation & Auth
   currentScreen: ScreenState;
   prevScreen: ScreenState;
   navigateTo: (screen: ScreenState) => void;
   goBack: () => void;
+  isAuthenticated: boolean;
+  login: (emailOrPhone?: string, name?: string) => void;
+  register: (data: Partial<DriverProfile>) => void;
+  logout: () => void;
 
   // Trips & Stops State
   completedStops: number[];
@@ -145,10 +152,11 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Navigation state (Stack-based navigation history)
-  const [history, setHistory] = useState<ScreenState[]>(['beranda']);
-  const currentScreen = history[history.length - 1] || 'beranda';
-  const prevScreen = history.length > 1 ? history[history.length - 2] : 'beranda';
+  // Navigation & Session state (Defaults to onboarding for welcoming first-time experience)
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [history, setHistory] = useState<ScreenState[]>(['onboarding']);
+  const currentScreen = history[history.length - 1] || 'onboarding';
+  const prevScreen = history.length > 1 ? history[history.length - 2] : 'onboarding';
 
   // Trip & e-POD state
   const [completedStops, setCompletedStops] = useState<number[]>([1]);
@@ -205,8 +213,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const navigateTo = (screen: ScreenState) => {
     setHistory((prev) => {
-      // If navigating to a primary tab ('beranda', 'perjalanan', 'profil'), reset sub-screen history
-      if (screen === 'beranda' || screen === 'perjalanan' || screen === 'profil') {
+      // If navigating to standalone flows or primary tabs, reset history stack
+      if (
+        screen === 'onboarding' ||
+        screen === 'login' ||
+        screen === 'register' ||
+        screen === 'beranda' ||
+        screen === 'perjalanan' ||
+        screen === 'profil'
+      ) {
         return [screen];
       }
       // If target screen is already top of stack, don't duplicate
@@ -220,12 +235,31 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const goBack = () => {
     setHistory((prev) => {
       if (prev.length <= 1) {
-        return ['beranda'];
+        return isAuthenticated ? ['beranda'] : ['onboarding'];
       }
       const next = [...prev];
       next.pop(); // Pop current screen
-      return next.length > 0 ? next : ['beranda'];
+      return next.length > 0 ? next : (isAuthenticated ? ['beranda'] : ['onboarding']);
     });
+  };
+
+  const login = (emailOrPhone?: string, name?: string) => {
+    setIsAuthenticated(true);
+    if (name) {
+      setDriverProfile((prev) => ({ ...prev, name }));
+    }
+    navigateTo('beranda');
+  };
+
+  const register = (data: Partial<DriverProfile>) => {
+    setIsAuthenticated(true);
+    setDriverProfile((prev) => ({ ...prev, ...data }));
+    navigateTo('beranda');
+  };
+
+  const logout = () => {
+    setIsAuthenticated(false);
+    setHistory(['login']);
   };
 
   const saveEpodRecord = (record: EpodRecord) => {
@@ -317,6 +351,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     prevScreen,
     navigateTo,
     goBack,
+    isAuthenticated,
+    login,
+    register,
+    logout,
 
     completedStops,
     selectedStopId,
