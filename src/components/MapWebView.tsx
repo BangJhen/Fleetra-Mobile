@@ -250,12 +250,14 @@ export const MapWebView: React.FC<MapWebViewProps> = ({
           </View>
         )}
 
-        {/* Route Badge Overlay (Top Left) */}
+        {/* Route Badge Overlay (Top Left - Floating Navigation HUD) */}
         <View style={styles.routeBadge}>
-          <Navigation size={12} color={colors.primary} strokeWidth={2.5} />
-          <Text style={styles.routeBadgeText}>
-            {distance} • {duration}
-          </Text>
+          <View style={styles.routeBadgeIconCircle}>
+            <Navigation size={11} color={colors.primary} strokeWidth={2.5} />
+          </View>
+          <Text style={styles.routeDistanceText}>{distance.replace(/^\+\s*/, '')}</Text>
+          <View style={styles.routeBadgeDot} />
+          <Text style={styles.routeDurationText}>{duration.replace(/^±\s*/, '')}</Text>
         </View>
 
         {/* Map Controls (Top Right) */}
@@ -280,7 +282,7 @@ export const MapWebView: React.FC<MapWebViewProps> = ({
 const styles = StyleSheet.create({
   container: {
     marginHorizontal: 18,
-    marginTop: 12,
+    marginTop: 14,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: colors.border,
@@ -315,24 +317,44 @@ const styles = StyleSheet.create({
     left: 10,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
-    backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    borderRadius: 20,
     borderWidth: 1,
-    borderColor: colors.border,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    borderColor: 'rgba(226, 232, 240, 0.9)',
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowRadius: 4,
+    elevation: 3,
     zIndex: 5,
   },
-  routeBadgeText: {
-    fontSize: 10.5,
+  routeBadgeIconCircle: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: '#EFF6FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 6,
+  },
+  routeDistanceText: {
+    fontSize: 11,
     fontWeight: '700',
     color: colors.text,
+  },
+  routeBadgeDot: {
+    width: 3,
+    height: 3,
+    borderRadius: 1.5,
+    backgroundColor: colors.textDisabled,
+    marginHorizontal: 6,
+  },
+  routeDurationText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: colors.primary,
   },
   controlsCol: {
     position: 'absolute',

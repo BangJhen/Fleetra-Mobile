@@ -8,11 +8,9 @@ import {
   View,
 } from 'react-native';
 import {
-  Clock,
   Compass,
   Info,
   MessageSquare,
-  Navigation,
   Phone,
 } from 'lucide-react-native';
 import { colors } from '../theme/colors';
@@ -108,28 +106,15 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = (props) => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* 2. TOP DISTANCE & ETA BANNER */}
-        <View style={styles.distanceBanner}>
-          <View style={styles.bannerItem}>
-            <Navigation size={13} color={colors.primary} strokeWidth={2.2} />
-            <Text style={styles.bannerValue}>{stopData.distance}</Text>
-          </View>
-          <View style={styles.bannerDivider} />
-          <View style={styles.bannerItem}>
-            <Clock size={13} color={colors.primary} strokeWidth={2.2} />
-            <Text style={styles.bannerValue}>{stopData.duration}</Text>
-          </View>
-        </View>
-
-        {/* 3. INTERACTIVE WEBVIEW MAP (OpenStreetMap & Leaflet OSRM corridor) */}
+        {/* 2. INTERACTIVE ROUTE MAP (Integrated HUD with live distance & ETA) */}
         <MapWebView
-          height={195}
+          height={215}
           destinationName={stopData.name}
           distance={stopData.distance}
           duration={stopData.duration}
         />
 
-        {/* 4. CURRENT STOP CARD */}
+        {/* 3. CURRENT STOP CARD */}
         <View style={styles.card}>
           <View style={styles.stopHeaderRow}>
             <View style={styles.stopTextGroup}>
@@ -287,36 +272,6 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 40,
-  },
-
-  /* TOP DISTANCE & ETA BANNER */
-  distanceBanner: {
-    flexDirection: 'row',
-    backgroundColor: colors.surface,
-    marginHorizontal: 18,
-    marginTop: 14,
-    borderRadius: 12,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  bannerItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  bannerValue: {
-    fontSize: 12.5,
-    fontWeight: '700',
-    color: colors.primary,
-    marginLeft: 6,
-  },
-  bannerDivider: {
-    width: 1,
-    height: 16,
-    backgroundColor: colors.border,
   },
 
   /* CARDS */
