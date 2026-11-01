@@ -68,13 +68,14 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* 2. DRIVER PROFILE HERO CARD (Interactive: Tap to view profile) */}
-        <TouchableOpacity
-          style={styles.heroCard}
-          onPress={handleProfil}
-          activeOpacity={0.85}
-        >
-          <View style={styles.heroLeft}>
+        {/* 2. DRIVER PROFILE HERO CARD */}
+        <View style={styles.heroCard}>
+          <TouchableOpacity
+            style={styles.heroLeft}
+            onPress={handleProfil}
+            activeOpacity={0.8}
+            accessibilityLabel="Buka Profil Pengemudi"
+          >
             <View style={styles.avatarWrapper}>
               <Image
                 source={require('../../assets/driver-avatar.png')}
@@ -87,25 +88,71 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
               <Text style={styles.driverName}>Budi Santoso</Text>
               <View style={styles.vehicleRow}>
                 <Truck size={12} color={colors.textSecondary} strokeWidth={2} />
-                <Text style={styles.vehicleText}>Gran Max Blind Van • B 9821 KCE</Text>
+                <Text style={styles.vehicleText} numberOfLines={1}>
+                  Gran Max • B 9821 KCE
+                </Text>
               </View>
             </View>
-          </View>
-
-          <TouchableOpacity
-            style={styles.heroStatusBadge}
-            onPress={() => {
-              toggleDriverStatus();
-              Alert.alert(
-                'Status Mitra Pengemudi',
-                `Status Anda kini: ${driverStatus === 'Aktif' ? 'Istirahat (Off-Duty)' : 'Aktif (On-Duty) dan siap menerima tugas perjalanan.'}`
-              );
-            }}
-            activeOpacity={0.7}
-          >
-            <Text style={styles.heroStatusText}>{driverStatus}</Text>
           </TouchableOpacity>
-        </TouchableOpacity>
+
+          {/* DEDICATED ON / OFF DUTY SWITCH BUTTON */}
+          <View style={styles.dutySwitchCol}>
+            <Text style={styles.dutySwitchLabel}>STATUS TUGAS</Text>
+            <TouchableOpacity
+              style={[
+                styles.dutyToggleBtn,
+                driverStatus === 'Aktif'
+                  ? styles.dutyToggleBtnActive
+                  : styles.dutyToggleBtnInactive,
+              ]}
+              onPress={toggleDriverStatus}
+              activeOpacity={0.8}
+              accessibilityRole="switch"
+              accessibilityState={{ checked: driverStatus === 'Aktif' }}
+              accessibilityLabel={`Status kerja ${driverStatus}. Ketuk untuk mengalihkan mode ON/OFF.`}
+            >
+              <View style={styles.dutyStatusLeft}>
+                <View
+                  style={[
+                    styles.statusIndicatorDot,
+                    driverStatus === 'Aktif'
+                      ? styles.statusDotActive
+                      : styles.statusDotInactive,
+                  ]}
+                />
+                <Text
+                  style={[
+                    styles.dutyToggleStatusText,
+                    driverStatus === 'Aktif'
+                      ? styles.dutyToggleStatusTextActive
+                      : styles.dutyToggleStatusTextInactive,
+                  ]}
+                >
+                  {driverStatus === 'Aktif' ? 'ON' : 'OFF'}
+                </Text>
+              </View>
+
+              {/* Physical Switch Track & Thumb */}
+              <View
+                style={[
+                  styles.switchTrack,
+                  driverStatus === 'Aktif'
+                    ? styles.switchTrackActive
+                    : styles.switchTrackInactive,
+                ]}
+              >
+                <View
+                  style={[
+                    styles.switchThumb,
+                    driverStatus === 'Aktif'
+                      ? styles.switchThumbActive
+                      : styles.switchThumbInactive,
+                  ]}
+                />
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
 
         {/* 3. CARD: TUGAS HARI INI */}
         <View style={styles.card}>
@@ -385,18 +432,92 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
     marginLeft: 5,
   },
-  heroStatusBadge: {
-    backgroundColor: colors.surface2,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: colors.border,
+  /* DUTY ON / OFF SWITCH */
+  dutySwitchCol: {
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+    marginLeft: 10,
   },
-  heroStatusText: {
-    fontSize: 10,
-    fontWeight: '600',
-    color: colors.textSecondary,
+  dutySwitchLabel: {
+    fontSize: 9,
+    fontWeight: '800',
+    color: colors.textMuted,
+    letterSpacing: 0.6,
+    marginBottom: 4,
+  },
+  dutyToggleBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 4.5,
+    paddingHorizontal: 8,
+    borderRadius: 20,
+    borderWidth: 1.5,
+    gap: 6,
+  },
+  dutyToggleBtnActive: {
+    backgroundColor: '#F0FDF4',
+    borderColor: '#86EFAC',
+  },
+  dutyToggleBtnInactive: {
+    backgroundColor: '#F8FAFC',
+    borderColor: '#CBD5E1',
+  },
+  dutyStatusLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  statusIndicatorDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+  },
+  statusDotActive: {
+    backgroundColor: '#10B981',
+  },
+  statusDotInactive: {
+    backgroundColor: '#94A3B8',
+  },
+  dutyToggleStatusText: {
+    fontSize: 10.5,
+    fontWeight: '800',
+    letterSpacing: 0.2,
+  },
+  dutyToggleStatusTextActive: {
+    color: '#065F46',
+  },
+  dutyToggleStatusTextInactive: {
+    color: '#64748B',
+  },
+  switchTrack: {
+    width: 26,
+    height: 15,
+    borderRadius: 8,
+    padding: 1.5,
+    justifyContent: 'center',
+  },
+  switchTrackActive: {
+    backgroundColor: '#10B981',
+  },
+  switchTrackInactive: {
+    backgroundColor: '#CBD5E1',
+  },
+  switchThumb: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    backgroundColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.15,
+    shadowRadius: 1,
+    elevation: 1,
+  },
+  switchThumbActive: {
+    alignSelf: 'flex-end',
+  },
+  switchThumbInactive: {
+    alignSelf: 'flex-start',
   },
 
   /* CARD GENERIC */
