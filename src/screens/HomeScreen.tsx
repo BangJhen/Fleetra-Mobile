@@ -9,6 +9,8 @@ import {
   View,
 } from 'react-native';
 import {
+  AlertTriangle,
+  Check,
   ChevronRight,
   ClipboardList,
   Clock,
@@ -83,25 +85,29 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* VERIFICATION ALERT BANNER */}
+        {/* TOP STATUS NOTICE */}
         {isPendingVerification && (
           <View style={styles.verificationBanner}>
-            <View style={styles.verificationBannerDot} />
-            <View style={{ flex: 1 }}>
-              <Text style={styles.verificationBannerTitle}>Akun Menunggu Verifikasi Operator</Text>
+            <View style={styles.verificationBannerIcon}>
+              <Clock size={15} color="#D97706" strokeWidth={2.4} />
+            </View>
+            <View style={styles.verificationBannerContent}>
+              <Text style={styles.verificationBannerTitle}>Akun Dalam Peninjauan</Text>
               <Text style={styles.verificationBannerText}>
-                Dokumen SIM dan pendaftaran Anda sedang ditinjau dispatcher FLEETRA. Rute ritase akan otomatis aktif setelah disetujui.
+                Data pendaftaran sedang divalidasi oleh operator pool.
               </Text>
             </View>
           </View>
         )}
         {isRejectedVerification && (
-          <View style={[styles.verificationBanner, { backgroundColor: '#FFF1F2', borderColor: '#FECDD3' }]}>
-            <View style={[styles.verificationBannerDot, { backgroundColor: '#E11D48' }]} />
-            <View style={{ flex: 1 }}>
-              <Text style={[styles.verificationBannerTitle, { color: '#BE123C' }]}>Pendaftaran Ditolak</Text>
-              <Text style={[styles.verificationBannerText, { color: '#9F1239' }]}>
-                Operator pool logistik menolak pengajuan akun ini. Silakan hubungi dispatcher untuk informasi lebih lanjut.
+          <View style={[styles.verificationBanner, styles.verificationBannerRejected]}>
+            <View style={[styles.verificationBannerIcon, styles.verificationBannerIconRejected]}>
+              <AlertTriangle size={15} color="#E11D48" strokeWidth={2.4} />
+            </View>
+            <View style={styles.verificationBannerContent}>
+              <Text style={[styles.verificationBannerTitle, { color: '#9F1239' }]}>Pendaftaran Ditolak</Text>
+              <Text style={[styles.verificationBannerText, { color: '#BE123C' }]}>
+                Pengajuan belum disetujui. Hubungi kepala pool untuk klarifikasi.
               </Text>
             </View>
           </View>
@@ -189,7 +195,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
           </View>
         </View>
 
-        {/* 3. CARD: TUGAS HARI INI */}
+        {/* 3. CARD: TUGAS HARI INI / STATUS PENGAJUAN */}
         <View style={styles.card}>
           {isPendingVerification ? (
             <>
@@ -198,40 +204,95 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                   <View style={[styles.iconBoxBlue, { backgroundColor: '#F59E0B' }]}>
                     <Clock size={16} color={colors.white} strokeWidth={2.2} />
                   </View>
-                  <Text style={styles.cardTitle}>Status Pendaftaran Mitra</Text>
+                  <Text style={styles.cardTitle}>Status Pengajuan Mitra</Text>
                 </View>
                 <View style={[styles.statusPillNeutral, { backgroundColor: '#FEF3C7' }]}>
                   <Text style={[styles.statusPillNeutralText, { color: '#B45309', fontWeight: '700' }]}>
-                    Menunggu Verifikasi
+                    Dalam Peninjauan
                   </Text>
                 </View>
               </View>
 
-              <View style={[styles.innerTaskBox, { paddingVertical: 18, alignItems: 'center' }]}>
-                <Text style={[styles.tripCode, { fontSize: 15, color: '#B45309', marginBottom: 6 }]}>
-                  Menunggu Persetujuan Operator
+              {/* STRUCTURED ONBOARDING PROGRESS */}
+              <View style={styles.verificationStatusBox}>
+                <View style={styles.verificationStatusHeader}>
+                  <Text style={styles.verificationStatusTitle}>Validasi Berkas & Alokasi Armada</Text>
+                  <Text style={styles.verificationStatusDesc}>
+                    Dispatcher sedang meninjau dokumen SIM dan menyiapkan unit operasional. Rute tugas akan otomatis aktif setelah disetujui.
+                  </Text>
+                </View>
+
+                <View style={styles.stageList}>
+                  <View style={styles.stageItem}>
+                    <View style={styles.stageBadgeDone}>
+                      <Check size={11} color="#16A34A" strokeWidth={2.8} />
+                    </View>
+                    <View style={styles.stageTextWrap}>
+                      <Text style={styles.stageLabel}>Registrasi Akun Mitra</Text>
+                      <Text style={styles.stageSub}>Dokumen SIM & data identitas terkirim</Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.stageConnector} />
+
+                  <View style={styles.stageItem}>
+                    <View style={styles.stageBadgeActive}>
+                      <Clock size={11} color="#D97706" strokeWidth={2.6} />
+                    </View>
+                    <View style={styles.stageTextWrap}>
+                      <Text style={styles.stageLabel}>Persetujuan & Pasang Armada</Text>
+                      <Text style={styles.stageSub}>Penugasan pool atau skema sewa-beli (RTO)</Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+
+              <TouchableOpacity
+                style={styles.refreshStatusBtn}
+                onPress={refreshData}
+                activeOpacity={0.8}
+                accessibilityRole="button"
+                accessibilityLabel="Perbarui status verifikasi mitra"
+              >
+                <RefreshCw size={13} color={colors.primary} strokeWidth={2.2} style={{ marginRight: 6 }} />
+                <Text style={styles.refreshStatusBtnText}>
+                  Periksa Status Terbaru
                 </Text>
-                <Text
-                  style={[
-                    styles.tripRoute,
-                    { textAlign: 'center', color: colors.textSecondary, fontSize: 12.5, lineHeight: 18, paddingHorizontal: 10 },
-                  ]}
-                >
-                  Akun Anda sedang ditinjau oleh dispatcher pool FLEETRA. Setelah data SIM dan armada disetujui, jadwal rute ritase logistik akan otomatis dialokasikan ke akun Anda.
+              </TouchableOpacity>
+            </>
+          ) : isRejectedVerification ? (
+            <>
+              <View style={styles.cardHeader}>
+                <View style={styles.cardHeaderLeft}>
+                  <View style={[styles.iconBoxBlue, { backgroundColor: '#E11D48' }]}>
+                    <AlertTriangle size={16} color={colors.white} strokeWidth={2.2} />
+                  </View>
+                  <Text style={styles.cardTitle}>Status Pengajuan Mitra</Text>
+                </View>
+                <View style={[styles.statusPillNeutral, { backgroundColor: '#FFE4E6' }]}>
+                  <Text style={[styles.statusPillNeutralText, { color: '#BE123C', fontWeight: '700' }]}>
+                    Ditolak
+                  </Text>
+                </View>
+              </View>
+
+              <View style={[styles.verificationStatusBox, { borderColor: '#FECDD3', backgroundColor: '#FFF5F6' }]}>
+                <Text style={[styles.verificationStatusTitle, { color: '#BE123C' }]}>
+                  Pengajuan Belum Disetujui
+                </Text>
+                <Text style={[styles.verificationStatusDesc, { color: '#9F1239', marginTop: 4 }]}>
+                  Operator depo menolak verifikasi berkas ini. Silakan hubungi koordinator pool untuk informasi lebih lanjut.
                 </Text>
               </View>
 
               <TouchableOpacity
-                style={[
-                  styles.primaryActionButton,
-                  { backgroundColor: '#FFFFFF', borderWidth: 1.2, borderColor: '#CBD5E1', marginTop: 8 },
-                ]}
+                style={styles.refreshStatusBtn}
                 onPress={refreshData}
                 activeOpacity={0.8}
               >
-                <RefreshCw size={14} color={colors.primary} strokeWidth={2.2} style={{ marginRight: 8 }} />
-                <Text style={[styles.primaryActionText, { color: colors.text, fontWeight: '600' }]}>
-                  Perbarui Status Verifikasi
+                <RefreshCw size={13} color={colors.primary} strokeWidth={2.2} style={{ marginRight: 6 }} />
+                <Text style={styles.refreshStatusBtnText}>
+                  Muat Ulang Status
                 </Text>
               </TouchableOpacity>
             </>
@@ -336,30 +397,27 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
                 </View>
               </View>
 
-              <View style={[styles.innerTaskBox, { paddingVertical: 18, alignItems: 'center' }]}>
-                <Text style={[styles.tripCode, { fontSize: 15, color: colors.text, marginBottom: 6 }]}>
+              <View style={[styles.innerTaskBox, { paddingVertical: 14, alignItems: 'center' }]}>
+                <Text style={[styles.tripCode, { fontSize: 14, color: colors.text, marginBottom: 4 }]}>
                   Belum Ada Penugasan Aktif
                 </Text>
                 <Text
                   style={[
                     styles.tripRoute,
-                    { textAlign: 'center', color: colors.textSecondary, fontSize: 12.5, lineHeight: 18, paddingHorizontal: 10 },
+                    { textAlign: 'center', color: colors.textSecondary, fontSize: 12, lineHeight: 17, paddingHorizontal: 12 },
                   ]}
                 >
-                  Saat dispatcher FLEETRA menetapkan rute ritase baru untuk akun Anda, detail perjalanan dan titik pengantaran e-POD akan otomatis muncul di sini.
+                  Armada siaga. Detail rute ritase baru dari dispatcher akan otomatis muncul di sini.
                 </Text>
               </View>
 
               <TouchableOpacity
-                style={[
-                  styles.primaryActionButton,
-                  { backgroundColor: '#FFFFFF', borderWidth: 1.2, borderColor: '#CBD5E1', marginTop: 8 },
-                ]}
+                style={styles.refreshStatusBtn}
                 onPress={refreshData}
                 activeOpacity={0.8}
               >
-                <RefreshCw size={14} color={colors.primary} strokeWidth={2.2} style={{ marginRight: 8 }} />
-                <Text style={[styles.primaryActionText, { color: colors.text, fontWeight: '600' }]}>
+                <RefreshCw size={13} color={colors.primary} strokeWidth={2.2} style={{ marginRight: 6 }} />
+                <Text style={styles.refreshStatusBtnText}>
                   Perbarui Status Penugasan
                 </Text>
               </TouchableOpacity>
@@ -902,33 +960,139 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
     marginTop: 2,
   },
+  /* TOP STATUS NOTICE */
   verificationBanner: {
     flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFBEB',
+    borderWidth: 1,
+    borderColor: '#FEF08A',
+    borderRadius: 14,
+    marginHorizontal: 18,
+    marginTop: 14,
+    paddingHorizontal: 13,
+    paddingVertical: 10,
+    gap: 11,
+  },
+  verificationBannerRejected: {
+    backgroundColor: '#FFF1F2',
+    borderColor: '#FECDD3',
+  },
+  verificationBannerIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 8,
+    backgroundColor: '#FEF3C7',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  verificationBannerIconRejected: {
+    backgroundColor: '#FFE4E6',
+  },
+  verificationBannerContent: {
+    flex: 1,
+  },
+  verificationBannerTitle: {
+    fontSize: 12.5,
+    fontWeight: '700',
+    color: '#92400E',
+    letterSpacing: -0.1,
+  },
+  verificationBannerText: {
+    fontSize: 11,
+    color: '#B45309',
+    lineHeight: 15,
+    marginTop: 1,
+  },
+
+  /* STRUCTURED ONBOARDING CARD BODY */
+  verificationStatusBox: {
+    backgroundColor: '#F8FAFC',
+    borderRadius: 13,
+    padding: 13,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    marginBottom: 12,
+  },
+  verificationStatusHeader: {
+    marginBottom: 11,
+  },
+  verificationStatusTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: colors.text,
+    letterSpacing: -0.1,
+  },
+  verificationStatusDesc: {
+    fontSize: 11.5,
+    color: colors.textSecondary,
+    lineHeight: 16,
+    marginTop: 3,
+  },
+  stageList: {
+    marginTop: 2,
+    gap: 0,
+  },
+  stageItem: {
+    flexDirection: 'row',
     alignItems: 'flex-start',
+  },
+  stageBadgeDone: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: '#DCFCE7',
+    borderWidth: 1,
+    borderColor: '#86EFAC',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 1,
+  },
+  stageBadgeActive: {
+    width: 18,
+    height: 18,
+    borderRadius: 9,
     backgroundColor: '#FEF3C7',
     borderWidth: 1,
     borderColor: '#FDE68A',
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 12,
-    gap: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 1,
   },
-  verificationBannerDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#D97706',
-    marginTop: 5,
+  stageConnector: {
+    width: 1.5,
+    height: 12,
+    backgroundColor: '#CBD5E1',
+    marginLeft: 8.25,
+    marginVertical: 1,
   },
-  verificationBannerTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#92400E',
-    marginBottom: 2,
+  stageTextWrap: {
+    marginLeft: 9,
+    flex: 1,
   },
-  verificationBannerText: {
+  stageLabel: {
     fontSize: 11.5,
-    color: '#B45309',
-    lineHeight: 16,
+    fontWeight: '700',
+    color: colors.text,
+  },
+  stageSub: {
+    fontSize: 10.5,
+    color: colors.textMuted,
+    marginTop: 1,
+  },
+  refreshStatusBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1.2,
+    borderColor: '#CBD5E1',
+    borderRadius: 12,
+    paddingVertical: 10,
+  },
+  refreshStatusBtnText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.text,
   },
 });
