@@ -448,43 +448,31 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
           <View style={styles.emptyTripCard}>
             {/* Top Status Pill */}
             <View style={styles.emptyStatusPill}>
-              <View style={styles.emptyStatusDot} />
-              <Text style={styles.emptyStatusPillText}>Status Armada: Siaga</Text>
+              <Text style={styles.emptyStatusPillText}>Armada Siaga</Text>
             </View>
 
             {/* Centered Graphic Icon */}
             <View style={styles.emptyIconCircle}>
-              <Milestone size={26} color={colors.primary} strokeWidth={2.2} />
+              <Milestone size={24} color={colors.primary} strokeWidth={2.2} />
             </View>
 
             {/* Typography */}
-            <Text style={styles.emptyTitle}>Belum Ada Penugasan Aktif</Text>
+            <Text style={styles.emptyTitle}>Belum Ada Penugasan</Text>
             <Text style={styles.emptyDescription}>
-              Saat dispatcher FLEETRA menetapkan jadwal rute pengantaran baru untuk akun Anda, rute perjalanan, titik singgah, dan formulir e-POD akan otomatis muncul di sini.
+              Rute penugasan baru dari dispatcher akan otomatis muncul di sini.
             </Text>
-
-            {/* System Info Box */}
-            <View style={styles.emptyInfoBox}>
-              <View style={styles.emptyInfoRow}>
-                <Text style={styles.emptyInfoLabel}>Koneksi Pusat Kendali</Text>
-                <Text style={styles.emptyInfoValue}>Tersinkron Real-time</Text>
-              </View>
-              <View style={styles.emptyInfoDivider} />
-              <View style={styles.emptyInfoRow}>
-                <Text style={styles.emptyInfoLabel}>Mitra Pengemudi</Text>
-                <Text style={styles.emptyInfoValue}>{driverProfile.name || 'Mitra Aktif'}</Text>
-              </View>
-            </View>
 
             {/* Refresh Action Button */}
             <TouchableOpacity
               style={styles.emptyRefreshButton}
               onPress={refreshData}
               activeOpacity={0.8}
+              accessibilityRole="button"
+              accessibilityLabel="Periksa status penugasan"
             >
-              <RefreshCw size={14} color={colors.primary} strokeWidth={2.2} style={{ marginRight: 8 }} />
+              <RefreshCw size={13} color={colors.primary} strokeWidth={2.2} style={{ marginRight: 6 }} />
               <Text style={styles.emptyRefreshButtonText}>
-                Muat Ulang Status Penugasan
+                Perbarui Penugasan
               </Text>
             </TouchableOpacity>
           </View>
@@ -844,85 +832,47 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   emptyStatusPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
     borderRadius: 20,
     backgroundColor: '#F1F5F9',
     marginBottom: 16,
-    gap: 6,
-  },
-  emptyStatusDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#10B981',
   },
   emptyStatusPillText: {
-    fontSize: 11,
-    fontWeight: '600',
+    fontSize: 11.5,
+    fontWeight: '700',
     color: '#475569',
+    letterSpacing: 0.2,
   },
   emptyIconCircle: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     backgroundColor: '#EFF6FF',
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: '#DBEAFE',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 14,
   },
   emptyTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
     color: colors.text,
     textAlign: 'center',
-    marginBottom: 6,
+    marginBottom: 5,
   },
   emptyDescription: {
-    fontSize: 12.5,
+    fontSize: 12,
     color: colors.textSecondary,
     textAlign: 'center',
-    lineHeight: 18,
-    marginBottom: 18,
-    paddingHorizontal: 8,
-  },
-  emptyInfoBox: {
-    width: '100%',
-    backgroundColor: '#F8FAFC',
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    marginBottom: 18,
-  },
-  emptyInfoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 3,
-  },
-  emptyInfoDivider: {
-    height: 1,
-    backgroundColor: '#EDF2F7',
-    marginVertical: 3,
-  },
-  emptyInfoLabel: {
-    fontSize: 11.5,
-    color: colors.textMuted,
-  },
-  emptyInfoValue: {
-    fontSize: 11.5,
-    fontWeight: '600',
-    color: colors.text,
+    lineHeight: 17,
+    marginBottom: 20,
+    paddingHorizontal: 12,
   },
   emptyRefreshButton: {
     width: '100%',
-    height: 44,
+    height: 42,
     backgroundColor: '#FFFFFF',
     borderWidth: 1.2,
     borderColor: '#CBD5E1',
