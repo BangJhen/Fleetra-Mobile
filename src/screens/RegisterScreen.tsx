@@ -20,24 +20,29 @@ import {
   EyeOff,
   FileText,
   Lock,
+  Mail,
   Phone,
+  Truck,
   User,
 } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 import { useApp } from '../context/AppContext';
 
 export const RegisterScreen: React.FC = () => {
-  const { register, navigateTo } = useApp();
+  const { register, navigateTo, vehicle, driverProfile } = useApp();
 
   const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [simNumber, setSimNumber] = useState('');
+  const [vehicleModel, setVehicleModel] = useState('');
+  const [vehiclePlate, setVehiclePlate] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!name.trim()) {
       Alert.alert('Nama Wajib', 'Harap masukkan nama lengkap Anda sesuai KTP/SIM.');
       return;
@@ -50,6 +55,14 @@ export const RegisterScreen: React.FC = () => {
       Alert.alert('Nomor SIM Wajib', 'Harap masukkan nomor SIM pengemudi Anda.');
       return;
     }
+    if (!vehicleModel.trim()) {
+      Alert.alert('Model Kendaraan Wajib', 'Harap masukkan tipe/model kendaraan yang Anda kemudikan.');
+      return;
+    }
+    if (!vehiclePlate.trim()) {
+      Alert.alert('Nomor Pelat Wajib', 'Harap masukkan nomor pelat nomor kendaraan Anda.');
+      return;
+    }
     if (!password.trim() || password.length < 6) {
       Alert.alert('Kata Sandi Terlalu Pendek', 'Kata sandi minimal 6 karakter.');
       return;
@@ -60,20 +73,31 @@ export const RegisterScreen: React.FC = () => {
     }
 
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      register({
+    try {
+      const userEmail =
+        email.trim() || `${name.trim().toLowerCase().replace(/\s+/g, '.')}@fleetra.id`;
+
+      await register({
         name: name.trim(),
+        email: userEmail,
         phone: phone.trim(),
         simNumber: simNumber.trim(),
-        vehicleModel: 'Daihatsu Gran Max Blind Van 1.3L (RTO)',
-        vehiclePlate: 'B 9821 KCE',
+        vehicleModel: vehicleModel.trim(),
+        vehiclePlate: vehiclePlate.trim().toUpperCase(),
+        password: password.trim(),
       });
       Alert.alert(
         'Pendaftaran Berhasil!',
         `Selamat datang mitra ${name.trim()}! Akun kemitraan armada Anda telah aktif.`
       );
-    }, 600);
+    } catch (err) {
+      Alert.alert(
+        'Pendaftaran Gagal',
+        err instanceof Error ? err.message : 'Silakan periksa data pendaftaran Anda.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -128,6 +152,23 @@ export const RegisterScreen: React.FC = () => {
             </View>
           </View>
 
+          {/* INPUT: EMAIL */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>Email Mitra (Opsional / Otomatis)</Text>
+            <View style={styles.inputContainer}>
+              <Mail size={16} color={colors.textMuted} strokeWidth={2} style={styles.inputIcon} />
+              <TextInput
+                style={styles.textInput}
+                placeholder="nama@fleetra.id"
+                placeholderTextColor={colors.textDisabled}
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+            </View>
+          </View>
+
           {/* INPUT: NO HANDPHONE */}
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>No. Handphone / WhatsApp</Text>
@@ -151,10 +192,41 @@ export const RegisterScreen: React.FC = () => {
               <FileText size={16} color={colors.textMuted} strokeWidth={2} style={styles.inputIcon} />
               <TextInput
                 style={styles.textInput}
-                placeholder="Nomor SIM pengemudi"
+                placeholder="Contoh: 9204-1284-9012"
                 placeholderTextColor={colors.textDisabled}
                 value={simNumber}
                 onChangeText={setSimNumber}
+                autoCapitalize="characters"
+              />
+            </View>
+          </View>
+
+          {/* INPUT: MODEL KENDARAAN */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>Model Kendaraan Mitra</Text>
+            <View style={styles.inputContainer}>
+              <Truck size={16} color={colors.textMuted} strokeWidth={2} style={styles.inputIcon} />
+              <TextInput
+                style={styles.textInput}
+                placeholder="Contoh: Daihatsu Gran Max Blind Van"
+                placeholderTextColor={colors.textDisabled}
+                value={vehicleModel}
+                onChangeText={setVehicleModel}
+              />
+            </View>
+          </View>
+
+          {/* INPUT: NOMOR PELAT KENDARAAN */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>Nomor Pelat Polisi</Text>
+            <View style={styles.inputContainer}>
+              <Truck size={16} color={colors.textMuted} strokeWidth={2} style={styles.inputIcon} />
+              <TextInput
+                style={styles.textInput}
+                placeholder="Contoh: D 8124 FTR"
+                placeholderTextColor={colors.textDisabled}
+                value={vehiclePlate}
+                onChangeText={(t) => setVehiclePlate(t.toUpperCase())}
                 autoCapitalize="characters"
               />
             </View>

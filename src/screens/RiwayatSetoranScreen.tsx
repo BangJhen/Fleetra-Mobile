@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Alert,
   ScrollView,
@@ -31,86 +31,101 @@ interface DepositTransaction {
   notes: string;
 }
 
-const DEPOSIT_HISTORY: DepositTransaction[] = [
-  {
-    id: 'tx-089',
-    tripCode: '#TRIP-2026-089',
-    route: '4 Titik Pengantaran',
-    date: 'Hari ini',
-    time: '08:15 WIB',
-    group: 'hari-ini',
-    stopsCount: 4,
-    amount: 50000,
-    status: 'proses',
-    notes: 'Estimasi setoran ritase aktif hari ini',
-  },
-  {
-    id: 'tx-088',
-    tripCode: '#TRIP-2026-088',
-    route: 'Padalarang (4 Stop)',
-    date: '31 Okt 2026',
-    time: '17:40 WIB',
-    group: 'bulan-ini',
-    stopsCount: 4,
-    amount: 45000,
-    status: 'selesai',
-    notes: 'Terpotong otomatis via e-POD terverifikasi',
-  },
-  {
-    id: 'tx-087',
-    tripCode: '#TRIP-2026-087',
-    route: 'Buah Batu (6 Stop)',
-    date: '28 Okt 2026',
-    time: '16:15 WIB',
-    group: 'bulan-ini',
-    stopsCount: 6,
-    amount: 60000,
-    status: 'selesai',
-    notes: 'Terpotong otomatis via e-POD terverifikasi',
-  },
-  {
-    id: 'tx-086',
-    tripCode: '#TRIP-2026-086',
-    route: 'Cibiru & Ujungberung (7 Stop)',
-    date: '26 Okt 2026',
-    time: '18:00 WIB',
-    group: 'bulan-ini',
-    stopsCount: 7,
-    amount: 75000,
-    status: 'selesai',
-    notes: 'Bonus ritase kargo jam sibuk sore',
-  },
-  {
-    id: 'tx-085',
-    tripCode: '#TRIP-2026-085',
-    route: 'Pasirkaliki (5 Stop)',
-    date: '24 Okt 2026',
-    time: '15:30 WIB',
-    group: 'bulan-ini',
-    stopsCount: 5,
-    amount: 50000,
-    status: 'selesai',
-    notes: 'Terpotong otomatis via e-POD terverifikasi',
-  },
-  {
-    id: 'tx-084',
-    tripCode: '#TRIP-2026-084',
-    route: 'Dago & Cihampelas (6 Stop)',
-    date: '22 Okt 2026',
-    time: '17:10 WIB',
-    group: 'bulan-ini',
-    stopsCount: 6,
-    amount: 65000,
-    status: 'selesai',
-    notes: 'Terpotong otomatis via e-POD terverifikasi',
-  },
-];
-
 export const RiwayatSetoranScreen: React.FC = () => {
-  const { goBack, driverProfile, rtoPercent } = useApp();
+  const {
+    goBack,
+    driverProfile,
+    rtoPercent,
+    rtoPaid,
+    rtoTotal,
+    rtoRemaining,
+    rtoContract,
+    rtoLedger,
+    activeTrip,
+    completedTrips,
+  } = useApp();
   const [filterPeriod, setFilterPeriod] = useState<'semua' | 'bulan-ini' | 'bulan-lalu'>('semua');
 
-  const filteredTransactions = DEPOSIT_HISTORY.filter((tx) => {
+  const formatRupiah = (val: number) => {
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      maximumFractionDigits: 0,
+    }).format(val);
+  };
+
+  const depositTransactions = useMemo<DepositTransaction[]>(() => {
+    if (!rtoLedger || rtoLedger.length === 0) {
+      if (activeTrip) {
+        return [
+          {
+            id: `tx-${activeTrip.id}`,
+            tripCode: `#${activeTrip.code}`,
+            route: `${activeTrip.stops.length} Titik Pengantaran`,
+            date: 'Hari ini',
+            time: new Date(activeTrip.createdAt).toLocaleTimeString('id-ID', {
+              hour: '2-digit',
+              minute: '2-digit',
+            }) + ' WIB',
+            group: 'hari-ini',
+            stopsCount: activeTrip.stops.length,
+            amount: 50000,
+            status: activeTrip.status === 'completed' ? 'selesai' : 'proses',
+            notes:
+              activeTrip.status === 'completed'
+                ? 'Terpotong otomatis via e-POD terverifikasi'
+                : 'Estimasi setoran ritase aktif hari ini',
+          },
+        ];
+      }
+      return [];
+    }
+
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    return rtoLedger.map((item, idx) => {
+      const itemDate = new Date(item.at);
+      const isToday =
+        itemDate.getDate() === now.getDate() &&
+        itemDate.getMonth() === currentMonth &&
+        itemDate.getFullYear() === currentYear;
+      const isThisMonth =
+        itemDate.getMonth() === currentMonth && itemDate.getFullYear() === currentYear;
+
+      let group: 'hari-ini' | 'bulan-ini' | 'bulan-lalu' = 'bulan-ini';
+      if (isToday) group = 'hari-ini';
+      else if (isThisMonth) group = 'bulan-ini';
+      else group = 'bulan-lalu';
+
+      const dateStr = isToday
+        ? 'Hari ini'
+        : itemDate.toLocaleDateString('id-ID', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+          });
+      const timeStr =
+        itemDate.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) +
+        ' WIB';
+
+      return {
+        id: item.id || `tx-${idx}`,
+        tripCode: `#${item.tripId || `TRIP-2026-${String(idx + 85).padStart(3, '0')}`}`,
+        route: 'Titik Pengantaran Logistik',
+        date: dateStr,
+        time: timeStr,
+        group,
+        stopsCount: 4,
+        amount: item.amount || 50000,
+        status: 'selesai',
+        notes: item.note || 'Terpotong otomatis via e-POD terverifikasi',
+      };
+    });
+  }, [rtoLedger, activeTrip]);
+
+  const filteredTransactions = depositTransactions.filter((tx) => {
     if (filterPeriod === 'semua') return true;
     if (filterPeriod === 'bulan-ini') return tx.group === 'hari-ini' || tx.group === 'bulan-ini';
     if (filterPeriod === 'bulan-lalu') return tx.group === 'bulan-lalu';
@@ -120,10 +135,17 @@ export const RiwayatSetoranScreen: React.FC = () => {
   const todayTx = filteredTransactions.filter((tx) => tx.group === 'hari-ini');
   const pastTx = filteredTransactions.filter((tx) => tx.group !== 'hari-ini');
 
+  // Month sum calculation
+  const thisMonthTotal = useMemo(() => {
+    return depositTransactions
+      .filter((t) => t.group === 'hari-ini' || t.group === 'bulan-ini')
+      .reduce((sum, t) => sum + t.amount, 0);
+  }, [depositTransactions]);
+
   const handleDownloadReport = () => {
     Alert.alert(
       'Unduh Rekap Mutasi RTO',
-      'Laporan mutasi setoran sewa-beli armada (Oktober 2026) berhasil diproses dan dikirim ke email terdaftar pengemudi.',
+      `Laporan mutasi setoran sewa-beli armada ${driverProfile.vehiclePlate} berhasil diproses dan dikirim ke server.`,
       [{ text: 'Tutup' }]
     );
   };
@@ -131,7 +153,7 @@ export const RiwayatSetoranScreen: React.FC = () => {
   const handleTxDetail = (tx: DepositTransaction) => {
     Alert.alert(
       `Rincian ${tx.tripCode}`,
-      `Pengantaran: ${tx.route}\nWaktu: ${tx.date} (${tx.time})\nNilai Ekuitas: Rp ${tx.amount.toLocaleString('id-ID')}\nStatus: ${
+      `Pengantaran: ${tx.route}\nWaktu: ${tx.date} (${tx.time})\nNilai Ekuitas: ${formatRupiah(tx.amount)}\nStatus: ${
         tx.status === 'selesai' ? 'Selesai (Masuk Ekuitas)' : 'Diproses (Menunggu e-POD)'
       }\nCatatan: ${tx.notes}`,
       [{ text: 'Tutup' }]
@@ -141,10 +163,18 @@ export const RiwayatSetoranScreen: React.FC = () => {
   const handleRtoInfo = () => {
     Alert.alert(
       'Tentang Skema RTO FLEETRA',
-      'Sistem Rent-to-Own mengalokasikan pemotongan otomatis per-ritase kargo (Pay-per-Trip) untuk kepemilikan armada.\n\nSetelah 36 bulan (3 tahun), kepemilikan armada (BPKB & STNK) dialihkan sepenuhnya ke mitra pengemudi.',
+      'Sistem Rent-to-Own mengalokasikan pemotongan otomatis per-ritase kargo (Pay-per-Trip) untuk kepemilikan armada.\n\nSetelah tenor tuntas, kepemilikan armada (BPKB & STNK) dialihkan sepenuhnya ke mitra pengemudi.',
       [{ text: 'Mengerti' }]
     );
   };
+
+  const monthsRemaining = rtoContract
+    ? Math.max(
+        0,
+        (rtoContract.tenureMonths ?? rtoContract.months ?? 36) -
+          (rtoContract.monthsPaid ?? rtoContract.elapsed ?? 23)
+      )
+    : 13;
 
   return (
     <View style={styles.container}>
@@ -170,29 +200,33 @@ export const RiwayatSetoranScreen: React.FC = () => {
               onPress={handleRtoInfo}
               activeOpacity={0.7}
             >
-              <Text style={styles.tenorPillText}>Tenor Bln 23/36</Text>
+              <Text style={styles.tenorPillText}>
+                {rtoContract
+                  ? `Tenor Bln ${rtoContract.monthsPaid}/${rtoContract.tenureMonths}`
+                  : 'Belum Ada Kontrak'}
+              </Text>
               <HelpCircle size={13} color={colors.textMuted} strokeWidth={2} style={{ marginLeft: 3 }} />
             </TouchableOpacity>
           </View>
 
           {/* Large Clean Balance */}
           <View style={styles.assetAmountRow}>
-            <Text style={styles.assetAmountBold}>Rp 194.400.000</Text>
+            <Text style={styles.assetAmountBold}>{formatRupiah(rtoPaid)}</Text>
             <Text style={styles.pctText}>({rtoPercent.toString().replace('.', ',')}%)</Text>
           </View>
 
           {/* Minimalist Progress Bar */}
           <View style={styles.progressTrack}>
-            <View style={[styles.progressFill, { width: `${rtoPercent}%` }]} />
+            <View style={[styles.progressFill, { width: `${Math.min(100, Math.max(0, rtoPercent))}%` }]} />
           </View>
 
           {/* Clean Sub-details */}
           <View style={styles.milestoneRow}>
             <Text style={styles.milestoneText}>
-              Target: <Text style={styles.milestoneBold}>Rp 300.000.000</Text>
+              Target: <Text style={styles.milestoneBold}>{formatRupiah(rtoTotal)}</Text>
             </Text>
             <Text style={styles.milestoneText}>
-              Sisa: <Text style={styles.milestoneBold}>Rp 105.600.000</Text> (13 Bln)
+              Sisa: <Text style={styles.milestoneBold}>{formatRupiah(rtoRemaining)}</Text> ({monthsRemaining} Bln)
             </Text>
           </View>
 
@@ -205,16 +239,20 @@ export const RiwayatSetoranScreen: React.FC = () => {
           </View>
         </View>
 
-        {/* 3. CALM TWIN STATS CARDS (NO LOUD COLORS) */}
+        {/* 3. CALM TWIN STATS CARDS */}
         <View style={styles.twinStatsRow}>
           <View style={styles.statCard}>
-            <Text style={styles.statLabel}>Bulan Ini (Okt)</Text>
-            <Text style={styles.statValue}>Rp 4.250.000</Text>
+            <Text style={styles.statLabel}>Bulan Berjalan</Text>
+            <Text style={styles.statValue}>
+              {formatRupiah(thisMonthTotal)}
+            </Text>
           </View>
 
           <View style={styles.statCard}>
             <Text style={styles.statLabel}>Ritase Logistik</Text>
-            <Text style={styles.statValue}>18 Trip</Text>
+            <Text style={styles.statValue}>
+              {completedTrips.length > 0 ? `${completedTrips.length} Selesai` : `${depositTransactions.length} Trip`}
+            </Text>
           </View>
         </View>
 
@@ -293,7 +331,7 @@ export const RiwayatSetoranScreen: React.FC = () => {
 
         {pastTx.length > 0 && (
           <View style={styles.txGroupSection}>
-            <Text style={styles.groupHeaderTitle}>OKTOBER 2026</Text>
+            <Text style={styles.groupHeaderTitle}>MUTASI SEBELUMNYA</Text>
             <View style={styles.txGroupCard}>
               {pastTx.map((tx, idx) => {
                 const isLast = idx === pastTx.length - 1;

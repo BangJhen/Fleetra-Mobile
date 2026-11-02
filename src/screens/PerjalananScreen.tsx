@@ -16,6 +16,7 @@ import {
   MapPin,
   Milestone,
   Play,
+  RefreshCw,
 } from 'lucide-react-native';
 import { colors } from '../theme/colors';
 import { useApp } from '../context/AppContext';
@@ -70,14 +71,18 @@ const PAST_TRIPS = [
 
 export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
   const {
-    completedStops: contextCompletedStops,
     activeTripTab,
     setActiveTripTab,
     setSelectedStopId,
     isTripCompleted,
     completeEntireTrip,
     navigateTo,
-    hasUnreadNotifications,
+    activeTrip,
+    completedTrips,
+    refreshData,
+    driverProfile,
+    stops: backendStops,
+    completedStops: contextCompletedStops,
   } = useApp();
 
   const completedStops = props.completedStops || contextCompletedStops;
@@ -92,11 +97,44 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
   };
 
   const activeSegmentTab = activeTripTab;
+  const [historyPage, setHistoryPage] = useState<number>(1);
+  const historyPageSize = 5;
 
+  // Stops list computed from real backend stops
+  const stops: StopItem[] = useMemo(() => {
+    if (!backendStops || backendStops.length === 0) return [];
+    const firstPendingIndex = backendStops.findIndex((s) => s.status !== 'delivered');
+
+    return backendStops.map((s, idx) => {
+      let itemStatus: 'selesai' | 'tujuan_saat_ini' | 'berikutnya' | 'menunggu' = 'menunggu';
+      if (s.status === 'delivered') {
+        itemStatus = 'selesai';
+      } else if (idx === firstPendingIndex) {
+        itemStatus = 'tujuan_saat_ini';
+      } else if (idx === firstPendingIndex + 1) {
+        itemStatus = 'berikutnya';
+      } else {
+        itemStatus = 'menunggu';
+      }
+
+      return {
+        id: idx + 1,
+        name: s.name,
+        address: s.address,
+        status: itemStatus,
+        time: s.epod?.at
+          ? new Date(s.epod.at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+          : undefined,
+        distance: `${(idx * 3.5 + 1.2).toFixed(1)} km`,
+      };
+    });
+  }, [backendStops]);
+
+  const totalStopsCount = stops.length || 1;
   const completedCount = completedStops.length;
-  const progressPercent = Math.min(Math.round((completedCount / 4) * 100), 100);
-  const isAllCompleted = completedCount >= 4 || isTripCompleted;
-  const nextActiveStopId = [1, 2, 3, 4].find((id) => !completedStops.includes(id)) || 4;
+  const progressPercent = Math.min(Math.round((completedCount / totalStopsCount) * 100), 100);
+  const isAllCompleted = completedCount >= totalStopsCount || isTripCompleted;
+  const nextActiveStopId = stops.find((s) => s.status === 'tujuan_saat_ini')?.id || (completedCount < totalStopsCount ? completedCount + 1 : totalStopsCount);
 
   const handleStopPress = (stop: StopItem) => {
     if (stop.status === 'tujuan_saat_ini' || stop.status === 'selesai') {
@@ -110,68 +148,26 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
     }
   };
 
-  // Stop list based on mockup
-  const stops: StopItem[] = [
-    {
-      id: 1,
-      name: 'Gudang Logistik Cimahi',
-      address: 'Jl. Industri No. 12, Cimahi',
-      status: completedStops.includes(1) ? 'selesai' : 'tujuan_saat_ini',
-      time: '08.10',
-    },
-    {
-      id: 2,
-      name: 'Toko Sumber Rejeki',
-      address: 'Jl. Sudirman No. 45, Bandung',
-      status: completedStops.includes(2)
-        ? 'selesai'
-        : completedStops.includes(1)
-        ? 'tujuan_saat_ini'
-        : 'berikutnya',
-      time: completedStops.includes(2) ? '09.15' : undefined,
-    },
-    {
-      id: 3,
-      name: 'Minimarket Sejahtera',
-      address: 'Jl. Flyover Pasirkoja, Bandung',
-      status: completedStops.includes(3)
-        ? 'selesai'
-        : completedStops.includes(2)
-        ? 'tujuan_saat_ini'
-        : 'berikutnya',
-      time: completedStops.includes(3) ? '10.30' : undefined,
-    },
-    {
-      id: 4,
-      name: 'Toko Makmur Jaya',
-      address: 'Jl. Peta No. 88, Bandung',
-      status: completedStops.includes(4)
-        ? 'selesai'
-        : completedStops.includes(3)
-        ? 'tujuan_saat_ini'
-        : 'menunggu',
-      time: completedStops.includes(4) ? '11.45' : undefined,
-    },
-  ];
-
+  // Past trips computed from real database completed trips
   const pastTripsList = useMemo(() => {
-    if (isTripCompleted || completedCount >= 4) {
-      return [
-        {
-          id: 'TRIP-2026-089',
-          date: 'Hari ini, 01 Nov 2026',
-          route: 'Gudang Cimahi → 4 Titik Bandung Kota',
-          distance: '28,4 km',
-          duration: '1j 15m',
-          status: 'Selesai',
-          rtoContribution: 'Rp 50.000',
-          stops: 4,
-        },
-        ...PAST_TRIPS,
-      ];
+    if (completedTrips && completedTrips.length > 0) {
+      return completedTrips.map((t) => ({
+        id: t.code,
+        date: new Date(t.completedAt || t.createdAt).toLocaleDateString('id-ID', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+        }),
+        route: t.stops.length > 0 ? `${t.stops[0].name} → ${t.stops[t.stops.length - 1].name}` : 'Rute Penugasan',
+        distance: `${t.distance} km`,
+        duration: `${t.duration} menit`,
+        status: 'Selesai',
+        rtoContribution: 'Rp 45.000',
+        stops: t.stops.length,
+      }));
     }
-    return PAST_TRIPS;
-  }, [isTripCompleted, completedCount]);
+    return [];
+  }, [completedTrips]);
 
   return (
     <View style={styles.container}>
@@ -228,28 +224,35 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
         </View>
 
         {activeSegmentTab === 'aktif' ? (
-          <>
-            {/* 4. ACTIVE TRIP CARD */}
-            <View style={styles.tripCard}>
-              {/* Card Header */}
-              <View style={styles.tripHeaderRow}>
-                <Text style={styles.tripCode}>#TRIP-2026-089</Text>
+          activeTrip ? (
+            <>
+              {/* 4. ACTIVE TRIP CARD */}
+              <View style={styles.tripCard}>
+                {/* Card Header */}
+                <View style={styles.tripHeaderRow}>
+                  <Text style={styles.tripCode}>#{activeTrip.code}</Text>
 
                 <View style={styles.statusPillNeutral}>
                   <Text style={styles.statusPillNeutralText}>
-                    {isAllCompleted ? 'Ritase Selesai' : 'Dalam Perjalanan'}
+                    {isAllCompleted ? 'Ritase Selesai' : activeTrip?.status === 'assigned' ? 'Menunggu Dimulai' : 'Dalam Perjalanan'}
                   </Text>
                 </View>
               </View>
 
-              <Text style={styles.tripRoute}>Gudang Cimahi → 4 Titik Bandung Kota</Text>
+              <Text style={styles.tripRoute}>
+                {stops.length > 0 ? `${stops[0].name} → ${stops.length - 1} Titik Pengantaran` : 'Rute Penugasan Belum Tersedia'}
+              </Text>
 
               {/* 3-Column Metrics */}
               <View style={styles.metricsBox}>
                 <View style={styles.metricCol}>
                   <View style={styles.metricIconRow}>
                     <Clock size={13} color={colors.primary} strokeWidth={2.2} />
-                    <Text style={styles.metricValue}>08.00 WIB</Text>
+                    <Text style={styles.metricValue}>
+                      {activeTrip?.startedAt
+                        ? new Date(activeTrip.startedAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB'
+                        : '08.00 WIB'}
+                    </Text>
                   </View>
                   <Text style={styles.metricLabel}>Waktu Mulai</Text>
                 </View>
@@ -259,7 +262,7 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
                 <View style={styles.metricCol}>
                   <View style={styles.metricIconRow}>
                     <MapPin size={13} color={colors.primary} strokeWidth={2.2} />
-                    <Text style={styles.metricValue}>4 Stop</Text>
+                    <Text style={styles.metricValue}>{totalStopsCount} Stop</Text>
                   </View>
                   <Text style={styles.metricLabel}>Tujuan</Text>
                 </View>
@@ -269,7 +272,7 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
                 <View style={styles.metricCol}>
                   <View style={styles.metricIconRow}>
                     <Milestone size={13} color={colors.primary} strokeWidth={2.2} />
-                    <Text style={styles.metricValue}>28,4 km</Text>
+                    <Text style={styles.metricValue}>{activeTrip?.distance || 28.4} km</Text>
                   </View>
                   <Text style={styles.metricLabel}>Total Jarak</Text>
                 </View>
@@ -279,7 +282,7 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
               <View style={styles.progressContainer}>
                 <View style={styles.progressHeaderRow}>
                   <Text style={styles.progressLabel}>
-                    {completedCount} / 4 stop selesai
+                    {completedCount} / {totalStopsCount} stop selesai
                   </Text>
                   <Text style={styles.progressPctText}>{progressPercent}%</Text>
                 </View>
@@ -442,6 +445,51 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
             </View>
           </>
         ) : (
+          <View style={styles.emptyTripCard}>
+            {/* Top Status Pill */}
+            <View style={styles.emptyStatusPill}>
+              <View style={styles.emptyStatusDot} />
+              <Text style={styles.emptyStatusPillText}>Status Armada: Siaga</Text>
+            </View>
+
+            {/* Centered Graphic Icon */}
+            <View style={styles.emptyIconCircle}>
+              <Milestone size={26} color={colors.primary} strokeWidth={2.2} />
+            </View>
+
+            {/* Typography */}
+            <Text style={styles.emptyTitle}>Belum Ada Penugasan Aktif</Text>
+            <Text style={styles.emptyDescription}>
+              Saat dispatcher FLEETRA menetapkan jadwal rute pengantaran baru untuk akun Anda, rute perjalanan, titik singgah, dan formulir e-POD akan otomatis muncul di sini.
+            </Text>
+
+            {/* System Info Box */}
+            <View style={styles.emptyInfoBox}>
+              <View style={styles.emptyInfoRow}>
+                <Text style={styles.emptyInfoLabel}>Koneksi Pusat Kendali</Text>
+                <Text style={styles.emptyInfoValue}>Tersinkron Real-time</Text>
+              </View>
+              <View style={styles.emptyInfoDivider} />
+              <View style={styles.emptyInfoRow}>
+                <Text style={styles.emptyInfoLabel}>Mitra Pengemudi</Text>
+                <Text style={styles.emptyInfoValue}>{driverProfile.name || 'Mitra Aktif'}</Text>
+              </View>
+            </View>
+
+            {/* Refresh Action Button */}
+            <TouchableOpacity
+              style={styles.emptyRefreshButton}
+              onPress={refreshData}
+              activeOpacity={0.8}
+            >
+              <RefreshCw size={14} color={colors.primary} strokeWidth={2.2} style={{ marginRight: 8 }} />
+              <Text style={styles.emptyRefreshButtonText}>
+                Muat Ulang Status Penugasan
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )
+      ) : (
           /* RIWAYAT PENUGASAN SECTION */
           <View style={styles.historyListSection}>
             <View style={styles.historyHeaderRow}>
@@ -449,44 +497,113 @@ export const PerjalananScreen: React.FC<PerjalananScreenProps> = (props) => {
               <Text style={styles.historyCountText}>{pastTripsList.length} Ritase</Text>
             </View>
 
-            {pastTripsList.map((trip) => (
-              <TouchableOpacity
-                key={trip.id}
-                style={styles.historyCard}
-                onPress={() =>
-                  Alert.alert(
-                    `Detail Ritase #${trip.id}`,
-                    `Tanggal: ${trip.date}\nRute: ${trip.route}\nTotal Jarak: ${trip.distance}\nDurasi: ${trip.duration}\nJumlah Stop: ${trip.stops} Titik (Selesai 100%)\nAlokasi Setoran RTO: ${trip.rtoContribution}\n\nSeluruh data e-POD dan dokumen logistik telah terarsip di cloud konsol dispatcher.`,
-                    [{ text: 'Tutup' }]
-                  )
-                }
-                activeOpacity={0.8}
-              >
-                <View style={styles.historyCardHeader}>
-                  <Text style={styles.historyTripCode}>#{trip.id}</Text>
-                  <Text style={styles.historyDateText}>{trip.date}</Text>
-                </View>
+            {pastTripsList.length === 0 ? (
+              <View style={[styles.historyCard, { alignItems: 'center', paddingVertical: 24 }]}>
+                <Clock size={28} color={colors.textDisabled} strokeWidth={1.8} style={{ marginBottom: 8 }} />
+                <Text style={{ fontSize: 13, fontWeight: '700', color: colors.text, marginBottom: 4 }}>
+                  Belum Ada Riwayat Penugasan
+                </Text>
+                <Text style={{ fontSize: 11, color: colors.textSecondary, textAlign: 'center', paddingHorizontal: 20 }}>
+                  Perjalanan yang diselesaikan hari ini akan otomatis tersinkronisasi dan tercatat di sini.
+                </Text>
+              </View>
+            ) : (
+              <>
+                {pastTripsList
+                  .slice((historyPage - 1) * historyPageSize, historyPage * historyPageSize)
+                  .map((trip) => (
+                    <TouchableOpacity
+                      key={trip.id}
+                      style={styles.historyCard}
+                      onPress={() =>
+                        Alert.alert(
+                          `Detail Ritase #${trip.id}`,
+                          `Tanggal: ${trip.date}\nRute: ${trip.route}\nTotal Jarak: ${trip.distance}\nDurasi: ${trip.duration}\nJumlah Stop: ${trip.stops} Titik (Selesai 100%)\nAlokasi Setoran RTO: ${trip.rtoContribution}\n\nSeluruh data e-POD dan dokumen logistik telah terarsip di cloud konsol dispatcher.`,
+                          [{ text: 'Tutup' }]
+                        )
+                      }
+                      activeOpacity={0.8}
+                    >
+                      <View style={styles.historyCardHeader}>
+                        <Text style={styles.historyTripCode}>#{trip.id}</Text>
+                        <Text style={styles.historyDateText}>{trip.date}</Text>
+                      </View>
 
-                <Text style={styles.historyRouteText}>{trip.route}</Text>
+                      <Text style={styles.historyRouteText}>{trip.route}</Text>
 
-                <View style={styles.historyDivider} />
+                      <View style={styles.historyDivider} />
 
-                <View style={styles.historyMetaRow}>
-                  <View style={styles.historyMetaItem}>
-                    <Milestone size={12} color={colors.primary} strokeWidth={2} />
-                    <Text style={styles.historyMetaVal}>{trip.distance}</Text>
+                      <View style={styles.historyMetaRow}>
+                        <View style={styles.historyMetaItem}>
+                          <Milestone size={12} color={colors.primary} strokeWidth={2} />
+                          <Text style={styles.historyMetaVal}>{trip.distance}</Text>
+                        </View>
+                        <View style={styles.historyMetaItem}>
+                          <Clock size={12} color={colors.primary} strokeWidth={2} />
+                          <Text style={styles.historyMetaVal}>{trip.duration}</Text>
+                        </View>
+                        <View style={styles.historyMetaItem}>
+                          <CheckCircle2 size={12} color={colors.primary} strokeWidth={2} />
+                          <Text style={styles.historyMetaVal}>{trip.stops} Stop e-POD</Text>
+                        </View>
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+
+                {/* Pagination Controls */}
+                {Math.ceil(pastTripsList.length / historyPageSize) > 1 && (
+                  <View style={styles.paginationRow}>
+                    <TouchableOpacity
+                      style={[
+                        styles.paginationBtn,
+                        historyPage === 1 && styles.paginationBtnDisabled,
+                      ]}
+                      disabled={historyPage === 1}
+                      onPress={() => setHistoryPage((p) => Math.max(1, p - 1))}
+                      activeOpacity={0.7}
+                    >
+                      <Text
+                        style={[
+                          styles.paginationBtnText,
+                          historyPage === 1 && styles.paginationBtnTextDisabled,
+                        ]}
+                      >
+                        Sebelumnya
+                      </Text>
+                    </TouchableOpacity>
+
+                    <Text style={styles.paginationInfoText}>
+                      Hal. {historyPage} dari {Math.ceil(pastTripsList.length / historyPageSize)}
+                    </Text>
+
+                    <TouchableOpacity
+                      style={[
+                        styles.paginationBtn,
+                        historyPage >= Math.ceil(pastTripsList.length / historyPageSize) &&
+                          styles.paginationBtnDisabled,
+                      ]}
+                      disabled={historyPage >= Math.ceil(pastTripsList.length / historyPageSize)}
+                      onPress={() =>
+                        setHistoryPage((p) =>
+                          Math.min(Math.ceil(pastTripsList.length / historyPageSize), p + 1)
+                        )
+                      }
+                      activeOpacity={0.7}
+                    >
+                      <Text
+                        style={[
+                          styles.paginationBtnText,
+                          historyPage >= Math.ceil(pastTripsList.length / historyPageSize) &&
+                            styles.paginationBtnTextDisabled,
+                        ]}
+                      >
+                        Berikutnya
+                      </Text>
+                    </TouchableOpacity>
                   </View>
-                  <View style={styles.historyMetaItem}>
-                    <Clock size={12} color={colors.primary} strokeWidth={2} />
-                    <Text style={styles.historyMetaVal}>{trip.duration}</Text>
-                  </View>
-                  <View style={styles.historyMetaItem}>
-                    <CheckCircle2 size={12} color={colors.primary} strokeWidth={2} />
-                    <Text style={styles.historyMetaVal}>{trip.stops} Stop e-POD</Text>
-                  </View>
-                </View>
-              </TouchableOpacity>
-            ))}
+                )}
+              </>
+            )}
           </View>
         )}
       </ScrollView>
@@ -707,6 +824,123 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     color: colors.white,
+  },
+
+  /* EMPTY STATE STYLES */
+  emptyTripCard: {
+    backgroundColor: colors.surface,
+    marginHorizontal: 18,
+    borderRadius: 16,
+    paddingVertical: 32,
+    paddingHorizontal: 22,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: 16,
+    alignItems: 'center',
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.04,
+    shadowRadius: 6,
+    elevation: 1,
+  },
+  emptyStatusPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 20,
+    backgroundColor: '#F1F5F9',
+    marginBottom: 16,
+    gap: 6,
+  },
+  emptyStatusDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#10B981',
+  },
+  emptyStatusPillText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#475569',
+  },
+  emptyIconCircle: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#EFF6FF',
+    borderWidth: 1.5,
+    borderColor: '#DBEAFE',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 14,
+  },
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.text,
+    textAlign: 'center',
+    marginBottom: 6,
+  },
+  emptyDescription: {
+    fontSize: 12.5,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 18,
+    marginBottom: 18,
+    paddingHorizontal: 8,
+  },
+  emptyInfoBox: {
+    width: '100%',
+    backgroundColor: '#F8FAFC',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    marginBottom: 18,
+  },
+  emptyInfoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 3,
+  },
+  emptyInfoDivider: {
+    height: 1,
+    backgroundColor: '#EDF2F7',
+    marginVertical: 3,
+  },
+  emptyInfoLabel: {
+    fontSize: 11.5,
+    color: colors.textMuted,
+  },
+  emptyInfoValue: {
+    fontSize: 11.5,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  emptyRefreshButton: {
+    width: '100%',
+    height: 44,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1.2,
+    borderColor: '#CBD5E1',
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    shadowColor: '#0F172A',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 3,
+    elevation: 1,
+  },
+  emptyRefreshButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.text,
   },
 
   /* SECTION HEADER */
@@ -965,6 +1199,38 @@ const styles = StyleSheet.create({
   },
   historyMetaVal: {
     fontSize: 11,
+    fontWeight: '600',
+    color: colors.textSecondary,
+  },
+  paginationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    marginTop: 6,
+    marginBottom: 16,
+  },
+  paginationBtn: {
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  paginationBtnDisabled: {
+    opacity: 0.45,
+  },
+  paginationBtnText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.primary,
+  },
+  paginationBtnTextDisabled: {
+    color: colors.textDisabled,
+  },
+  paginationInfoText: {
+    fontSize: 12,
     fontWeight: '600',
     color: colors.textSecondary,
   },

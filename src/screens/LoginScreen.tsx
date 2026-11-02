@@ -27,13 +27,13 @@ import { useApp } from '../context/AppContext';
 export const LoginScreen: React.FC = () => {
   const { login, navigateTo } = useApp();
 
-  const [identifier, setIdentifier] = useState('budi.santoso@fleetra.id');
-  const [password, setPassword] = useState('fleetra2026');
+  const [identifier, setIdentifier] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!identifier.trim()) {
       Alert.alert('Data Wajib', 'Harap masukkan Email atau No. Handphone Anda.');
       return;
@@ -44,20 +44,26 @@ export const LoginScreen: React.FC = () => {
     }
 
     setIsLoading(true);
-    setTimeout(() => {
+    try {
+      await login(identifier.trim(), password.trim());
+    } catch (err) {
+      Alert.alert('Gagal Masuk', err instanceof Error ? err.message : 'Silakan coba lagi');
+    } finally {
       setIsLoading(false);
-      login(identifier.trim(), 'Budi Santoso');
-    }, 450);
+    }
   };
 
-  const handleQuickDemo = () => {
-    setIdentifier('budi.santoso@fleetra.id');
-    setPassword('fleetra2026');
+  const handleQuickDemo = async () => {
+    setIdentifier('driver@fleetra.id');
+    setPassword('Fleetra2026!');
     setIsLoading(true);
-    setTimeout(() => {
+    try {
+      await login('driver@fleetra.id', 'Fleetra2026!');
+    } catch (err) {
+      Alert.alert('Gagal Masuk', err instanceof Error ? err.message : 'Silakan coba lagi');
+    } finally {
       setIsLoading(false);
-      login('budi.santoso@fleetra.id', 'Budi Santoso');
-    }, 350);
+    }
   };
 
   return (
@@ -185,7 +191,7 @@ export const LoginScreen: React.FC = () => {
             disabled={isLoading}
           >
             <Sparkles size={14} color={colors.primary} strokeWidth={2} />
-            <Text style={styles.demoButtonText}>1-Tap Demo: Budi Santoso (Driver)</Text>
+            <Text style={styles.demoButtonText}>1-Tap Masuk: driver@fleetra.id</Text>
           </TouchableOpacity>
 
           {/* 8. FOOTER: LINK TO REGISTER */}

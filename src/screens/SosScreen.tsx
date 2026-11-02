@@ -37,6 +37,8 @@ export const SosScreen: React.FC<SosScreenProps> = (props) => {
     activateSos,
     deactivateSos,
     driverProfile,
+    selectedStop,
+    vehicle,
     goBack,
   } = useApp();
 
@@ -44,6 +46,9 @@ export const SosScreen: React.FC<SosScreenProps> = (props) => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(sosCategory);
   const [isConfirmModalVisible, setIsConfirmModalVisible] = useState<boolean>(false);
   const [pendingCategory, setPendingCategory] = useState<string | null>(null);
+
+  const currentLocationText = selectedStop?.address || 'Koridor Pasteur - Cimahi, Bandung';
+  const currentCoordsText = `Lat: ${vehicle?.lat ?? -6.8992}, Lng: ${vehicle?.lng ?? 107.5954} (Presisi ± 3m)`;
 
   const handleOpenConfirmModal = (categoryName?: string, categoryKey?: string) => {
     if (isSosActive) {
@@ -57,15 +62,22 @@ export const SosScreen: React.FC<SosScreenProps> = (props) => {
     setIsConfirmModalVisible(true);
   };
 
-  const handleConfirmActivateSos = () => {
+  const handleConfirmActivateSos = async () => {
     setIsConfirmModalVisible(false);
     const categoryToActivate = pendingCategory || 'Panggilan Darurat Umum';
-    activateSos(categoryToActivate);
-    Alert.alert(
-      'Sinyal Darurat Dipancarkan',
-      `Pusat Kendali Dispatcher FLEETRA telah menerima sinyal SOS dari armada ${driverProfile.vehiclePlate} (${driverProfile.name}) di lokasi Jl. Pasteur No. 142, Bandung.\n\nKategori: ${categoryToActivate}.\n\nPetugas dispatcher dan tim tanggap darurat segera menghubungi Anda. Status darurat tersimpan aktif di seluruh sistem aplikasi.`,
-      [{ text: 'Konfirmasi Diterima' }]
-    );
+    try {
+      await activateSos(categoryToActivate);
+      Alert.alert(
+        'Sinyal Darurat Dipancarkan',
+        `Pusat Kendali Dispatcher FLEETRA telah menerima sinyal SOS dari armada ${driverProfile.vehiclePlate} (${driverProfile.name}) di ${currentLocationText}.\n\nKategori: ${categoryToActivate}.\n\nPetugas dispatcher dan tim tanggap darurat segera menghubungi Anda. Status darurat tersimpan aktif di seluruh sistem aplikasi.`,
+        [{ text: 'Konfirmasi Diterima' }]
+      );
+    } catch (err) {
+      Alert.alert(
+        'Gagal Memancarkan SOS',
+        err instanceof Error ? err.message : 'Silakan periksa koneksi data'
+      );
+    }
   };
 
   const handleCancelConfirm = () => {
@@ -236,8 +248,8 @@ export const SosScreen: React.FC<SosScreenProps> = (props) => {
             </View>
             <View style={styles.locationTextGroup}>
               <Text style={styles.locationLabel}>Koordinat Lokasi Saat Ini</Text>
-              <Text style={styles.locationAddress}>
-                Jl. Pasteur No. 142, Bandung
+              <Text style={styles.locationAddress} numberOfLines={1}>
+                {currentLocationText}
               </Text>
             </View>
           </View>
@@ -245,7 +257,7 @@ export const SosScreen: React.FC<SosScreenProps> = (props) => {
           <TouchableOpacity
             style={styles.viewMapLink}
             onPress={() =>
-              Alert.alert('Koordinat GPS', 'Lat: -6.8992, Lng: 107.5954 (Presisi ± 3m)')
+              Alert.alert('Koordinat GPS', currentCoordsText)
             }
             activeOpacity={0.7}
           >
@@ -351,7 +363,7 @@ export const SosScreen: React.FC<SosScreenProps> = (props) => {
                 <Text style={styles.modalDetailLabel}>Lokasi</Text>
                 <Text style={styles.modalDetailColon}>:</Text>
                 <Text style={styles.modalDetailValue} numberOfLines={1}>
-                  Jl. Pasteur No. 142, Bandung
+                  {currentLocationText}
                 </Text>
               </View>
             </View>

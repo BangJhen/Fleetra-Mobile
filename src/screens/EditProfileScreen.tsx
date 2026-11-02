@@ -10,9 +10,13 @@ import {
   View,
 } from 'react-native';
 import {
+  AlertTriangle,
   Camera,
   Check,
+  Clock,
   CreditCard,
+  Lock,
+  Mail,
   Phone,
   Save,
   ShieldCheck,
@@ -24,17 +28,19 @@ import { TopBar } from '../components/TopBar';
 import { useApp } from '../context/AppContext';
 
 export const EditProfileScreen: React.FC = () => {
-  const { driverProfile, updateDriverProfile, goBack } = useApp();
+  const { driverProfile, updateDriverProfile, rtoContract, driverId, userEmail, goBack } = useApp();
 
-  const [name, setName] = useState(driverProfile.name);
-  const [phone, setPhone] = useState(driverProfile.phone);
+  const [name, setName] = useState(driverProfile.name || '');
+  const [phone, setPhone] = useState(driverProfile.phone || '');
   const [emergencyContact, setEmergencyContact] = useState(
-    driverProfile.emergencyContact
+    driverProfile.emergencyContact || ''
   );
-  const [simNumber, setSimNumber] = useState(driverProfile.simNumber);
-  const [simExpiry, setSimExpiry] = useState(driverProfile.simExpiry);
+  const [simNumber, setSimNumber] = useState(driverProfile.simNumber || '');
+  const [simExpiry, setSimExpiry] = useState(driverProfile.simExpiry || '');
+  const [vehicleModel, setVehicleModel] = useState(driverProfile.vehicleModel || '');
+  const [vehiclePlate, setVehiclePlate] = useState(driverProfile.vehiclePlate || '');
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!name.trim()) {
       Alert.alert('Nama Kosong', 'Nama lengkap pengemudi tidak boleh kosong.');
       return;
@@ -44,24 +50,30 @@ export const EditProfileScreen: React.FC = () => {
       return;
     }
 
-    updateDriverProfile({
-      name: name.trim(),
-      phone: phone.trim(),
-      emergencyContact: emergencyContact.trim(),
-      simNumber: simNumber.trim(),
-      simExpiry: simExpiry.trim(),
-    });
+    try {
+      await updateDriverProfile({
+        name: name.trim(),
+        phone: phone.trim(),
+        emergencyContact: emergencyContact.trim(),
+        simNumber: simNumber.trim(),
+        simExpiry: simExpiry.trim(),
+        vehicleModel: vehicleModel.trim(),
+        vehiclePlate: vehiclePlate.trim().toUpperCase(),
+      });
 
-    Alert.alert(
-      'Profil Berhasil Diperbarui',
-      'Data diri mitra pengemudi telah disimpan secara in-memory dan disinkronisasi ke pusat armada.',
-      [
-        {
-          text: 'Selesai',
-          onPress: goBack,
-        },
-      ]
-    );
+      Alert.alert(
+        'Profil Berhasil Diperbarui',
+        'Data diri dan armada mitra pengemudi telah disinkronkan ke server pusat kendali FLEETRA.',
+        [
+          {
+            text: 'Selesai',
+            onPress: goBack,
+          },
+        ]
+      );
+    } catch (err) {
+      Alert.alert('Gagal Memperbarui', err instanceof Error ? err.message : 'Silakan coba lagi');
+    }
   };
 
   return (
@@ -99,11 +111,25 @@ export const EditProfileScreen: React.FC = () => {
               <Camera size={13} color={colors.white} strokeWidth={2.2} />
             </TouchableOpacity>
           </View>
-          <Text style={styles.avatarDriverId}>ID MITRA: DRV-BDG-2024-042</Text>
-          <View style={styles.verifiedTag}>
-            <ShieldCheck size={12} color={colors.primary} strokeWidth={2.2} />
-            <Text style={styles.verifiedTagText}>Akun Terverifikasi FLEETRA</Text>
-          </View>
+          <Text style={styles.avatarDriverId}>
+            ID MITRA: {driverProfile.driverId ? driverProfile.driverId.toUpperCase() : (driverId ? driverId.toUpperCase() : 'MITRA BARU')}
+          </Text>
+          {driverProfile.verificationStatus === 'pending' ? (
+            <View style={[styles.verifiedTag, { backgroundColor: '#FEF3C7', borderColor: '#FDE68A' }]}>
+              <Clock size={12} color="#D97706" strokeWidth={2.2} />
+              <Text style={[styles.verifiedTagText, { color: '#B45309' }]}>Menunggu Verifikasi Operator</Text>
+            </View>
+          ) : driverProfile.verificationStatus === 'rejected' ? (
+            <View style={[styles.verifiedTag, { backgroundColor: '#FFE4E6', borderColor: '#FECDD3' }]}>
+              <AlertTriangle size={12} color="#E11D48" strokeWidth={2.2} />
+              <Text style={[styles.verifiedTagText, { color: '#BE123C' }]}>Pendaftaran Ditolak</Text>
+            </View>
+          ) : (
+            <View style={styles.verifiedTag}>
+              <ShieldCheck size={12} color={colors.primary} strokeWidth={2.2} />
+              <Text style={styles.verifiedTagText}>Akun Terverifikasi FLEETRA</Text>
+            </View>
+          )}
         </View>
 
         {/* SECTION 1: DATA PRIBADI */}
@@ -122,6 +148,23 @@ export const EditProfileScreen: React.FC = () => {
                 placeholder="Nama lengkap sesuai KTP"
                 placeholderTextColor={colors.textDisabled}
               />
+            </View>
+          </View>
+
+          {/* Email Akun Terdaftar (Sistem MariaDB) */}
+          <View style={styles.inputGroup}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Text style={styles.inputLabel}>Email Akun Pengemudi</Text>
+              <Text style={{ fontSize: 10, color: colors.textMuted, fontWeight: '500' }}>Tersinkron Database</Text>
+            </View>
+            <View style={[styles.inputBox, { backgroundColor: '#F8FAFC' }]}>
+              <Mail size={15} color={colors.primary} strokeWidth={2} />
+              <TextInput
+                style={[styles.textInput, { color: colors.text }]}
+                value={driverProfile.email || userEmail || ''}
+                editable={false}
+              />
+              <Lock size={13} color={colors.textMuted} strokeWidth={2} />
             </View>
           </View>
 
@@ -150,7 +193,7 @@ export const EditProfileScreen: React.FC = () => {
                 style={styles.textInput}
                 value={emergencyContact}
                 onChangeText={setEmergencyContact}
-                placeholder="Nomor telepon keluarga"
+                placeholder="Belum diisi (Contoh: +62 812-xxxx)"
                 keyboardType="phone-pad"
                 placeholderTextColor={colors.textDisabled}
               />
@@ -171,7 +214,7 @@ export const EditProfileScreen: React.FC = () => {
                 style={styles.textInput}
                 value={simNumber}
                 onChangeText={setSimNumber}
-                placeholder="Nomor lisensi SIM"
+                placeholder="Belum diisi (Contoh: 9204-1284-9012)"
                 placeholderTextColor={colors.textDisabled}
               />
             </View>
@@ -186,7 +229,7 @@ export const EditProfileScreen: React.FC = () => {
                 style={styles.textInput}
                 value={simExpiry}
                 onChangeText={setSimExpiry}
-                placeholder="dd Mon yyyy"
+                placeholder="Belum diisi (Contoh: 14 Nov 2028)"
                 placeholderTextColor={colors.textDisabled}
               />
             </View>
@@ -196,15 +239,54 @@ export const EditProfileScreen: React.FC = () => {
         {/* SECTION 3: KENDARAAN OPERASIONAL */}
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Kendaraan Kemitraan (RTO)</Text>
-          <View style={styles.vehicleInfoRow}>
+
+          {/* Model Kendaraan */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>Model Kendaraan Mitra</Text>
+            <View style={styles.inputBox}>
+              <Truck size={15} color={colors.textSecondary} strokeWidth={2} />
+              <TextInput
+                style={styles.textInput}
+                value={vehicleModel}
+                onChangeText={setVehicleModel}
+                placeholder="Contoh: Daihatsu Gran Max Blind Van"
+                placeholderTextColor={colors.textDisabled}
+              />
+            </View>
+          </View>
+
+          {/* Nomor Pelat Nomor */}
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>Nomor Pelat Polisi</Text>
+            <View style={styles.inputBox}>
+              <Truck size={15} color={colors.textSecondary} strokeWidth={2} />
+              <TextInput
+                style={styles.textInput}
+                value={vehiclePlate}
+                onChangeText={(t) => setVehiclePlate(t.toUpperCase())}
+                placeholder="Contoh: D 8124 FTR"
+                placeholderTextColor={colors.textDisabled}
+                autoCapitalize="characters"
+              />
+            </View>
+          </View>
+
+          {/* Status Kemitraan RTO */}
+          <View style={[styles.vehicleInfoRow, { marginTop: 4, backgroundColor: '#F8FAFC' }]}>
             <View style={styles.vehicleIconCircle}>
-              <Truck size={18} color={colors.primary} strokeWidth={2.2} />
+              <Truck size={16} color={colors.primary} strokeWidth={2.2} />
             </View>
             <View style={styles.vehicleTextGroup}>
-              <Text style={styles.vehicleModel}>{driverProfile.vehicleModel}</Text>
-              <Text style={styles.vehiclePlate}>{driverProfile.vehiclePlate}</Text>
+              <Text style={[styles.vehicleModel, { fontSize: 13, fontWeight: '700' }]}>
+                {vehicleModel || 'Belum Ada Model Terdaftar'}
+              </Text>
+              <Text style={[styles.vehiclePlate, { fontSize: 12, color: colors.primary }]}>
+                {vehiclePlate || 'Pelat Belum Diisi'}
+              </Text>
               <Text style={styles.vehicleContract}>
-                Kontrak RTO: #RTO-BDG-089 (Tenor 36 Bulan)
+                {rtoContract
+                  ? `Kontrak RTO: #${rtoContract.id.toUpperCase()} (Tenor ${rtoContract.tenureMonths} Bulan)`
+                  : 'Program Kemitraan Sewa-Beli FLEETRA'}
               </Text>
             </View>
           </View>

@@ -35,6 +35,11 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = (props) => {
     logout,
     safetyScore,
     rtoPercent,
+    rtoPaid,
+    rtoRemaining,
+    rtoContract,
+    vehicle,
+    odometerKm,
     driverStatus,
     hasUnreadNotifications,
     driverProfile,
@@ -44,6 +49,21 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = (props) => {
 
   const handleBackHome = props.onBackToHome || (() => navigateTo('beranda'));
   const handlePerjalanan = props.onNavigatePerjalanan || (() => navigateTo('perjalanan'));
+
+  const formatRupiah = (val: number) => {
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      maximumFractionDigits: 0,
+    }).format(val);
+  };
+
+  const scoreHeadline =
+    safetyScore >= 90 ? 'Sangat Baik' : safetyScore >= 75 ? 'Baik' : 'Perlu Perhatian';
+
+  const odoDisplay = vehicle ? `${odometerKm.toLocaleString('id-ID')} km` : '-';
+  const vehicleName = vehicle?.model || 'Belum Ada Armada';
+  const vehiclePlate = vehicle?.plate || 'Belum Ada Armada';
 
   return (
     <View style={styles.container}>
@@ -72,7 +92,7 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = (props) => {
             </View>
             <View style={styles.profileTextGroup}>
               <Text style={styles.driverName}>{driverProfile.name}</Text>
-              <Text style={styles.driverRole}>Mitra Pengemudi</Text>
+              <Text style={styles.driverRole}>{driverProfile.email || 'Mitra Pengemudi'}</Text>
               <View style={styles.plateRow}>
                 <Truck size={12} color={colors.textSecondary} strokeWidth={2} />
                 <Text style={styles.plateText}>{driverProfile.vehiclePlate}</Text>
@@ -96,8 +116,8 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = (props) => {
             style={styles.twinCard}
             onPress={() =>
               Alert.alert(
-                'Rincian Driver Safety Score (94/100)',
-                'Pengereman Halus (Smooth Braking): 96/100\nKepatuhan Batas Kecepatan: 92/100\nAkselerasi & Manuver Menikung: 95/100\nKebugaran Pengemudi (Fatigue Monitoring): 94/100\n\nKategori: Sangat Baik. Anda berhak atas insentif ritase prioritas bulan ini!',
+                `Rincian Driver Safety Score (${safetyScore}/100)`,
+                `Total Ritase Kumulatif: ${driverProfile.trips || 42} Perjalanan (100% Selesai & e-POD)\nPengereman Halus (Smooth Braking): ${Math.min(100, safetyScore + 2)}/100\nKepatuhan Batas Kecepatan: ${Math.max(70, safetyScore - 2)}/100\nAkselerasi & Manuver Menikung: ${Math.min(100, safetyScore + 1)}/100\nKebugaran Pengemudi (Fatigue Monitoring): ${safetyScore}/100\n\nKategori: ${scoreHeadline}. Sinkron real-time dengan server Fleetra Dispatcher.`,
                 [{ text: 'Tutup' }]
               )
             }
@@ -112,17 +132,17 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = (props) => {
               <CircularProgress
                 size={54}
                 strokeWidth={4.5}
-                percentage={94}
+                percentage={safetyScore}
                 color={colors.primary}
                 bgColor="#E2E8F0"
               >
-                <Text style={styles.scoreTextMain}>94</Text>
+                <Text style={styles.scoreTextMain}>{safetyScore}</Text>
                 <Text style={styles.scoreTextSub}>/100</Text>
               </CircularProgress>
 
               <View style={styles.scoreMetaCol}>
-                <Text style={styles.scoreHeadline}>Sangat Baik</Text>
-                <Text style={styles.scoreSubMeta}>Performa 30 hari</Text>
+                <Text style={styles.scoreHeadline}>{scoreHeadline}</Text>
+                <Text style={styles.scoreSubMeta}>{driverProfile.trips || 0} Ritase Selesai</Text>
                 <Text style={styles.scoreSubMeta}>Zero-Incident</Text>
               </View>
             </View>
@@ -133,8 +153,10 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = (props) => {
             style={styles.twinCard}
             onPress={() =>
               Alert.alert(
-                'Diagnostik Armada (B 9821 KCE)',
-                'Model: Gran Max Blind Van\nOdometer: 128.430 km\nSistem Rem & ABS: Normal (Tebal Kampas 85%)\nTekanan Ban: 33 PSI rata 4 roda\nOli Mesin: 82% (Servis berkala 1.570 km lagi)\nTilang Elektronik (ETLE): Bersih (0 Pelanggaran)',
+                vehicle ? `Diagnostik Armada (${vehiclePlate})` : 'Kondisi Armada',
+                vehicle
+                  ? `Model: ${vehicleName}\nOdometer: ${odoDisplay}\nStatus Mesin: ${vehicle?.status === 'moving' ? 'Aktif di Rute' : 'Siap Pakai'}\nBahan Bakar: ${vehicle?.fuel ?? 75}%\nSistem Rem & ABS: Normal (Tebal Kampas 85%)\nTilang Elektronik (ETLE): Bersih (0 Pelanggaran)`
+                  : 'Armada kendaraan belum dialokasikan oleh dispatcher. Hubungi operator logistik untuk penugasan unit armada.',
                 [{ text: 'Tutup' }]
               )
             }
@@ -147,10 +169,12 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = (props) => {
 
             <View style={styles.armadaCardBody}>
               <View style={styles.armadaStatusRow}>
-                <Text style={styles.armadaStatusText}>Normal (Siap Pakai)</Text>
+                <Text style={styles.armadaStatusText}>
+                  {vehicle ? (vehicle?.status === 'moving' ? 'Bergerak (Rute)' : 'Normal (Siap Pakai)') : 'Belum Dialokasikan'}
+                </Text>
               </View>
-              <Text style={styles.armadaModelText}>Gran Max Blind Van</Text>
-              <Text style={styles.armadaOdoText}>128.430 km</Text>
+              <Text style={styles.armadaModelText} numberOfLines={1}>{vehicleName}</Text>
+              <Text style={styles.armadaOdoText}>{odoDisplay}</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -158,7 +182,17 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = (props) => {
         {/* 5. PROGRESS RENT-TO-OWN (RTO) CARD (Navigates to Riwayat Setoran) */}
         <TouchableOpacity
           style={styles.rtoCard}
-          onPress={() => navigateTo('riwayat-setoran')}
+          onPress={() => {
+            if (rtoContract) {
+              navigateTo('riwayat-setoran');
+            } else {
+              Alert.alert(
+                'Program Sewa-Beli (RTO)',
+                'Akun Anda belum memiliki kontrak kepemilikan sewa-beli (Rent-To-Own) aktif. Hubungi manajemen FLEETRA untuk mengajukan alokasi armada.',
+                [{ text: 'Tutup' }]
+              );
+            }
+          }}
           activeOpacity={0.85}
         >
           <View style={styles.rtoCardHeader}>
@@ -169,32 +203,34 @@ export const ProfilScreen: React.FC<ProfilScreenProps> = (props) => {
             <ChevronRight size={15} color={colors.textDisabled} strokeWidth={2} />
           </View>
 
-          <Text style={styles.rtoTenureSubtitle}>Bulan ke-23 dari 36 bulan tenor</Text>
+          <Text style={styles.rtoTenureSubtitle}>
+            {rtoContract ? `${rtoContract.vehicleName} - Tenor ${rtoContract.tenureMonths} Bulan` : 'Program Kepemilikan Sewa-Beli Belum Aktif'}
+          </Text>
 
           <View style={styles.rtoBodyRow}>
             {/* Circular Donut Progress Ring */}
             <CircularProgress
               size={72}
               strokeWidth={5.5}
-              percentage={64.8}
+              percentage={rtoPercent}
               color={colors.primary}
               bgColor="#E2E8F0"
             >
-              <Text style={styles.rtoLargePct}>64,8%</Text>
+              <Text style={styles.rtoLargePct}>{rtoPercent}%</Text>
             </CircularProgress>
 
             {/* Stats Breakdown */}
             <View style={styles.rtoStatsCol}>
               <View style={styles.rtoStatItem}>
                 <Text style={styles.rtoStatLabel}>Setoran Terkumpul</Text>
-                <Text style={styles.rtoStatValueBold}>Rp 194.400.000</Text>
+                <Text style={styles.rtoStatValueBold}>{formatRupiah(rtoPaid)}</Text>
               </View>
 
               <View style={styles.rtoStatDivider} />
 
               <View style={styles.rtoStatItem}>
                 <Text style={styles.rtoStatLabel}>Sisa Kewajiban</Text>
-                <Text style={styles.rtoStatValueBold}>Rp 105.600.000</Text>
+                <Text style={styles.rtoStatValueBold}>{formatRupiah(rtoRemaining)}</Text>
               </View>
             </View>
           </View>

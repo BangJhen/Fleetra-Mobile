@@ -38,7 +38,7 @@ export const NotificationsScreen: React.FC<NotificationsScreenProps> = (props) =
 
   const handleMarkAllAsRead = () => {
     markAllNotificationsAsRead();
-    Alert.alert('Sukses', 'Semua notifikasi telah ditandai sebagai dibaca. State in-memory diperbarui.');
+    Alert.alert('Sukses', 'Semua notifikasi telah ditandai sebagai telah dibaca.');
   };
 
   const handleNotificationPress = (item: NotificationItem) => {

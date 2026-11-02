@@ -50,10 +50,14 @@ const DEFAULT_PHOTOS: PhotoItem[] = [
 
 export const EpodScreen: React.FC<EpodScreenProps> = (props) => {
   const {
+    selectedStop,
     selectedStopId,
     setSelectedStopId,
+    stops,
+    activeTrip,
     epodRecords,
     saveEpodRecord,
+    submitStopEpod,
     completeEntireTrip,
     driverProfile,
     navigateTo,
@@ -67,25 +71,18 @@ export const EpodScreen: React.FC<EpodScreenProps> = (props) => {
     }
   };
 
-  const existingRecord = epodRecords[selectedStopId];
+  const stopIndex = stops.findIndex(
+    (s, idx) => s.id === selectedStop?.id || idx + 1 === selectedStopId
+  );
+  const currentIdx = stopIndex >= 0 ? stopIndex : 0;
+  const currentStop = stops[currentIdx] || selectedStop;
+  const stopTitle = currentStop?.name || 'Titik Pengantaran';
+  const stopAddress = currentStop?.address || 'Alamat Logistik Bandung Raya';
+  const totalStops = stops.length || 4;
+  const stopNumber = currentIdx + 1;
+  const nextStop = currentIdx < stops.length - 1 ? stops[currentIdx + 1] : null;
 
-  const stopTitle =
-    selectedStopId === 1
-      ? 'Gudang Pusat Cimahi'
-      : selectedStopId === 3
-      ? 'Minimarket Sejahtera'
-      : selectedStopId === 4
-      ? 'Toko Makmur Jaya'
-      : 'Toko Sumber Rejeki';
-
-  const stopAddress =
-    selectedStopId === 1
-      ? 'Jl. Industri Raya No. 12, Cimahi'
-      : selectedStopId === 3
-      ? 'Jl. Flyover Pasirkoja, Bandung'
-      : selectedStopId === 4
-      ? 'Jl. Peta No. 88, Bandung'
-      : 'Jl. Sudirman No. 45, Bandung';
+  const existingRecord = epodRecords[selectedStopId] || (currentStop?.id ? epodRecords[currentStop.id] : undefined);
 
   // 1. Photos State (Supports up to 3 interactive photos)
   const [photos, setPhotos] = useState<PhotoItem[]>(
@@ -96,9 +93,9 @@ export const EpodScreen: React.FC<EpodScreenProps> = (props) => {
   const [recipientName, setRecipientName] = useState(
     existingRecord
       ? existingRecord.recipientName
-      : selectedStopId === 1
-      ? 'Bpk. Budi (Gudang Cimahi)'
-      : 'Budi Setiawan'
+      : currentStop?.type === 'pickup'
+      ? 'Petugas Gudang Asal'
+      : 'Bpk. Budi (Penerima)'
   );
 
   // 3. Signature State & Style Variant
@@ -192,7 +189,7 @@ export const EpodScreen: React.FC<EpodScreenProps> = (props) => {
     setSignatureVariant((prev) => (prev === 0 ? 1 : 0));
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     if (!recipientName.trim()) {
       Alert.alert('Nama Penerima Wajib', 'Harap masukkan nama perwakilan penerima kargo.');
       return;
@@ -207,15 +204,27 @@ export const EpodScreen: React.FC<EpodScreenProps> = (props) => {
     }
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
       const now = new Date();
       const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(
         now.getMinutes()
       ).padStart(2, '0')} WIB`;
 
+      // Standard base64 sample photo & signature with valid data URI format
+      const photoPayload =
+        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aL1kAAAAASUVORK5CYII=';
+      const sigPayload =
+        'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aL1kAAAAASUVORK5CYII=';
+
+      await submitStopEpod(
+        recipientName.trim(),
+        photoPayload,
+        sigPayload,
+        currentStop?.id
+      );
+
       saveEpodRecord({
-        stopId: selectedStopId,
+        stopId: currentStop?.id || selectedStopId,
         recipientName: recipientName.trim(),
         hasPhoto: true,
         hasSignature: true,
@@ -223,7 +232,14 @@ export const EpodScreen: React.FC<EpodScreenProps> = (props) => {
       });
 
       setShowSuccessModal(true);
-    }, 500);
+    } catch (err) {
+      Alert.alert(
+        'Gagal Mengunggah',
+        err instanceof Error ? err.message : 'Terjadi kesalahan saat menyimpan e-POD ke server'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -232,7 +248,7 @@ export const EpodScreen: React.FC<EpodScreenProps> = (props) => {
       <TopBar
         variant="back"
         title="Bukti Pengantaran (e-POD)"
-        subtitle={`Trip #TRIP-2026-089 - Stop ${selectedStopId}/4`}
+        subtitle={`Trip #${activeTrip?.code || 'TRIP-2026-089'} - Stop ${stopNumber}/${totalStops}`}
         onBack={handleBack}
       />
 
@@ -515,12 +531,12 @@ export const EpodScreen: React.FC<EpodScreenProps> = (props) => {
             </View>
 
             <Text style={styles.modalTitle}>
-              {selectedStopId >= 4 ? 'Ritase #TRIP-2026-089 Selesai!' : 'Serah Terima Berhasil!'}
+              {!nextStop ? `Ritase #${activeTrip?.code || 'TRIP-2026-089'} Selesai!` : 'Serah Terima Berhasil!'}
             </Text>
             <Text style={styles.modalSubtitle}>
-              {selectedStopId >= 4
-                ? 'Seluruh 4 titik pengantaran telah sukses diselesaikan dengan verifikasi e-POD.'
-                : `${stopTitle} (Stop ${selectedStopId}/4) telah terverifikasi secara digital.`}
+              {!nextStop
+                ? `Seluruh ${totalStops} titik pengantaran telah sukses diselesaikan dengan verifikasi e-POD.`
+                : `${stopTitle} (Stop ${stopNumber}/${totalStops}) telah terverifikasi secara digital.`}
             </Text>
 
             {/* Receipt Summary Card */}
@@ -537,40 +553,48 @@ export const EpodScreen: React.FC<EpodScreenProps> = (props) => {
               <View style={styles.receiptDivider} />
               <View style={styles.receiptRow}>
                 <Text style={styles.receiptLabel}>Setoran Ekuitas (RTO)</Text>
-                <Text style={styles.receiptValueGreen}>+Rp 50.000 (Masuk)</Text>
+                <Text style={styles.receiptValueGreen}>+Rp 50.000 (Tercatat)</Text>
               </View>
             </View>
 
             {/* Action Buttons */}
-            {selectedStopId < 4 ? (
+            {nextStop ? (
               <TouchableOpacity
                 style={styles.modalPrimaryBtn}
                 onPress={() => {
                   setShowSuccessModal(false);
-                  setSelectedStopId(selectedStopId + 1);
+                  setSelectedStopId(nextStop.id);
                   navigateTo('detail-stop');
                 }}
                 activeOpacity={0.85}
               >
-                <Text style={styles.modalPrimaryBtnText}>
-                  Lanjut ke Stop Berikutnya (Stop {selectedStopId + 1})
+                <Text
+                  style={styles.modalPrimaryBtnText}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  Lanjut ke Stop {stopNumber + 1} ({nextStop.name})
                 </Text>
-                <ArrowRight size={15} color={colors.white} strokeWidth={2.2} />
+                <ArrowRight size={13} color={colors.white} strokeWidth={2.4} />
               </TouchableOpacity>
             ) : (
               <TouchableOpacity
                 style={styles.modalPrimaryBtn}
-                onPress={() => {
+                onPress={async () => {
                   setShowSuccessModal(false);
-                  completeEntireTrip();
+                  await completeEntireTrip();
                   navigateTo('perjalanan');
                 }}
                 activeOpacity={0.85}
               >
-                <Text style={styles.modalPrimaryBtnText}>
-                  Selesaikan Seluruh Pesanan
+                <Text
+                  style={styles.modalPrimaryBtnText}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  Selesaikan Seluruh Ritase
                 </Text>
-                <CheckCircle2 size={15} color={colors.white} strokeWidth={2.2} />
+                <CheckCircle2 size={14} color={colors.white} strokeWidth={2.4} />
               </TouchableOpacity>
             )}
 
@@ -992,14 +1016,15 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(15, 23, 42, 0.65)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
+    padding: 20,
   },
   modalCard: {
     width: '100%',
-    maxWidth: 380,
+    maxWidth: 360,
     backgroundColor: colors.surface,
     borderRadius: 20,
-    padding: 22,
+    paddingHorizontal: 20,
+    paddingVertical: 22,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: colors.border,
@@ -1010,39 +1035,41 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   modalIconBox: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 54,
+    height: 54,
+    borderRadius: 27,
     backgroundColor: '#EFF6FF',
     borderWidth: 2,
     borderColor: '#BFDBFE',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 14,
+    marginBottom: 12,
   },
   modalTitle: {
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: '700',
     color: colors.text,
     textAlign: 'center',
     marginBottom: 4,
   },
   modalSubtitle: {
-    fontSize: 12,
+    fontSize: 11.5,
     color: colors.textSecondary,
     textAlign: 'center',
-    lineHeight: 17,
-    marginBottom: 16,
+    lineHeight: 16,
+    marginBottom: 14,
+    paddingHorizontal: 8,
   },
   modalReceiptCard: {
     width: '100%',
     backgroundColor: '#F8FAFC',
-    borderRadius: 14,
-    padding: 12,
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     borderWidth: 1,
     borderColor: '#E2E8F0',
-    marginBottom: 18,
-    gap: 8,
+    marginBottom: 14,
+    gap: 7,
   },
   receiptRow: {
     flexDirection: 'row',
@@ -1074,14 +1101,16 @@ const styles = StyleSheet.create({
   },
   modalPrimaryBtn: {
     width: '100%',
-    height: 46,
+    minHeight: 44,
     backgroundColor: colors.primary,
     borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 8,
-    marginBottom: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    gap: 6,
+    marginBottom: 6,
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
@@ -1089,19 +1118,21 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   modalPrimaryBtnText: {
-    fontSize: 12.5,
+    fontSize: 11.5,
     fontWeight: '700',
     color: colors.white,
+    flexShrink: 1,
+    textAlign: 'center',
   },
   modalSecondaryBtn: {
     width: '100%',
-    height: 42,
+    height: 38,
     backgroundColor: 'transparent',
     alignItems: 'center',
     justifyContent: 'center',
   },
   modalSecondaryBtnText: {
-    fontSize: 12,
+    fontSize: 11.5,
     fontWeight: '600',
     color: colors.textSecondary,
   },

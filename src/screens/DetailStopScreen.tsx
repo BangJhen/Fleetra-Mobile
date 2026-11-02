@@ -26,11 +26,15 @@ interface DetailStopScreenProps {
 
 export const DetailStopScreen: React.FC<DetailStopScreenProps> = (props) => {
   const {
+    selectedStop,
     selectedStopId,
     setSelectedStopId,
+    stops,
     completedStops,
+    activeTrip,
+    arriveAtCurrentStop,
+    confirmStopPickup,
     completeEntireTrip,
-    epodRecords,
     navigateTo,
     goBack,
   } = useApp();
@@ -42,56 +46,55 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = (props) => {
       navigateTo('perjalanan');
     }
   };
+
+  const stopIndex = stops.findIndex(
+    (s, idx) => s.id === selectedStop?.id || idx + 1 === selectedStopId
+  );
+  const currentIdx = stopIndex >= 0 ? stopIndex : 0;
   const isCompleted =
     props.isCompleted !== undefined
       ? props.isCompleted
-      : completedStops.includes(selectedStopId);
-  const handleArrive = props.onArriveAtLocation || (() => navigateTo('epod'));
+      : selectedStop?.status === 'delivered';
+  const isPickup = selectedStop?.type === 'pickup';
 
-  const stopData =
-    selectedStopId === 1
-      ? {
-          name: 'Gudang Pusat Cimahi',
-          address: 'Jl. Industri Raya No. 12, Cimahi',
-          orderCode: 'ORD-2026-7740',
-          packages: '48 Koli Blind Van',
-          note: 'Pemberangkatan ritase kargo awal',
-          stopNumber: '1 / 4 Stop',
-          distance: '0 km',
-          duration: 'Selesai 08.15',
-        }
-      : selectedStopId === 3
-      ? {
-          name: 'Minimarket Sejahtera',
-          address: 'Jl. Flyover Pasirkoja, Bandung',
-          orderCode: 'ORD-2026-7742',
-          packages: '8 Paket Farmasi',
-          note: 'Hubungi Ibu Ratna (PIC)',
-          stopNumber: '3 / 4 Stop',
-          distance: '+ 6,8 km',
-          duration: '± 18 menit',
-        }
-      : selectedStopId === 4
-      ? {
-          name: 'Toko Makmur Jaya',
-          address: 'Jl. Peta No. 88, Bandung',
-          orderCode: 'ORD-2026-7743',
-          packages: '6 Paket Sembako',
-          note: 'Titik akhir ritase hari ini',
-          stopNumber: '4 / 4 Stop',
-          distance: '+ 11,2 km',
-          duration: '± 28 menit',
-        }
-      : {
-          name: 'Toko Sumber Rejeki',
-          address: 'Jl. Sudirman No. 45, Bandung',
-          orderCode: 'ORD-2026-7741',
-          packages: '12 Paket',
-          note: 'Serahkan ke PIC toko (Bpk. Budi Setiawan)',
-          stopNumber: '2 / 4 Stop',
-          distance: '+ 4,2 km',
-          duration: '± 12 menit',
-        };
+  const stopData = {
+    name: selectedStop?.name || 'Titik Pengantaran',
+    address: selectedStop?.address || 'Alamat Logistik Bandung Raya',
+    orderCode: `ORD-2026-${selectedStop?.id ? selectedStop.id.slice(-4).toUpperCase() : '7741'}`,
+    packages: isPickup ? 'Muatan Utama Kargo (Gudang Asal)' : 'Paket Logistik Pengantaran',
+    note: isPickup
+      ? 'Konfirmasi muatan kargo siap diberangkatkan dari gudang'
+      : 'Pastikan bukti fisik kargo dan tanda tangan penerima terverifikasi',
+    stopNumber: `Stop ${currentIdx + 1} / ${stops.length || 4}`,
+    distance: `+ ${(currentIdx * 3.2 + 1.5).toFixed(1)} km`,
+    duration: isCompleted ? 'Tuntas' : `± ${currentIdx * 8 + 12} menit`,
+  };
+
+  const nextStop = currentIdx < stops.length - 1 ? stops[currentIdx + 1] : null;
+
+  const handleArrive = async () => {
+    if (isPickup) {
+      try {
+        await confirmStopPickup();
+        Alert.alert('Pickup Terkonfirmasi', 'Muatan kargo gudang asal siap didistribusikan.', [
+          { text: 'Lanjut', onPress: () => navigateTo('perjalanan') },
+        ]);
+        return;
+      } catch (err) {
+        Alert.alert('Gagal Konfirmasi', err instanceof Error ? err.message : 'Silakan coba lagi');
+        return;
+      }
+    } else {
+      try {
+        await arriveAtCurrentStop();
+      } catch {}
+    }
+    if (props.onArriveAtLocation) {
+      props.onArriveAtLocation();
+    } else {
+      navigateTo('epod');
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -99,7 +102,7 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = (props) => {
       <TopBar
         variant="back"
         title="Detail Stop"
-        subtitle={`Trip #TRIP-2026-089 - Stop ${selectedStopId}/4`}
+        subtitle={`Trip #${activeTrip?.code || 'TRIP-2026-089'} - Stop ${currentIdx + 1}/${stops.length || 4}`}
         onBack={handleBack}
       />
 
@@ -225,21 +228,25 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = (props) => {
         {/* 6. PRIMARY & SECONDARY CTA BUTTONS */}
         {isCompleted ? (
           <View style={styles.completedActionsContainer}>
-            {selectedStopId < 4 ? (
+            {nextStop ? (
               <TouchableOpacity
                 style={styles.primaryActionButton}
-                onPress={() => setSelectedStopId(selectedStopId + 1)}
+                onPress={() => setSelectedStopId(nextStop.id)}
                 activeOpacity={0.85}
               >
-                <Text style={styles.primaryActionText}>
-                  Lanjut ke Stop Berikutnya (Stop {selectedStopId + 1})
+                <Text
+                  style={styles.primaryActionText}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  Lanjut ke Stop {currentIdx + 2} ({nextStop.name})
                 </Text>
               </TouchableOpacity>
             ) : (
               <TouchableOpacity
                 style={styles.primaryActionButton}
-                onPress={() => {
-                  completeEntireTrip();
+                onPress={async () => {
+                  await completeEntireTrip();
                   navigateTo('perjalanan');
                 }}
                 activeOpacity={0.85}
@@ -250,13 +257,15 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = (props) => {
               </TouchableOpacity>
             )}
 
-            <TouchableOpacity
-              style={styles.secondaryActionButton}
-              onPress={handleArrive}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.secondaryActionText}>Lihat Bukti e-POD</Text>
-            </TouchableOpacity>
+            {!isPickup && (
+              <TouchableOpacity
+                style={styles.secondaryActionButton}
+                onPress={handleArrive}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.secondaryActionText}>Lihat Bukti e-POD</Text>
+              </TouchableOpacity>
+            )}
           </View>
         ) : (
           <TouchableOpacity
@@ -264,15 +273,17 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = (props) => {
             onPress={handleArrive}
             activeOpacity={0.85}
           >
-            <Text style={styles.primaryActionText}>Tiba di Lokasi & Buka e-POD</Text>
+            <Text style={styles.primaryActionText}>
+              {isPickup ? 'Tiba di Gudang & Konfirmasi Muat' : 'Tiba di Lokasi & Buka e-POD'}
+            </Text>
           </TouchableOpacity>
         )}
 
         {/* 7. STOP BERIKUTNYA CARD */}
-        {selectedStopId < 4 && (
+        {nextStop && (
           <TouchableOpacity
             style={styles.nextStopCard}
-            onPress={() => setSelectedStopId(selectedStopId + 1)}
+            onPress={() => setSelectedStopId(nextStop.id)}
             activeOpacity={0.8}
           >
             <View style={styles.nextStopHeaderRow}>
@@ -281,29 +292,13 @@ export const DetailStopScreen: React.FC<DetailStopScreenProps> = (props) => {
             </View>
             <View style={styles.nextStopBody}>
               <View style={styles.nextStopLeft}>
-                <Text style={styles.nextStopName}>
-                  {selectedStopId === 1
-                    ? 'Toko Sumber Rejeki'
-                    : selectedStopId === 2
-                    ? 'Minimarket Sejahtera'
-                    : 'Toko Makmur Jaya'}
-                </Text>
-                <Text style={styles.nextStopAddress}>
-                  {selectedStopId === 1
-                    ? 'Jl. Sudirman No. 45, Bandung'
-                    : selectedStopId === 2
-                    ? 'Jl. Flyover Pasirkoja, Bandung'
-                    : 'Jl. Peta No. 88, Bandung'}
-                </Text>
+                <Text style={styles.nextStopName}>{nextStop.name}</Text>
+                <Text style={styles.nextStopAddress}>{nextStop.address || 'Bandung Raya'}</Text>
               </View>
 
               <View style={styles.nextStopRight}>
                 <Text style={styles.nextStopDistance}>
-                  {selectedStopId === 1
-                    ? '+ 4,2 km'
-                    : selectedStopId === 2
-                    ? '+ 6,8 km'
-                    : '+ 11,2 km'}
+                  {`+ ${((currentIdx + 1) * 3.4).toFixed(1)} km`}
                 </Text>
               </View>
             </View>
@@ -449,10 +444,12 @@ const styles = StyleSheet.create({
   primaryActionButton: {
     backgroundColor: colors.primary,
     marginHorizontal: 18,
-    height: 48,
+    minHeight: 46,
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.2,
@@ -460,9 +457,10 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   primaryActionText: {
-    fontSize: 13.5,
+    fontSize: 12.5,
     fontWeight: '700',
     color: colors.white,
+    textAlign: 'center',
   },
   secondaryActionButton: {
     backgroundColor: colors.surface,
