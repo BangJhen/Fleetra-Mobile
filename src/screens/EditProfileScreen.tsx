@@ -28,7 +28,7 @@ import { TopBar } from '../components/TopBar';
 import { useApp } from '../context/AppContext';
 
 export const EditProfileScreen: React.FC = () => {
-  const { driverProfile, updateDriverProfile, rtoContract, driverId, userEmail, goBack } = useApp();
+  const { driverProfile, updateDriverProfile, rtoContract, driverId, userEmail, goBack, vehicle } = useApp();
 
   const [name, setName] = useState(driverProfile.name || '');
   const [phone, setPhone] = useState(driverProfile.phone || '');
@@ -37,8 +37,6 @@ export const EditProfileScreen: React.FC = () => {
   );
   const [simNumber, setSimNumber] = useState(driverProfile.simNumber || '');
   const [simExpiry, setSimExpiry] = useState(driverProfile.simExpiry || '');
-  const [vehicleModel, setVehicleModel] = useState(driverProfile.vehicleModel || '');
-  const [vehiclePlate, setVehiclePlate] = useState(driverProfile.vehiclePlate || '');
 
   const handleSave = async () => {
     if (!name.trim()) {
@@ -57,13 +55,11 @@ export const EditProfileScreen: React.FC = () => {
         emergencyContact: emergencyContact.trim(),
         simNumber: simNumber.trim(),
         simExpiry: simExpiry.trim(),
-        vehicleModel: vehicleModel.trim(),
-        vehiclePlate: vehiclePlate.trim().toUpperCase(),
       });
 
       Alert.alert(
         'Profil Berhasil Diperbarui',
-        'Data diri dan armada mitra pengemudi telah disinkronkan ke server pusat kendali FLEETRA.',
+        'Data diri mitra pengemudi telah disinkronkan ke server pusat kendali FLEETRA.',
         [
           {
             text: 'Selesai',
@@ -238,58 +234,47 @@ export const EditProfileScreen: React.FC = () => {
 
         {/* SECTION 3: KENDARAAN OPERASIONAL */}
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>Kendaraan Kemitraan (RTO)</Text>
-
-          {/* Model Kendaraan */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Model Kendaraan Mitra</Text>
-            <View style={styles.inputBox}>
-              <Truck size={15} color={colors.textSecondary} strokeWidth={2} />
-              <TextInput
-                style={styles.textInput}
-                value={vehicleModel}
-                onChangeText={setVehicleModel}
-                placeholder="Contoh: Daihatsu Gran Max Blind Van"
-                placeholderTextColor={colors.textDisabled}
-              />
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <Text style={styles.cardTitle}>Armada Operasional</Text>
+            <View style={{ backgroundColor: '#F1F5F9', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 }}>
+              <Text style={{ fontSize: 10.5, fontWeight: '600', color: '#64748B' }}>Ditetapkan Operator</Text>
             </View>
           </View>
 
-          {/* Nomor Pelat Nomor */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Nomor Pelat Polisi</Text>
-            <View style={styles.inputBox}>
-              <Truck size={15} color={colors.textSecondary} strokeWidth={2} />
-              <TextInput
-                style={styles.textInput}
-                value={vehiclePlate}
-                onChangeText={(t) => setVehiclePlate(t.toUpperCase())}
-                placeholder="Contoh: D 8124 FTR"
-                placeholderTextColor={colors.textDisabled}
-                autoCapitalize="characters"
-              />
+          {vehicle || driverProfile.vehiclePlate ? (
+            <View style={[styles.vehicleInfoRow, { backgroundColor: '#F8FAFC' }]}>
+              <View style={styles.vehicleIconCircle}>
+                <Truck size={16} color={colors.primary} strokeWidth={2.2} />
+              </View>
+              <View style={styles.vehicleTextGroup}>
+                <Text style={[styles.vehicleModel, { fontSize: 13, fontWeight: '700' }]}>
+                  {vehicle?.model || driverProfile.vehicleModel || 'Unit Armada Terpasang'}
+                </Text>
+                <Text style={[styles.vehiclePlate, { fontSize: 12, color: colors.primary }]}>
+                  {vehicle?.plate || driverProfile.vehiclePlate}
+                </Text>
+                <Text style={styles.vehicleContract}>
+                  {rtoContract
+                    ? `Sewa-Beli (RTO) • Tenor ${rtoContract.tenureMonths} Bulan`
+                    : 'Armada Pool Perusahaan'}
+                </Text>
+              </View>
             </View>
-          </View>
-
-          {/* Status Kemitraan RTO */}
-          <View style={[styles.vehicleInfoRow, { marginTop: 4, backgroundColor: '#F8FAFC' }]}>
-            <View style={styles.vehicleIconCircle}>
-              <Truck size={16} color={colors.primary} strokeWidth={2.2} />
+          ) : (
+            <View style={[styles.vehicleInfoRow, { backgroundColor: '#F8FAFC' }]}>
+              <View style={[styles.vehicleIconCircle, { backgroundColor: '#FEF3C7' }]}>
+                <Clock size={16} color="#D97706" strokeWidth={2.2} />
+              </View>
+              <View style={styles.vehicleTextGroup}>
+                <Text style={[styles.vehicleModel, { fontSize: 13, fontWeight: '700' }]}>
+                  Menunggu Alokasi Armada
+                </Text>
+                <Text style={styles.vehicleContract}>
+                  Unit kendaraan akan ditetapkan oleh operator pool setelah verifikasi akun selesai disetujui.
+                </Text>
+              </View>
             </View>
-            <View style={styles.vehicleTextGroup}>
-              <Text style={[styles.vehicleModel, { fontSize: 13, fontWeight: '700' }]}>
-                {vehicleModel || 'Belum Ada Model Terdaftar'}
-              </Text>
-              <Text style={[styles.vehiclePlate, { fontSize: 12, color: colors.primary }]}>
-                {vehiclePlate || 'Pelat Belum Diisi'}
-              </Text>
-              <Text style={styles.vehicleContract}>
-                {rtoContract
-                  ? `Kontrak RTO: #${rtoContract.id.toUpperCase()} (Tenor ${rtoContract.tenureMonths} Bulan)`
-                  : 'Program Kemitraan Sewa-Beli FLEETRA'}
-              </Text>
-            </View>
-          </View>
+          )}
         </View>
 
         {/* SAVE BUTTON */}

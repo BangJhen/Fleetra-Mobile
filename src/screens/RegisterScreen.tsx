@@ -35,8 +35,6 @@ export const RegisterScreen: React.FC = () => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [simNumber, setSimNumber] = useState('');
-  const [vehicleModel, setVehicleModel] = useState('');
-  const [vehiclePlate, setVehiclePlate] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(true);
@@ -53,14 +51,6 @@ export const RegisterScreen: React.FC = () => {
     }
     if (!simNumber.trim()) {
       Alert.alert('Nomor SIM Wajib', 'Harap masukkan nomor SIM pengemudi Anda.');
-      return;
-    }
-    if (!vehicleModel.trim()) {
-      Alert.alert('Model Kendaraan Wajib', 'Harap masukkan tipe/model kendaraan yang Anda kemudikan.');
-      return;
-    }
-    if (!vehiclePlate.trim()) {
-      Alert.alert('Nomor Pelat Wajib', 'Harap masukkan nomor pelat nomor kendaraan Anda.');
       return;
     }
     if (!password.trim() || password.length < 6) {
@@ -82,13 +72,11 @@ export const RegisterScreen: React.FC = () => {
         email: userEmail,
         phone: phone.trim(),
         simNumber: simNumber.trim(),
-        vehicleModel: vehicleModel.trim(),
-        vehiclePlate: vehiclePlate.trim().toUpperCase(),
         password: password.trim(),
       });
       Alert.alert(
         'Pendaftaran Berhasil!',
-        `Selamat datang mitra ${name.trim()}! Akun kemitraan armada Anda telah aktif.`
+        `Selamat datang mitra ${name.trim()}! Berkas Anda sedang ditinjau operator untuk alokasi armada.`
       );
     } catch (err) {
       Alert.alert(
@@ -201,34 +189,16 @@ export const RegisterScreen: React.FC = () => {
             </View>
           </View>
 
-          {/* INPUT: MODEL KENDARAAN */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Model Kendaraan Mitra</Text>
-            <View style={styles.inputContainer}>
-              <Truck size={16} color={colors.textMuted} strokeWidth={2} style={styles.inputIcon} />
-              <TextInput
-                style={styles.textInput}
-                placeholder="Contoh: Daihatsu Gran Max Blind Van"
-                placeholderTextColor={colors.textDisabled}
-                value={vehicleModel}
-                onChangeText={setVehicleModel}
-              />
+          {/* INFO: ALOKASI ARMADA POOL / RTO OLEH DISPATCHER */}
+          <View style={styles.fleetAllocationNotice}>
+            <View style={styles.fleetAllocationNoticeIcon}>
+              <Truck size={16} color={colors.primary} strokeWidth={2.2} />
             </View>
-          </View>
-
-          {/* INPUT: NOMOR PELAT KENDARAAN */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>Nomor Pelat Polisi</Text>
-            <View style={styles.inputContainer}>
-              <Truck size={16} color={colors.textMuted} strokeWidth={2} style={styles.inputIcon} />
-              <TextInput
-                style={styles.textInput}
-                placeholder="Contoh: D 8124 FTR"
-                placeholderTextColor={colors.textDisabled}
-                value={vehiclePlate}
-                onChangeText={(t) => setVehiclePlate(t.toUpperCase())}
-                autoCapitalize="characters"
-              />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.fleetAllocationNoticeTitle}>Alokasi Armada oleh Operator</Text>
+              <Text style={styles.fleetAllocationNoticeText}>
+                Mitra tidak perlu mendaftarkan kendaraan sendiri. Unit armada (Motor, Mobil MPV, Van, atau Pick-up) akan dialokasikan oleh dispatcher setelah data SIM diverifikasi.
+              </Text>
             </View>
           </View>
 
@@ -370,6 +340,39 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     marginBottom: 22,
     paddingHorizontal: 6,
+  },
+
+  /* FLEET ALLOCATION NOTICE */
+  fleetAllocationNotice: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: '#F8FAFC',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 14,
+    padding: 12,
+    marginBottom: 16,
+    gap: 10,
+  },
+  fleetAllocationNoticeIcon: {
+    width: 30,
+    height: 30,
+    borderRadius: 8,
+    backgroundColor: '#EFF6FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 1,
+  },
+  fleetAllocationNoticeTitle: {
+    fontSize: 12.5,
+    fontWeight: '700',
+    color: colors.text,
+  },
+  fleetAllocationNoticeText: {
+    fontSize: 11,
+    color: colors.textSecondary,
+    lineHeight: 15,
+    marginTop: 2,
   },
 
   /* INPUTS */
