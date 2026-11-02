@@ -1,6 +1,6 @@
 # FLEETRA Mobile Driver App
 
-Aplikasi seluler mitra pengemudi untuk Sistem Manajemen Armada Cerdas FLEETRA pada kompetisi ADIKARA 2026. Aplikasi ini berfungsi sebagai konsol kemudi bagi mitra pengemudi logistik untuk menerima jadwal penugasan ritase harian, menjalankan navigasi titik singgah berurutan, menyerahkan bukti serah terima digital (electronic Proof of Delivery / e-POD), memantau skor keselamatan berkendara (Driver Safety Score), serta memonitor akumulasi ekuitas program kepemilikan armada Sewa-Beli (Rent-to-Own / RTO).
+Aplikasi seluler mitra pengemudi untuk Sistem Manajemen Armada Cerdas FLEETRA. Aplikasi ini berfungsi sebagai konsol kemudi bagi mitra pengemudi logistik untuk menerima jadwal penugasan ritase harian, menjalankan navigasi titik singgah berurutan, menyerahkan bukti serah terima digital (electronic Proof of Delivery / e-POD), memantau skor keselamatan berkendara (Driver Safety Score), serta memonitor akumulasi ekuitas program kepemilikan armada Sewa-Beli (Rent-to-Own / RTO).
 
 ## Alur Kerja Operasional Pengemudi (Driver Workflow)
 
@@ -40,57 +40,37 @@ Aplikasi seluler mitra pengemudi untuk Sistem Manajemen Armada Cerdas FLEETRA pa
 
 Aplikasi mobile berkomunikasi dengan FLEETRA Dispatcher Dashboard (port default 3000) melalui protokol HTTP RESTful API. Aplikasi secara adaptif mendeteksi IP jaringan lokal (LAN) maupun localhost untuk kebutuhan pengujian di perangkat fisik:
 
-### Endpoint yang Dikonsumsi
+### 1. Endpoint Backend yang Dikonsumsi
 
-- POST /api/mobile/auth
-  Melakukan autentikasi kredensial mitra pengemudi.
-  Payload: email, password.
-  Response: status autentikasi, token sesi, driverId, dan data profil pengemudi.
+| Method | Endpoint | Fungsi | Parameter / Payload | Respons / Output |
+| --- | --- | --- | --- | --- |
+| POST | /api/mobile/auth | Autentikasi kredensial mitra pengemudi | email, password | Status autentikasi, token sesi, driverId, profil mitra |
+| POST | /api/mobile/register | Pendaftaran mitra baru ke antrean KYD | nama lengkap, email, nomor HP, SIM, password | Konfirmasi pendaftaran berstatus pending_verification |
+| GET | /api/mobile | Polling data real-time berkala | driverId (query parameter) | Status verifikasi akun, unit armada, rute ritase aktif, daftar stop, ekuitas RTO |
+| POST | /api/mobile | Pengiriman aksi operasional driver di lapangan | action, payload spesifik | Konfirmasi pembaruan status tugas di server |
 
-- POST /api/mobile/register
-  Mengirimkan formulir pendaftaran mitra baru ke antrean verifikasi KYD.
-  Payload: nama lengkap, email, nomor telepon, nomor SIM, password.
-  Response: konfirmasi pendaftaran berstatus pending_verification.
+### 2. Parameter Aksi Lapangan Pengemudi (POST /api/mobile)
 
-- GET /api/mobile?driverId={id}
-  Melakukan polling sinkronisasi berkala untuk memperbarui status lokal aplikasi:
-  - Status verifikasi akun (pending, verified, rejected)
-  - Data kendaraan yang dialokasikan (tipe, nomor plat, model, level BBM, kondisi rem)
-  - Detail tugas ritase aktif beserta seluruh daftar titik singgah (stops)
-  - Statistik ringkasan (ritase selesai, safety score, akumulasi ekuitas RTO)
-
-- POST /api/mobile (Action: submit_epod)
-  Mengirimkan bukti serah terima digital ke konsol dispatcher.
-  Payload: tripId, stopId, recipientName, signatureData (SVG string), photoUri, latitude, longitude, completedAt.
-
-- POST /api/mobile (Action: start_trip)
-  Mengonfirmasi pengemudi telah memulai perjalanan rute ritase aktif.
-  Payload: tripId, startedAt.
-
-- POST /api/mobile (Action: complete_stop)
-  Memperbarui status penyelesaian titik singgah tertentu.
-  Payload: tripId, stopId, status.
-
-- POST /api/mobile (Action: complete_trip)
-  Menyelesaikan seluruh rangkaian tugas ritase yang telah diserahterimakan.
-  Payload: tripId, completedAt, totalDistanceKm.
-
-- POST /api/mobile (Action: update_duty)
-  Mengubah status ketersediaan kerja pengemudi di lapangan.
-  Payload: driverId, status (Aktif / Istirahat).
-
-- POST /api/mobile (Action: sos)
-  Mengirimkan alarm darurat ke layar peringatan dispatcher.
-  Payload: driverId, emergencyType, latitude, longitude, timestamp.
+| Action | Fungsi | Parameter Utama |
+| --- | --- | --- |
+| submit_epod | Mengunggah bukti serah terima digital | tripId, stopId, recipientName, signatureData (SVG string), photoUri, latitude, longitude, completedAt |
+| start_trip | Memulai perjalanan rute ritase aktif | tripId, startedAt |
+| complete_stop | Memperbarui status penyelesaian titik singgah | tripId, stopId, status |
+| complete_trip | Menyelesaikan seluruh rangkaian tugas ritase | tripId, completedAt, totalDistanceKm |
+| update_duty | Mengubah status ketersediaan kerja pengemudi | driverId, status (Aktif / Istirahat) |
+| sos | Mengirimkan alarm insiden darurat dan lokasi GPS | driverId, emergencyType, latitude, longitude, timestamp |
 
 ## Tumpukan Teknologi (Tech Stack)
 
-- Framework: React Native v0.88, Expo SDK 58 (TypeScript)
-- Styling dan Sistem Desain: 100% Light Mode mutlak mengacu pada Apple Human Interface Guidelines (HIG) dan panduan DESIGN.md
-- Ikonografi: lucide-react-native
-- Komponen Grafis: react-native-svg (lingkaran progres dan kanvas tanda tangan digital)
-- Navigasi dan Area Aman: react-native-safe-area-context
-- Lingkungan Eksekusi: Expo Go (iOS dan Android), iOS Simulator (macOS), dan Web Preview
+| Kategori | Teknologi | Keterangan & Penggunaan |
+| --- | --- | --- |
+| Mobile Framework | React Native v0.88, Expo SDK 58 | Arsitektur lintas platform (iOS dan Android) dengan performa native |
+| Bahasa Pemrograman | TypeScript 5 | Validasi tipe data ketat di seluruh komponen antarmuka dan API call |
+| Sistem Desain | Apple HIG & Palet FLEETRA | 100% Light Mode mutlak (#FFFFFF, #F8FAFC, aksen utama #2463D8) |
+| Komponen Grafis | react-native-svg | Render kanvas interaktif tanda tangan digital e-POD dan lingkaran progres |
+| Tata Letak & Area Aman | react-native-safe-area-context | Penanganan responsif notch dan gesture navigation modern |
+| Ikonografi | lucide-react-native | Ikonografi antarmuka konsisten dan ringan |
+| Lingkungan Eksekusi | Expo Go, iOS Simulator, Web Preview | Pengujian cepat tanpa instalasi SDK kompilasi native yang berat |
 
 ## Panduan Menjalankan Aplikasi
 
